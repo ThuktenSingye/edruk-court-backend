@@ -87,9 +87,9 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: edruk_court_production
-    username: edruk_court
-    password: <%= ENV["EDRUK_COURT_DATABASE_PASSWORD"] %>
+    username: <%= ENV['DATABASE_USERNAME'] %>
+    password: <%= ENV['DATABASE_PASSWORD'] %>
+    database: <%= ENV['DATABASE_NAME'] %>_production
   cache:
     <<: *primary_production
     database: edruk_court_production_cache
