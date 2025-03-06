@@ -69,3 +69,9 @@ group :development, :test do
 end
 
 gem "acts_as_tenant"
+
+gem "devise"
+
+gem "devise-jwt"
+
+gem "jsonapi-serializer"
