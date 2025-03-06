@@ -67,3 +67,5 @@ group :development, :test do
 
   gem "rubycritic", require: false
 end
+
+gem "acts_as_tenant"
