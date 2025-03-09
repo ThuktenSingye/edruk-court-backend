@@ -96,6 +96,7 @@
     <orderEntry type="library" scope="PROVIDED" name="kamal (v2.5.3, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="language_server-protocol (v3.17.0.4, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="launchy (v3.1.0, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="letter_opener (v1.10.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="lint_roller (v1.1.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="logger (v1.6.6, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="loofah (v2.24.0, RVM: ruby-3.3.6) [gem]" level="application" />

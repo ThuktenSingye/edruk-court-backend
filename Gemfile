@@ -66,6 +66,8 @@ group :development, :test do
   gem "dotenv-rails"
 
   gem "rubycritic", require: false
+
+  gem "letter_opener"
 end
 
 gem "acts_as_tenant"
