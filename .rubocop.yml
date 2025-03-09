@@ -1,6 +1,19 @@
 # Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
-
+#inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+require:
+  - rubocop-performance
+  - rubocop-rspec
+  - rubocop-rails
+AllCops:
+  NewCops: enable
+  Exclude:
+    - 'bin/bundle'
+    - 'config/initializers/*'
+    - 'db/migrate/*'
+    - 'db/*'
+    - 'config/environments/*'
+    - 'config/*'
+    - 'vendor/**/*'
 # Overwrite or add rules to create your own house style
 #
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`

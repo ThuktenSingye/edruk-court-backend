@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# User Model
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
 
@@ -12,8 +15,4 @@ class User < ApplicationRecord
 
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
-
-  def jwt_payload
-    super
-  end
 end

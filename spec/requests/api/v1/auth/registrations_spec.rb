@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "Api::V1::Auth::Registrations", type: :request do
+RSpec.describe 'Api::V1::Auth::Registrations', type: :request do
   describe 'POST /api/v1/signup' do
-    context 'when valid attributes' do
+    context 'with valid user attributes' do
       subject(:register_user) do
         post user_registration_path, params: { user: user }
         response
@@ -14,7 +16,7 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
       it { expect { register_user }.to change(User, :count).by(1) }
     end
 
-    context 'when valid attributes' do
+    context 'with invalid user attributes' do
       subject(:register_user) do
         post user_registration_path, params: { user: user }
         response

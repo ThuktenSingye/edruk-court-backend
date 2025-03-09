@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     module Auth
+      # Registration Controller
       class RegistrationsController < Devise::RegistrationsController
         include RackSessionsFix
 
@@ -11,7 +14,7 @@ module Api
         def respond_with(resource, _opts = {})
           if resource.persisted?
             render json: {
-              status: { code: 201, message: "Signed up successfully." }
+              status: { code: 201, message: 'Signed up successfully.' }
             }, status: :created
           else
             render json: {
@@ -21,7 +24,7 @@ module Api
         end
 
         def sign_up_params
-          params.require(:user).permit(:email, :password, :password_confirmation)
+          params.expect(user: %i[email password password_confirmation])
         end
       end
     end

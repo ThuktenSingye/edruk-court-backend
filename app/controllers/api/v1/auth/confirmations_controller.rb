@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     module Auth
+      # Confirmation Controller
       class ConfirmationsController < Devise::ConfirmationsController
         include RackSessionsFix
 
@@ -11,7 +14,7 @@ module Api
         def respond_with(resource, _opts = {})
           if resource.errors.empty?
             render json: {
-              status: { code: 200, message: "Confirmation Successful." }
+              status: { code: 200, message: 'Confirmation Successful.' }
             }, status: :ok
           else
             error_messages = resource.errors.map(&:message).to_sentence
