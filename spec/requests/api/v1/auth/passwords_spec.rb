@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Api::V1::Users::Passwords", type: :request do
+RSpec.describe "Api::V1::Auth::Passwords", type: :request do
   let!(:user) { FactoryBot.create(:user) }
   let!(:reset_password_token) { generate_reset_password_token(user) }
 

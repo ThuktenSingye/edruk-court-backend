@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Api::V1::Users::Registrations", type: :request do
+RSpec.describe "Api::V1::Auth::Registrations", type: :request do
   describe 'POST /api/v1/signup' do
     context 'when valid attributes' do
       subject(:register_user) do

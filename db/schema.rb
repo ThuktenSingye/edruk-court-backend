@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_06_112848) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_09_104106) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -45,7 +45,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_06_112848) do
     t.index ["user_id"], name: "index_user_roles_on_user_id"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "auth", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -54,6 +54,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_06_112848) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "jti", null: false
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -61,5 +66,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_06_112848) do
 
   add_foreign_key "courts", "courts", column: "parent_court_id"
   add_foreign_key "user_roles", "roles"
-  add_foreign_key "user_roles", "users"
+  add_foreign_key "user_roles", "auth"
 end

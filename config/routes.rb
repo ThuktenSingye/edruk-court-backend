@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  devise_for :users, skip: [ :sessions, :registrations, :passwords ]
+  devise_for :users, skip: [ :sessions, :registrations, :passwords, :confirmations ]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -11,9 +11,10 @@ Rails.application.routes.draw do
   resources :test, only: [ :index ]
 
   devise_for :users, path: "api/v1/auth", controllers: {
-    sessions: "api/v1/users/sessions",
-    registrations: "api/v1/users/registrations",
-    passwords: "api/v1/users/passwords"
+    sessions: "api/v1/auth/sessions",
+    registrations: "api/v1/auth/registrations",
+    passwords: "api/v1/auth/passwords",
+    confirmations: "api/v1/auth/confirmations"
   }
 
   # namespace :api do

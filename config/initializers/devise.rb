@@ -151,7 +151,7 @@ Devise.setup do |config|
   # their account can't be confirmed with the token any more.
   # Default is nil, meaning there is no restriction on how long a user can take
   # before confirming their account.
-  # config.confirm_within = 3.days
+  config.confirm_within = 10.minutes
 
   # If true, requires any email changes to be confirmed (exactly the same way as
   # initial account confirmation) to be applied. Requires additional unconfirmed_email
@@ -222,7 +222,7 @@ Devise.setup do |config|
   # config.reset_password_keys = [:email]
 
   # Time interval you can reset your password with a reset password key.
-  # Don't put a too small interval or your users won't have the time to
+  # Don't put a too small interval or your auth won't have the time to
   # change their passwords.
   config.reset_password_within = 6.hours
 
@@ -242,7 +242,7 @@ Devise.setup do |config|
 
   # ==> Scopes configuration
   # Turn scoped views on. Before rendering "sessions/new", it will first check for
-  # "users/sessions/new". It's turned off by default because it's slower if you
+  # "auth/sessions/new". It's turned off by default because it's slower if you
   # are using only default views.
   # config.scoped_views = false
 
@@ -250,7 +250,7 @@ Devise.setup do |config|
   # devise role declared in your routes (usually :user).
   # config.default_scope = :user
 
-  # Set this configuration to false if you want /users/sign_out to sign out
+  # Set this configuration to false if you want /auth/sign_out to sign out
   # only the current scope. By default, Devise signs out all scopes.
   # config.sign_out_all_scopes = true
 
@@ -293,8 +293,8 @@ Devise.setup do |config|
   # config.router_name = :my_engine
   #
   # When using OmniAuth, Devise cannot automatically set OmniAuth path,
-  # so you need to do it manually. For the users scope, it would be:
-  # config.omniauth_path_prefix = '/my_engine/users/auth'
+  # so you need to do it manually. For the auth scope, it would be:
+  # config.omniauth_path_prefix = '/my_engine/auth/auth'
 
   # ==> Hotwire/Turbo configuration
   # When using Devise with Hotwire/Turbo, the http status for error responses

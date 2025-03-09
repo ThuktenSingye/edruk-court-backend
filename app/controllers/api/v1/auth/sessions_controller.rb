@@ -1,6 +1,6 @@
 module Api
   module V1
-    module Users
+    module Auth
       class SessionsController < Devise::SessionsController
         include RackSessionsFix
 
