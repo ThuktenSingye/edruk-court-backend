@@ -65,8 +65,6 @@ group :development, :test do
 
   gem 'rails-controller-testing'
 
-  gem 'dotenv-rails'
-
   gem 'rubycritic', require: false
 
   gem 'letter_opener'
@@ -79,3 +77,5 @@ gem 'devise'
 gem 'devise-jwt'
 
 gem 'jsonapi-serializer'
+
+gem 'dotenv-rails'
