@@ -7,6 +7,12 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: self
 
+  validates :email, :password, presence: true
+
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
+
+  def jwt_payload
+    super
+  end
 end

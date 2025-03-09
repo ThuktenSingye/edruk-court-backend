@@ -15,7 +15,7 @@ module Api
             }, status: :ok
           else
             render json: {
-              status: { message: "Failed to send password reset instructions. #{resource.errors.full_messages.to_sentence}" }
+              status: { message: "#{resource.errors.full_messages.to_sentence}" }
             }, status: :unprocessable_entity
           end
         end

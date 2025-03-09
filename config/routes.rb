@@ -10,19 +10,16 @@ Rails.application.routes.draw do
   # root "posts#index"
   resources :test, only: [ :index ]
 
-  namespace :api do
-    namespace :v1 do
-      devise_for :users, path: "", path_names: {
-        sign_in: "login",
-        sign_out: "logout",
-        registration: "signup",
-        password: "password"
-    },
-               controllers: {
-                 sessions: "api/v1/users/sessions",
-                 registrations: "api/v1/users/registrations",
-                 passwords: "api/v1/users/passwords"
-               }
-    end
-  end
+  devise_for :users, path: "api/v1/auth", controllers: {
+    sessions: "api/v1/users/sessions",
+    registrations: "api/v1/users/registrations",
+    passwords: "api/v1/users/passwords"
+  }
+
+  # namespace :api do
+  #   namespace :v1 do
+  #     # Other API routes
+  #     resources :test, only: [:index]
+  #   end
+  # end
 end

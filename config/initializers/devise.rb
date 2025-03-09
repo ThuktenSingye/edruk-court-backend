@@ -314,12 +314,8 @@ Devise.setup do |config|
   # Configure JWT for token-based authentication
   config.jwt do |jwt|
     jwt.secret = Rails.application.credentials.devise_jwt_secret_key!
-    jwt.dispatch_requests = [
-      [ "POST", %r{^/api/v1/login$} ]
-    ]
-    jwt.revocation_requests = [
-      [ "DELETE", %r{^/api/v1/logout$} ]
-    ]
+    jwt.dispatch_requests = [ [ "POST", %r{^/api/v1/login$} ] ]
+    jwt.revocation_requests = [ [ "DELETE", %r{^/api/v1/logout$} ] ]
     jwt.expiration_time = 15.minutes.to_i
   end
 end
