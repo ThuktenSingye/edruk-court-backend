@@ -45,7 +45,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_104106) do
     t.index ["user_id"], name: "index_user_roles_on_user_id"
   end
 
-  create_table "auth", force: :cascade do |t|
+  create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -66,5 +66,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_104106) do
 
   add_foreign_key "courts", "courts", column: "parent_court_id"
   add_foreign_key "user_roles", "roles"
-  add_foreign_key "user_roles", "auth"
+  add_foreign_key "user_roles", "users"
 end

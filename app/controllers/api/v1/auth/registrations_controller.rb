@@ -14,11 +14,11 @@ module Api
         def respond_with(resource, _opts = {})
           if resource.persisted?
             render json: {
-              status: { code: 201, message: 'Signed up successfully.' }
+              status: 201, message: 'Signed up successfully.'
             }, status: :created
           else
             render json: {
-              status: { message: "User couldn't be created successfully. #{resource.errors.full_messages.to_sentence}" }
+              status: 422, message: "User couldn't be created successfully. #{resource.errors.full_messages.to_sentence}"
             }, status: :unprocessable_entity
           end
         end
