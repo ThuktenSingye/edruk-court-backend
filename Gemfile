@@ -79,3 +79,5 @@ gem 'devise-jwt'
 gem 'jsonapi-serializer'
 
 gem 'dotenv-rails'
+
+gem 'pundit'
