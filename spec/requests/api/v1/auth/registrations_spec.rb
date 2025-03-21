@@ -14,6 +14,13 @@ RSpec.describe 'Api::V1::Auth::Registrations', type: :request do
 
       it { is_expected.to have_http_status(:created) }
       it { expect { register_user }.to change(User, :count).by(1) }
+
+      it 'assigns the default role to the user' do
+        register_user
+        created_user = User.last
+        default_role = Role.find_by(name: 'User')
+        expect(created_user.roles).to include(default_role)
+      end
     end
 
     context 'with invalid user attributes' do

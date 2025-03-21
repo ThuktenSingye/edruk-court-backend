@@ -9,6 +9,15 @@ module Api
 
         respond_to :json
 
+        def create
+          super do |resource|
+            if resource.persisted?
+              default_role = Role.find_or_create_by!(name: 'User')
+              UserRole.find_or_create_by!(user: resource, role: default_role)
+            end
+          end
+        end
+
         private
 
         def respond_with(resource, _opts = {})
@@ -18,7 +27,7 @@ module Api
             }, status: :created
           else
             render json: {
-              status: 422, message: "User couldn't be created successfully. #{resource.errors.full_messages.to_sentence}"
+              status: 422, message: resource.errors.full_messages.to_sentence.to_s
             }, status: :unprocessable_entity
           end
         end
