@@ -32,5 +32,10 @@ module EdrukCourt
     # Timezone
     config.time_zone = "Asia/Thimphu"
     config.active_record.default_timezone = :local
+
+    # Active Record Encryption Config
+    config.active_record.encryption.primary_key = ENV['ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY']
+    config.active_record.encryption.deterministic_key = ENV['ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY']
+    config.active_record.encryption.key_derivation_salt = ENV['ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT']
   end
 end

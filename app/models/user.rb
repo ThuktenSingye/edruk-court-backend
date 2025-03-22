@@ -15,4 +15,22 @@ class User < ApplicationRecord
 
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
+
+  encrypts :private_key
+
+  # Override the method
+  def after_confirmation
+    super
+    generate_key_pair
+    save!
+  end
+
+  private
+
+  def generate_key_pair
+    key_pair = EccKeyGenerator.generate
+    self.public_key = key_pair[:public_key]
+    self.private_key = key_pair[:private_key]
+    validate!
+  end
 end
