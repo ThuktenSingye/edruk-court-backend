@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_21_091206) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_22_132149) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "courts", force: :cascade do |t|
     t.string "name"
-    t.integer "type"
+    t.integer "court_type"
     t.string "email"
     t.string "contact_no"
     t.string "subdomain"
@@ -24,9 +24,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_21_091206) do
     t.bigint "parent_court_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "location_id", null: false
     t.index ["domain"], name: "index_courts_on_domain", unique: true
+    t.index ["location_id"], name: "index_courts_on_location_id"
     t.index ["parent_court_id"], name: "index_courts_on_parent_court_id"
     t.index ["subdomain"], name: "index_courts_on_subdomain", unique: true
+  end
+
+  create_table "locations", force: :cascade do |t|
+    t.string "name"
+    t.integer "location_type"
+    t.integer "parent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "roles", force: :cascade do |t|
@@ -67,6 +77,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_21_091206) do
   end
 
   add_foreign_key "courts", "courts", column: "parent_court_id"
+  add_foreign_key "courts", "locations"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
 end
