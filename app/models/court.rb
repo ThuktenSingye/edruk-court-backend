@@ -10,5 +10,6 @@ class Court < ApplicationRecord
   enum :court_type, { supreme: 0, high: 1, dzongkhag: 2, dungkhag: 3, bench: 4 }
 
   validates :name, :court_type, :email, :contact_no, presence: true
-  validates :domain, :subdomain, :name, :email, uniqueness: true
+
+  validates :domain, :subdomain, :name, :email, uniqueness: { case_sensitive: false }
 end

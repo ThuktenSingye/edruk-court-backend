@@ -10,9 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_22_132149) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_22_155812) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "clerks", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "court_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["court_id"], name: "index_clerks_on_court_id"
+    t.index ["user_id"], name: "index_clerks_on_user_id"
+  end
 
   create_table "courts", force: :cascade do |t|
     t.string "name"
@@ -31,12 +40,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_132149) do
     t.index ["subdomain"], name: "index_courts_on_subdomain", unique: true
   end
 
+  create_table "judges", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "court_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["court_id"], name: "index_judges_on_court_id"
+    t.index ["user_id"], name: "index_judges_on_user_id"
+  end
+
   create_table "locations", force: :cascade do |t|
     t.string "name"
     t.integer "location_type"
     t.integer "parent_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "registrars", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "court_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["court_id"], name: "index_registrars_on_court_id"
+    t.index ["user_id"], name: "index_registrars_on_user_id"
   end
 
   create_table "roles", force: :cascade do |t|
@@ -76,8 +103,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_132149) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "clerks", "courts"
+  add_foreign_key "clerks", "users"
   add_foreign_key "courts", "courts", column: "parent_court_id"
   add_foreign_key "courts", "locations"
+  add_foreign_key "judges", "courts"
+  add_foreign_key "judges", "users"
+  add_foreign_key "registrars", "courts"
+  add_foreign_key "registrars", "users"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
 end
