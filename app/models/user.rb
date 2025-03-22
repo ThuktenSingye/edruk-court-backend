@@ -16,9 +16,10 @@ class User < ApplicationRecord
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
 
+  acts_as_tenant :court, optional: true
+
   encrypts :private_key
 
-  # Override the method
   def after_confirmation
     super
     generate_key_pair

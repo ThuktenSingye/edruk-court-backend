@@ -13,6 +13,7 @@ RSpec.describe User, type: :model do
   context 'when associating model' do
     it { is_expected.to have_many(:user_roles).dependent(:destroy) }
     it { is_expected.to have_many(:roles).through(:user_roles) }
+    it { is_expected.to belong_to(:court).optional }
   end
 
   describe '#after_confirmation' do
