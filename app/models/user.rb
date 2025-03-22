@@ -22,7 +22,7 @@ class User < ApplicationRecord
   def after_confirmation
     super
     generate_key_pair
-    save!
+    save!(validate: false)
   end
 
   private
@@ -31,6 +31,5 @@ class User < ApplicationRecord
     key_pair = EccKeyGenerator.generate
     self.public_key = key_pair[:public_key]
     self.private_key = key_pair[:private_key]
-    validate!
   end
 end

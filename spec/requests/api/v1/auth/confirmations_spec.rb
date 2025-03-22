@@ -12,6 +12,8 @@ RSpec.describe 'Api::V1::Auth::Confirmation', type: :request do
         response
       end
 
+      it { is_expected.to have_http_status :ok }
+
       it 'confirms the user' do
         user.confirm
         expect(user.reload).to be_confirmed
