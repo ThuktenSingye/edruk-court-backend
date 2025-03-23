@@ -29,3 +29,12 @@
 
 en:
   hello: "Hello world"
+  login:
+    success: "Log In Successfully."
+    error:
+      credentials: "Invalid credentials or user does not belong to this court."
+      court_not_found: "Court Not found."
+  logout:
+    success: "Log Out Successfully"
+    error:
+      unauthorized: "Couldn't find an active session."

@@ -9,14 +9,40 @@ module Api
 
         respond_to :json
 
+        def create
+          if current_tenant
+            authenticate_user
+          else
+            handle_court_not_found
+          end
+        end
+
         private
 
-        def respond_with(current_user, _opts = {})
-          render json: {
-            status: 200,
-            message: 'Logged in successfully.',
-            data: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
-          }, status: :ok
+        def authenticate_user
+          @user = current_tenant.users.find_by(email: params[:user][:email])
+          if @user
+            sign_in(@user)
+            respond_with(@user, success: true)
+          else
+            handle_invalid_credentials
+          end
+        end
+
+        def handle_invalid_credentials
+          respond_with(nil, success: false, message: I18n.t('login.error.credentials'), status: 401)
+        end
+
+        def handle_court_not_found
+          respond_with(nil, success: false, message: I18n.t('login.error.court_not_found'), status: 404)
+        end
+
+        def respond_with(current_user, opts = {})
+          status = opts[:status] || :ok
+          message = opts[:message] || I18n.t('login.success')
+          data = current_user ? UserSerializer.new(current_user).serializable_hash[:data][:attributes] : nil
+
+          render json: { status: status == :ok ? 200 : status, message: message, data: data }, status: status
         end
 
         # rubocop:disable Metrics/AbcSize
@@ -27,9 +53,9 @@ module Api
             current_user = User.find(jwt_payload['sub'])
           end
           if current_user
-            render json: { status: 200, message: 'Logged out successfully.' }, status: :ok
+            render json: { status: 200, message: I18n.t('logout.success') }, status: :ok
           else
-            render json: { status: 401, message: "Couldn't find an active session." }, status: :unauthorized
+            render json: { status: 401, message: I18n.t('logout.error.unauthorized') }, status: :unauthorized
           end
         end
         # rubocop:enable Metrics/AbcSize

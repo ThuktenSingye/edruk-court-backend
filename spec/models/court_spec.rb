@@ -23,6 +23,7 @@ RSpec.describe Court, type: :model do
   context 'when associating model' do
     it { is_expected.to belong_to(:parent_court).optional }
     it { is_expected.to have_many :child_courts }
-    it { is_expected.to belong_to(:location) }
+    it { is_expected.to belong_to :location }
+    it { is_expected.to have_many :users }
   end
 end
