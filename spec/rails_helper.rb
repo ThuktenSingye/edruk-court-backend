@@ -70,6 +70,54 @@ RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Warden::Test::Helpers
+
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.before do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.start
+  end
+
+  config.append_after do
+    DatabaseCleaner.clean
+  end
+
+  # rubocop:disable Style/GlobalVars
+  config.before(:suite) do |_example|
+    # Make the default tenant globally available to the tests
+    $default_location = Location.find_or_create_by!(
+      name: 'Default Location',
+      location_type: 0 # Assuming 0 for Dzongkhag
+    )
+
+    $default_account = Court.find_or_create_by!(
+      name: 'Default Court',
+      court_type: 1,
+      email: 'default@example.com',
+      contact_no: '12345678',
+      location_id: $default_location.id
+    )
+  end
+
+  config.before do |example|
+    if example.metadata[:type] == :request
+      # Set the `test_tenant` value for integration tests
+      ActsAsTenant.test_tenant = $default_account
+    else
+      # Otherwise just use current_tenant
+      ActsAsTenant.current_tenant = $default_account
+    end
+  end
+
+  config.after do |_example|
+    # Clear any tenancy that might have been set
+    ActsAsTenant.current_tenant = nil
+    ActsAsTenant.test_tenant = nil
+  end
+  # rubocop:enable Style/GlobalVars
 end
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

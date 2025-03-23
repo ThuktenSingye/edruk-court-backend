@@ -3,7 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Api::V1::Auth::Sessions', type: :request do
-  let!(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
+  let(:court) { FactoryBot.create(:court) }
+  let(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
 
   describe 'POST /api/v1/signin' do
     context 'with valid user attributes' do

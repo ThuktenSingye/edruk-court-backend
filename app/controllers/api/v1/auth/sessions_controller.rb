@@ -30,11 +30,11 @@ module Api
         end
 
         def handle_invalid_credentials
-          respond_with(nil, success: false, message: I18n.t('login.error.credentials'), status: 401)
+          respond_with(nil, success: false, message: I18n.t('login.error.credentials'), status: :unauthorized)
         end
 
         def handle_court_not_found
-          respond_with(nil, success: false, message: I18n.t('login.error.court_not_found'), status: 404)
+          respond_with(nil, success: false, message: I18n.t('login.error.court_not_found'), status: :unauthorized)
         end
 
         def respond_with(current_user, opts = {})

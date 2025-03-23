@@ -15,4 +15,8 @@ FactoryBot.define do
     password { nil }
     password_confirmation { nil }
   end
+
+  trait :court_user do
+    association :court, factory: :court
+  end
 end

@@ -68,6 +68,8 @@ group :development, :test do
   gem 'rubycritic', require: false
 
   gem 'letter_opener'
+
+  gem 'database_cleaner-active_record'
 end
 
 gem 'acts_as_tenant'
