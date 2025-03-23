@@ -14,7 +14,6 @@ module Api
             if resource.persisted?
               default_role = Role.find_or_create_by!(name: 'User')
               UserRole.find_or_create_by!(user: resource, role: default_role)
-              # Generate Private and Public key Pair
             end
           end
         end

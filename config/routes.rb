@@ -21,7 +21,9 @@ Rails.application.routes.draw do
 
     namespace :api do
       namespace :v1 do
-        resources :profiles, only: [ :show, :update]
+        resources :profiles, only: [ :show, :update] do
+          resources :addresses, only: [ :create ]
+        end
       end
     end
   end
