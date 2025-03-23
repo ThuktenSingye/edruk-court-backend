@@ -15,6 +15,7 @@ class User < ApplicationRecord
 
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
+  has_one :profile, dependent: :destroy
 
   acts_as_tenant :court, optional: true
 

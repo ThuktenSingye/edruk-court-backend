@@ -19,5 +19,6 @@ RSpec.describe Profile, type: :model do
 
   context 'when associating model' do
     it { is_expected.to belong_to :user }
+    it { is_expected.to have_many :addresses }
   end
 end

@@ -9,7 +9,14 @@ FactoryBot.define do
     house_no { Faker::Number.number(digits: 5).to_s }
     thram_no { Faker::Number.number(digits: 5).to_s }
     age { 10 }
-    gender { 1 }
+    gender { :male }
     association :user, factory: :user
+  end
+
+  trait :invalid_profile_params do
+    first_name { nil }
+    last_name { nil }
+    cid_no { nil }
+    phone_number { nil }
   end
 end

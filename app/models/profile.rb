@@ -3,6 +3,8 @@
 # Profile Model
 class Profile < ApplicationRecord
   belongs_to :user
+  has_many :addresses, dependent: :destroy
+  accepts_nested_attributes_for :addresses
 
   enum :gender, { male: 0, female: 1, other: 2 }
 
