@@ -25,8 +25,8 @@ FactoryBot.define do
     name { 'Plaintiff' }
   end
 
-  trait :defendent do
-    name { 'Defendent' }
+  trait :defendant do
+    name { 'Defendant' }
   end
 
   trait :lawyer do
