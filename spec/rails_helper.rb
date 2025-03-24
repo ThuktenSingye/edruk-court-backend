@@ -13,6 +13,7 @@ require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 require 'support/subdomain_helpers'
+require 'pundit/rspec'
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -123,6 +124,12 @@ RSpec.configure do |config|
   end
   # rubocop:enable Style/GlobalVars
 end
+
+Pundit::Matchers.configure do |config|
+  # Change the default user alias
+  config.default_user_alias = :user
+end
+
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec

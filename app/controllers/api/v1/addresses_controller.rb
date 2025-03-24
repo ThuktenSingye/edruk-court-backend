@@ -10,6 +10,7 @@ module Api
 
       def create
         @address = @profile.addresses.build(address_params)
+        authorize @address
 
         if @address.save
           render_json :created, 'Address added successfully.',

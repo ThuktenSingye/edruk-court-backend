@@ -70,6 +70,8 @@ group :development, :test do
   gem 'letter_opener'
 
   gem 'database_cleaner-active_record'
+
+  gem 'pundit-matchers'
 end
 
 gem 'acts_as_tenant'

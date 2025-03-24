@@ -5,11 +5,19 @@ class ApplicationController < ActionController::API
   set_current_tenant_by_subdomain_or_domain(:court, :subdomain, :domain)
 
   include Pundit::Authorization
+  include JsonResponse
+
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :set_bench_as_subtenant, if: :bench_present?
+  after_action :verify_authorized, unless: :devise_controller?
 
   private
+
+  def user_not_authorized
+    render_json :forbidden, 'You are not authorized to perform this action'
+  end
 
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [

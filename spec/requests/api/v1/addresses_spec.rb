@@ -9,7 +9,6 @@ RSpec.describe 'Api::V1::Addresses', type: :request do
 
   before do
     sign_in user
-    subdomain court.subdomain
   end
 
   describe 'POST /create' do
@@ -18,7 +17,7 @@ RSpec.describe 'Api::V1::Addresses', type: :request do
 
     context 'with valid params' do
       subject(:create_address) do
-        post api_v1_profile_addresses_path(profile), params: { address: valid_address_params }
+        post api_v1_user_profile_addresses_path(user, profile), params: { address: valid_address_params }
         response
       end
 
@@ -36,7 +35,7 @@ RSpec.describe 'Api::V1::Addresses', type: :request do
 
     context 'with invalid address params' do
       subject(:create_address) do
-        post api_v1_profile_addresses_path(profile), params: { address: invalid_address_params }
+        post api_v1_user_profile_addresses_path(user), params: { address: invalid_address_params }
         response
       end
 

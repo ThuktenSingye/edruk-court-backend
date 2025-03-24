@@ -28,7 +28,15 @@ class User < ApplicationRecord
     save!(validate: false)
   end
 
+  def role?(role_name)
+    cached_roles.include?(role_name)
+  end
+
   private
+
+  def cached_roles
+    @cached_roles ||= roles.pluck(:name)
+  end
 
   def generate_key_pair
     key_pair = EccKeyGenerator.generate

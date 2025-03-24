@@ -4,18 +4,17 @@ require 'rails_helper'
 
 RSpec.describe 'Api::V1::Profiles', type: :request do
   let(:court) { FactoryBot.create(:court) }
-  let(:user) { FactoryBot.create(:user, :court_user, court: court, confirmed_at: Time.zone.now) }
+  let(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
   let!(:profile) { FactoryBot.create(:profile, user: user) }
 
   before do
     sign_in user
-    subdomain court.subdomain
   end
 
   describe 'GET /show' do
     context 'when user record exists' do
       subject(:get_profile) do
-        get api_v1_profile_path(profile)
+        get api_v1_user_profile_path(user)
         response
       end
 
@@ -26,7 +25,7 @@ RSpec.describe 'Api::V1::Profiles', type: :request do
   describe 'PUT /update' do
     context 'with valid profile params' do
       subject(:update_profile) do
-        put api_v1_profile_path(profile), params: { profile: valid_profile_params }
+        put api_v1_user_profile_path(profile), params: { profile: valid_profile_params }
         response
       end
 
@@ -79,7 +78,7 @@ RSpec.describe 'Api::V1::Profiles', type: :request do
 
     context 'with invalid profile params' do
       subject(:update_profile) do
-        put api_v1_profile_path(profile), params: { profile: invalid_profile_params }
+        put api_v1_user_profile_path(profile), params: { profile: invalid_profile_params }
         response
       end
 

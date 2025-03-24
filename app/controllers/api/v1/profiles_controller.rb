@@ -6,11 +6,10 @@ module Api
     class ProfilesController < ApplicationController
       include JsonResponse
       before_action :authenticate_user!
-      before_action :profile, only: %i[update]
+      before_action :profile, only: %i[show update]
 
       def show
-        profile = current_user.profile
-        data = ProfileSerializer.new(profile).serializable_hash[:data][:attributes] if profile
+        data = ProfileSerializer.new(@profile).serializable_hash[:data][:attributes] if @profile
         render_json :ok, 'Profile Data', data
       end
 
@@ -27,6 +26,7 @@ module Api
 
       def profile
         @profile ||= current_user.profile
+        authorize @profile
       end
 
       def profile_params
