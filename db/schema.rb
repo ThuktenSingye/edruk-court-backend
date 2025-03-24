@@ -24,7 +24,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_165507) do
     t.bigint "parent_court_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "location_id", null: false
+    t.bigint "location_id"
     t.index ["domain"], name: "index_courts_on_domain", unique: true
     t.index ["location_id"], name: "index_courts_on_location_id"
     t.index ["parent_court_id"], name: "index_courts_on_parent_court_id"
