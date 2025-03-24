@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_23_121817) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_24_174409) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_23_121817) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["profile_id"], name: "index_addresses_on_profile_id"
+  end
+
+  create_table "case_subtypes", force: :cascade do |t|
+    t.string "title"
+    t.bigint "case_type_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["case_type_id"], name: "index_case_subtypes_on_case_type_id"
+    t.index ["title"], name: "index_case_subtypes_on_title", unique: true
+  end
+
+  create_table "case_types", force: :cascade do |t|
+    t.string "title"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["title"], name: "index_case_types_on_title", unique: true
   end
 
   create_table "courts", force: :cascade do |t|
@@ -106,6 +122,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_23_121817) do
   end
 
   add_foreign_key "addresses", "profiles"
+  add_foreign_key "case_subtypes", "case_types"
   add_foreign_key "courts", "courts", column: "parent_court_id"
   add_foreign_key "courts", "locations"
   add_foreign_key "profiles", "users"
