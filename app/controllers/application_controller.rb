@@ -3,11 +3,20 @@
 # Base Controller
 class ApplicationController < ActionController::API
   set_current_tenant_by_subdomain_or_domain(:court, :subdomain, :domain)
+
   include Pundit::Authorization
 
+  before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :set_bench_as_subtenant, if: :bench_present?
 
   private
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [
+                                        :email, :password, :password_confirmation,
+                                        { profile_attributes: %i[first_name last_name cid_no phone_number gender] }
+                                      ])
+  end
 
   def bench_present?
     request.path.include?('benches')

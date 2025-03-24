@@ -31,10 +31,6 @@ module Api
             }, status: :unprocessable_entity
           end
         end
-
-        def sign_up_params
-          params.expect(user: %i[email password password_confirmation])
-        end
       end
     end
   end
