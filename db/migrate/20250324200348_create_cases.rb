@@ -11,6 +11,7 @@ class CreateCases < ActiveRecord::Migration[8.0]
       t.boolean :is_enforced, default: false
       t.boolean :is_remanded, default: false
       t.boolean :is_reopened, default: false
+      t.boolean :can_appeal, default: false
       t.integer :case_status
       t.references :court, null: false, foreign_key: true
       t.references :case_subtype, null: true, foreign_key: true

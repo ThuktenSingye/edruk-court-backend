@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_24_200348) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_25_152930) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_200348) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["profile_id"], name: "index_addresses_on_profile_id"
+  end
+
+  create_table "case_participants", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "case_id"
+    t.bigint "role_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["case_id"], name: "index_case_participants_on_case_id"
+    t.index ["role_id"], name: "index_case_participants_on_role_id"
+    t.index ["user_id"], name: "index_case_participants_on_user_id"
   end
 
   create_table "case_subtypes", force: :cascade do |t|
@@ -52,6 +63,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_200348) do
     t.boolean "is_enforced", default: false
     t.boolean "is_remanded", default: false
     t.boolean "is_reopened", default: false
+    t.boolean "can_appeal", default: false
     t.integer "case_status"
     t.bigint "court_id", null: false
     t.bigint "case_subtype_id"
@@ -150,6 +162,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_200348) do
   end
 
   add_foreign_key "addresses", "profiles"
+  add_foreign_key "case_participants", "cases"
+  add_foreign_key "case_participants", "roles"
+  add_foreign_key "case_participants", "users"
   add_foreign_key "case_subtypes", "case_types"
   add_foreign_key "cases", "case_subtypes"
   add_foreign_key "cases", "courts"
