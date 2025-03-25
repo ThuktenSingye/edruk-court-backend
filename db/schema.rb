@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_24_174409) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_24_200348) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -39,6 +39,34 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_174409) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["title"], name: "index_case_types_on_title", unique: true
+  end
+
+  create_table "cases", force: :cascade do |t|
+    t.string "case_number"
+    t.string "registration_number"
+    t.string "judgement_number"
+    t.string "title"
+    t.text "summary"
+    t.integer "case_priority"
+    t.boolean "is_appeal", default: false
+    t.boolean "is_enforced", default: false
+    t.boolean "is_remanded", default: false
+    t.boolean "is_reopened", default: false
+    t.integer "case_status"
+    t.bigint "court_id", null: false
+    t.bigint "case_subtype_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["case_number"], name: "index_cases_on_case_number", unique: true
+    t.index ["case_status"], name: "index_cases_on_case_status"
+    t.index ["case_subtype_id"], name: "index_cases_on_case_subtype_id"
+    t.index ["court_id"], name: "index_cases_on_court_id"
+    t.index ["is_appeal"], name: "index_cases_on_is_appeal"
+    t.index ["is_enforced"], name: "index_cases_on_is_enforced"
+    t.index ["is_remanded"], name: "index_cases_on_is_remanded"
+    t.index ["is_reopened"], name: "index_cases_on_is_reopened"
+    t.index ["judgement_number"], name: "index_cases_on_judgement_number", unique: true
+    t.index ["registration_number"], name: "index_cases_on_registration_number", unique: true
   end
 
   create_table "courts", force: :cascade do |t|
@@ -123,6 +151,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_174409) do
 
   add_foreign_key "addresses", "profiles"
   add_foreign_key "case_subtypes", "case_types"
+  add_foreign_key "cases", "case_subtypes"
+  add_foreign_key "cases", "courts"
   add_foreign_key "courts", "courts", column: "parent_court_id"
   add_foreign_key "courts", "locations"
   add_foreign_key "profiles", "users"
