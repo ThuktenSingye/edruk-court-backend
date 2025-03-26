@@ -5,35 +5,35 @@ FactoryBot.define do
     name { 'User' }
   end
 
-  trait :admin do
+  trait :admin_role do
     name { 'Admin' }
   end
 
-  trait :judge do
+  trait :judge_role do
     name { 'Judge' }
   end
 
-  trait :clerk do
+  trait :clerk_role do
     name { 'Clerk' }
   end
 
-  trait :registrar do
+  trait :registrar_role do
     name { 'Registrar' }
   end
 
-  trait :plaintiff do
+  trait :plaintiff_role do
     name { 'Plaintiff' }
   end
 
-  trait :defendant do
+  trait :defendant_role do
     name { 'Defendant' }
   end
 
-  trait :lawyer do
+  trait :lawyer_role do
     name { 'Lawyer' }
   end
 
-  trait :prosecutor do
+  trait :prosecutor_role do
     name { 'Prosecutor' }
   end
 end

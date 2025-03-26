@@ -16,7 +16,7 @@ class ApplicationController < ActionController::API
   private
 
   def user_not_authorized
-    render_json :forbidden, 'You are not authorized to perform this action'
+    render_json :unauthorized, 'You are not authorized to perform this action', nil
   end
 
   def configure_permitted_parameters

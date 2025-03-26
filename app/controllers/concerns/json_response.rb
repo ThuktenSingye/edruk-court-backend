@@ -20,6 +20,7 @@ module JsonResponse
     when :created then 201
     when :unprocessable_entity then 422
     when :not_found then 404
+    when :unauthorized then 401
     else 500
     end
   end

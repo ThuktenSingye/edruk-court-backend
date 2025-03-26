@@ -26,6 +26,13 @@ Rails.application.routes.draw do
             resources :addresses, only: %i[create]
           end
         end
+        scope module: :case do
+          resources :cases, except: %i[destroy] do
+            collection do
+              get :statistics
+            end
+          end
+        end
       end
     end
   end

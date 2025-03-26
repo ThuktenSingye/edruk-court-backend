@@ -8,8 +8,7 @@ RSpec.describe AddressPolicy, type: :policy do
   let(:user) { FactoryBot.create(:user) }
   let(:profile) { FactoryBot.create(:profile) }
   let(:address) { FactoryBot.create(:address, profile: profile) }
-  let(:admin_role) { FactoryBot.create(:role, :admin) }
-  let(:admin) { FactoryBot.create(:user) { |user| user.roles << admin_role } }
+  let(:admin) { FactoryBot.create(:user, :admin) }
 
   describe 'permissions' do
     context 'when role is user' do

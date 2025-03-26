@@ -28,6 +28,38 @@ class User < ApplicationRecord
     save!(validate: false)
   end
 
+  def judge?
+    role?('Judge')
+  end
+
+  def clerk?
+    role?('Clerk')
+  end
+
+  def registrar?
+    role?('Registrar')
+  end
+
+  def plaintiff?
+    role?('Plaintiff')
+  end
+
+  def defendant?
+    role?('Defendant')
+  end
+
+  def prosecutor?
+    role?('Prosecutor')
+  end
+
+  def lawyer?
+    role?('Lawyer')
+  end
+
+  def admin?
+    role?('Admin')
+  end
+
   def role?(role_name)
     cached_roles.include?(role_name)
   end

@@ -25,5 +25,6 @@ RSpec.describe Court, type: :model do
     it { is_expected.to have_many :child_courts }
     it { is_expected.to belong_to :location }
     it { is_expected.to have_many :users }
+    it { is_expected.to have_many :cases }
   end
 end

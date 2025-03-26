@@ -7,6 +7,7 @@ class Court < ApplicationRecord
   has_many :child_courts, class_name: 'Court', foreign_key: :parent_court_id, dependent: :destroy,
                           inverse_of: :parent_court
   has_many :users, dependent: :nullify
+  has_many :cases, dependent: :nullify
 
   enum :court_type, { supreme: 0, high: 1, dzongkhag: 2, dungkhag: 3, bench: 4 }
 
