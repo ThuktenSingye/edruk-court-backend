@@ -72,6 +72,8 @@ group :development, :test do
   gem 'database_cleaner-active_record'
 
   gem 'pundit-matchers'
+
+  gem 'rails-erd'
 end
 
 gem 'acts_as_tenant'
