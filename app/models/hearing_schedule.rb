@@ -5,7 +5,7 @@ class HearingSchedule < ApplicationRecord
   belongs_to :hearing
   belongs_to :scheduled_by, class_name: 'User'
 
-  enum :schedule_status, { approved: 0, rejected: 1, rescheduled: 2 }
+  enum :schedule_status, { approved: 0, rejected: 1, rescheduled: 2, cancelled: 3 }
 
   validates :schedule_status, :scheduled_date, presence: true
 end
