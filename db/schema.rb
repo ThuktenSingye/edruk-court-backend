@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_27_114608) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_27_135215) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -103,7 +103,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_27_114608) do
   end
 
   create_table "hearing_notes", force: :cascade do |t|
-    t.text "content", null: false
+    t.text "content"
     t.bigint "hearing_id", null: false
     t.bigint "author_id", null: false
     t.datetime "created_at", null: false
@@ -112,16 +112,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_27_114608) do
     t.index ["hearing_id"], name: "index_hearing_notes_on_hearing_id"
   end
 
-  create_table "hearing_reschedules", force: :cascade do |t|
-    t.datetime "original_date", null: false
-    t.datetime "new_date", null: false
-    t.text "reason"
+  create_table "hearing_schedules", force: :cascade do |t|
+    t.datetime "scheduled_date"
+    t.integer "schedule_status"
+    t.text "reschedule_reason"
     t.bigint "hearing_id", null: false
-    t.bigint "rescheduled_by_id", null: false
+    t.bigint "scheduled_by_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["hearing_id"], name: "index_hearing_reschedules_on_hearing_id"
-    t.index ["rescheduled_by_id"], name: "index_hearing_reschedules_on_rescheduled_by_id"
+    t.index ["hearing_id"], name: "index_hearing_schedules_on_hearing_id"
+    t.index ["scheduled_by_id"], name: "index_hearing_schedules_on_scheduled_by_id"
   end
 
   create_table "hearing_types", force: :cascade do |t|
@@ -132,18 +132,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_27_114608) do
   end
 
   create_table "hearings", force: :cascade do |t|
-    t.datetime "scheduled_date"
     t.integer "hearing_status"
-    t.bigint "hearing_type_id", null: false
     t.bigint "case_id", null: false
+    t.bigint "hearing_type_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "scheduled_by_id", null: false
-    t.bigint "court_id", null: false
     t.index ["case_id"], name: "index_hearings_on_case_id"
-    t.index ["court_id"], name: "index_hearings_on_court_id"
     t.index ["hearing_type_id"], name: "index_hearings_on_hearing_type_id"
-    t.index ["scheduled_by_id"], name: "index_hearings_on_scheduled_by_id"
   end
 
   create_table "locations", force: :cascade do |t|
@@ -222,12 +217,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_27_114608) do
   add_foreign_key "courts", "locations"
   add_foreign_key "hearing_notes", "hearings"
   add_foreign_key "hearing_notes", "users", column: "author_id"
-  add_foreign_key "hearing_reschedules", "hearings"
-  add_foreign_key "hearing_reschedules", "users", column: "rescheduled_by_id"
+  add_foreign_key "hearing_schedules", "hearings"
+  add_foreign_key "hearing_schedules", "users", column: "scheduled_by_id"
   add_foreign_key "hearings", "cases"
-  add_foreign_key "hearings", "courts"
   add_foreign_key "hearings", "hearing_types"
-  add_foreign_key "hearings", "users", column: "scheduled_by_id"
   add_foreign_key "profiles", "users"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"

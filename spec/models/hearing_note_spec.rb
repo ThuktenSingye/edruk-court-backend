@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe HearingNote, type: :model do
-  context 'when validating model' do
+  context 'when validating attributes' do
     it { is_expected.to validate_presence_of :content }
   end
 

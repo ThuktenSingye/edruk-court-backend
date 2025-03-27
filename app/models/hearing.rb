@@ -2,12 +2,11 @@
 
 # Hearing Model
 class Hearing < ApplicationRecord
-  acts_as_tenant :court, optional: false
-  belongs_to :hearing_type
   belongs_to :case
-  belongs_to :scheduled_by, class_name: 'User', optional: false
+  belongs_to :hearing_type
+  has_many :hearing_schedules, dependent: :destroy
 
-  enum :hearing_status, { accepted: 0, pending: 1, rescheduled: 2, rejected: 3 }
+  enum :hearing_status, { ongoing: 0, completed: 1, pending: 2 }
 
-  validates :scheduled_date, :hearing_status, presence: true
+  validates :hearing_status, presence: true
 end
