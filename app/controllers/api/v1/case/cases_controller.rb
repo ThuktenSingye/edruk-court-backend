@@ -7,7 +7,8 @@ module Api
       class CasesController < ApplicationController
         before_action :authenticate_user!
         before_action :case, only: %i[show update]
-        before_action :court_case, only: :statistics
+        before_action :court_case
+        before_action :case_service, only: :statistics
 
         def index
           @cases = current_tenant.cases.all
@@ -43,13 +44,7 @@ module Api
 
         def statistics
           authorize @court_case
-          stats_data = {
-            total: @court_case.count,
-            active: @court_case.where(case_status: :active).count,
-            decided: @court_case.where(case_status: :decided).count,
-            appeal: @court_case.where(is_appeal: true).count
-          }
-          render_json :ok, nil, stats_data
+          render_json :ok, nil, @case_service.case_statistics
         end
 
         private
@@ -60,6 +55,10 @@ module Api
 
         def court_case
           @court_case = current_tenant.cases
+        end
+
+        def case_service
+          @case_service ||= Cases::CaseService.new(@court_case)
         end
 
         def serialized_cases(court_cases)

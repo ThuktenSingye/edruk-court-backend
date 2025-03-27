@@ -3,6 +3,7 @@
 # Case Model
 class Case < ApplicationRecord
   acts_as_tenant :court, optional: false
+  belongs_to :case_type, optional: true
   belongs_to :case_subtype, optional: true
 
   enum :case_status, { filed: 0, pending: 1, active: 2, dismissed: 3, withdrawn: 4, settled: 5, closed: 6 }

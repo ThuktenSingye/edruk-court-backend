@@ -11,6 +11,7 @@ RSpec.describe Case, type: :model do
 
   context 'when associating model' do
     it { is_expected.to belong_to(:case_subtype).optional }
+    it { is_expected.to belong_to(:case_type).optional }
     it { is_expected.to belong_to(:court).optional }
   end
 end
