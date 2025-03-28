@@ -10,7 +10,7 @@ class HearingPolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.court_id.present?
-        scope.joins(:case).where(case: { court_id: user.court_id })
+        scope.joins(:case).where(cases: { court_id: user.court_id })
       else
         scope.none
       end
@@ -18,18 +18,26 @@ class HearingPolicy < ApplicationPolicy
   end
 
   def index?
-    user.clerk? || user.registrar? || user.judge?
+    user.registrar? || user.clerk? || user.judge?
   end
 
   def create?
-    court_user? && (user.registrar? || user.clerk?)
+    court_user? && (user.registrar? || assigned_to_clerk?)
   end
 
   def update?
-    court_user? && (user.judge? || user.registrar? || user.clerk?)
+    court_user? && (assigned_to_clerk? || user.registrar? || assigned_to_judge?)
   end
 
   private
+
+  def assigned_to_judge?
+    user.judge? && record.case.case_participants.exists?(user: user, role: Role.where(name: 'Judge'))
+  end
+
+  def assigned_to_clerk?
+    user.clerk? && record.case.case_participants.exists?(user: user, role: Role.where(name: 'Clerk'))
+  end
 
   def court_user?
     user.court_id == record.case.court_id

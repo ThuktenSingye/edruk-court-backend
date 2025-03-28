@@ -10,7 +10,7 @@ RSpec.describe 'Api::V1::Case::Cases', type: :request do
   let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: court) }
 
   describe 'GET /index' do
-    let(:registrar_user) { FactoryBot.create(:user, :registrar, confirmed_at: Time.zone.now) }
+    let(:registrar_user) { FactoryBot.create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
 
     context 'when role is registrar' do
       subject(:get_all_case) do

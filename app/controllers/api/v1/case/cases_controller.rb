@@ -11,7 +11,6 @@ module Api
         before_action :case_service, only: :statistics
 
         def index
-          # binding.pry
           @cases = current_tenant.cases.all
           @cases = policy_scope(@cases)
           authorize @cases
@@ -45,7 +44,7 @@ module Api
         end
 
         def statistics
-          authorize @court_case
+          authorize :case, :statistics?
           render_json :ok, nil, @case_service.case_statistics
         end
 

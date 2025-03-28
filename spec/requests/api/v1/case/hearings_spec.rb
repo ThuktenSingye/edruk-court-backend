@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-# rubocop:disable  RSpec/MultipleMemoizedHelpers
+# rubocop:disable  RSpec/MultipleMemoizedHelpers,RSpec/LetSetup
 RSpec.describe 'Api::V1::Case::Hearings', type: :request do
   let(:court) { FactoryBot.create(:court) }
   let(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
@@ -10,9 +10,9 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
   let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: court) }
   let!(:hearing_type) { FactoryBot.create(:hearing_type) }
   let!(:hearing) { FactoryBot.create(:hearing, case: court_case, hearing_type: hearing_type) }
-  let(:registrar_user) { FactoryBot.create(:user, :registrar, confirmed_at: Time.zone.now) }
-  let(:judge_user) { FactoryBot.create(:user, :judge, confirmed_at: Time.zone.now) }
-  let(:clerk_user) { FactoryBot.create(:user, :clerk, confirmed_at: Time.zone.now) }
+  let(:registrar_user) { FactoryBot.create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
+  let(:judge_user) { FactoryBot.create(:user, :judge, court: court, confirmed_at: Time.zone.now) }
+  let(:clerk_user) { FactoryBot.create(:user, :clerk, court: court, confirmed_at: Time.zone.now) }
 
   describe 'GET /index' do
     before { sign_in judge_user }
@@ -41,6 +41,10 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
           hearing_status: :completed
         }
       end
+      let!(:case_participant) do
+        FactoryBot.create(:case_participant, case: court_case, user: judge_user,
+                                             role: Role.find_by(name: 'Judge'))
+      end
 
       it { is_expected.to have_http_status :ok }
       it { expect { update_hearing }.not_to change(Hearing, :count) }
@@ -64,6 +68,10 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         {
           hearing_status: :completed
         }
+      end
+      let!(:case_participant) do
+        FactoryBot.create(:case_participant, case: court_case, user: clerk_user,
+                                             role: Role.find_by(name: 'Clerk'))
       end
 
       it { is_expected.to have_http_status :ok }
@@ -146,10 +154,14 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
           hearing_type_id: nil
         }
       end
+      let!(:case_participant) do
+        FactoryBot.create(:case_participant, case: court_case, user: clerk_user,
+                                             role: Role.find_by(name: 'Clerk'))
+      end
 
       it { is_expected.to have_http_status :unprocessable_entity }
       it { expect { create_hearing }.not_to change(Hearing, :count) }
     end
   end
 end
-# rubocop:enable RSpec/MultipleMemoizedHelpers
+# rubocop:enable RSpec/MultipleMemoizedHelpers,RSpec/LetSetup

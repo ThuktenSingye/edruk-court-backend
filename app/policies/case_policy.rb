@@ -9,7 +9,7 @@ class CasePolicy < ApplicationPolicy
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
   def index?
-    court_user? && (user.admin? || user.registrar? || assigned_to_clerk? || assigned_to_judge?)
+    user.admin? || user.registrar? || assigned_to_clerk? || assigned_to_judge?
   end
 
   def show?
@@ -25,16 +25,18 @@ class CasePolicy < ApplicationPolicy
   end
 
   def statistics?
-    court_user? && (user.admin? || user.registrar? || assigned_to_judge? || assigned_to_clerk?)
+    index?
   end
 
   # Case Scope
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.admin? || user.registrar?
-        scope.all
-      else
+        scope.where(court_id: user.court_id)
+      elsif user.clerk? || user.judge?
         cases_assigned_to_user
+      else
+        scope.none
       end
     end
   end
@@ -42,7 +44,7 @@ class CasePolicy < ApplicationPolicy
   private
 
   def assigned_to_judge?
-    user.judge? && record.case_participants.where(user: user, role: Role.where(name: 'Judge'))
+    user.judge? && record.case_participants.exists?(user: user, role: Role.where(name: 'Judge'))
   end
 
   def assigned_to_clerk?
