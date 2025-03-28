@@ -1,7 +1,155 @@
-require 'rails_helper'
+# frozen_string_literal: true
 
-RSpec.describe "Api::V1::Case::Hearings", type: :request do
-  describe "GET /index" do
-    pending "add some examples (or delete) #{__FILE__}"
+require 'rails_helper'
+# rubocop:disable  RSpec/MultipleMemoizedHelpers
+RSpec.describe 'Api::V1::Case::Hearings', type: :request do
+  let(:court) { FactoryBot.create(:court) }
+  let(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
+  let(:case_type) { FactoryBot.create(:case_type) }
+  let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
+  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: court) }
+  let!(:hearing_type) { FactoryBot.create(:hearing_type) }
+  let!(:hearing) { FactoryBot.create(:hearing, case: court_case, hearing_type: hearing_type) }
+  let(:registrar_user) { FactoryBot.create(:user, :registrar, confirmed_at: Time.zone.now) }
+  let(:judge_user) { FactoryBot.create(:user, :judge, confirmed_at: Time.zone.now) }
+  let(:clerk_user) { FactoryBot.create(:user, :clerk, confirmed_at: Time.zone.now) }
+
+  describe 'GET /index' do
+    before { sign_in judge_user }
+
+    context 'when role is judge' do
+      subject(:get_all_hearing) do
+        get api_v1_case_hearings_path(court_case)
+        response
+      end
+
+      it { is_expected.to have_http_status :ok }
+    end
+  end
+
+  describe 'PUT /update' do
+    context 'when role is judge' do
+      subject(:update_hearing) do
+        put api_v1_case_hearing_path(court_case, hearing), params: { hearing: valid_hearing_params }
+        response
+      end
+
+      before { sign_in judge_user }
+
+      let(:valid_hearing_params) do
+        {
+          hearing_status: :completed
+        }
+      end
+
+      it { is_expected.to have_http_status :ok }
+      it { expect { update_hearing }.not_to change(Hearing, :count) }
+
+      it 'update the status to completed' do
+        response = update_hearing
+        response_json = JSON.parse(response.body)
+        expect(response_json['data']['hearing_status']).to eq(valid_hearing_params[:hearing_status].to_s)
+      end
+    end
+
+    context 'when role is clerk' do
+      subject(:update_hearing) do
+        put api_v1_case_hearing_path(court_case, hearing), params: { hearing: valid_hearing_params }
+        response
+      end
+
+      before { sign_in clerk_user }
+
+      let(:valid_hearing_params) do
+        {
+          hearing_status: :completed
+        }
+      end
+
+      it { is_expected.to have_http_status :ok }
+      it { expect { update_hearing }.not_to change(Hearing, :count) }
+    end
+
+    context 'when role is general user' do
+      subject(:update_hearing) do
+        put api_v1_case_hearing_path(court_case, hearing), params: { hearing: valid_hearing_params }
+        response
+      end
+
+      before { sign_in user }
+
+      let(:valid_hearing_params) do
+        {
+          hearing_status: :completed
+        }
+      end
+
+      it { is_expected.to have_http_status :unauthorized }
+
+      it 'assign the original hearing' do
+        update_hearing
+        expect(assigns(:hearing)).to eq(hearing)
+      end
+    end
+  end
+
+  describe 'POST /create' do
+    context 'when role is judge' do
+      subject(:create_hearing) do
+        post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
+        response
+      end
+
+      before { sign_in judge_user }
+
+      let(:valid_hearing_params) do
+        {
+          hearing_status: :completed,
+          hearing_type_id: hearing_type.id
+        }
+      end
+
+      it { is_expected.to have_http_status :unauthorized }
+      it { expect { create_hearing }.not_to change(Hearing, :count) }
+    end
+
+    context 'when role is registrar' do
+      subject(:create_hearing) do
+        post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
+        response
+      end
+
+      before { sign_in registrar_user }
+
+      let(:valid_hearing_params) do
+        {
+          hearing_status: :completed,
+          hearing_type_id: hearing_type.id
+        }
+      end
+
+      it { is_expected.to have_http_status :created }
+      it { expect { create_hearing }.to change(Hearing, :count).by(1) }
+    end
+
+    context 'when role is clerk but param are invalid' do
+      subject(:create_hearing) do
+        post api_v1_case_hearings_path(court_case), params: { hearing: invalid_hearing_params }
+        response
+      end
+
+      before { sign_in clerk_user }
+
+      let(:invalid_hearing_params) do
+        {
+          hearing_status: nil,
+          hearing_type_id: nil
+        }
+      end
+
+      it { is_expected.to have_http_status :unprocessable_entity }
+      it { expect { create_hearing }.not_to change(Hearing, :count) }
+    end
   end
 end
+# rubocop:enable RSpec/MultipleMemoizedHelpers

@@ -5,6 +5,8 @@ class Case < ApplicationRecord
   acts_as_tenant :court, optional: false
   belongs_to :case_type, optional: true
   belongs_to :case_subtype, optional: true
+  has_many :case_participants, dependent: :destroy
+  has_many :hearings, dependent: :destroy
 
   enum :case_status, { filed: 0, pending: 1, active: 2, dismissed: 3, withdrawn: 4, settled: 5, closed: 6 }
   enum :case_priority, { low: 0, medium: 1, high: 2, critical: 3 }

@@ -31,6 +31,7 @@ Rails.application.routes.draw do
             collection do
               get :statistics
             end
+            resources :hearings, except: %i[destroy]
           end
         end
       end

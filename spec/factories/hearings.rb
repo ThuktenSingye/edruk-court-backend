@@ -6,4 +6,8 @@ FactoryBot.define do
     association :case, factory: :case
     association :hearing_type, factory: :hearing_type
   end
+
+  trait :invalid_hearing do
+    hearing_type { nil }
+  end
 end

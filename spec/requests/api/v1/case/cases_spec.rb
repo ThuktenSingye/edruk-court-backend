@@ -9,6 +9,21 @@ RSpec.describe 'Api::V1::Case::Cases', type: :request do
   let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
   let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: court) }
 
+  describe 'GET /index' do
+    let(:registrar_user) { FactoryBot.create(:user, :registrar, confirmed_at: Time.zone.now) }
+
+    context 'when role is registrar' do
+      subject(:get_all_case) do
+        get api_v1_cases_path
+        response
+      end
+
+      before { sign_in registrar_user }
+
+      it { is_expected.to have_http_status :ok }
+    end
+  end
+
   describe 'GET /show' do
     before { sign_in user }
 

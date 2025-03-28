@@ -13,5 +13,6 @@ RSpec.describe Case, type: :model do
     it { is_expected.to belong_to(:case_subtype).optional }
     it { is_expected.to belong_to(:case_type).optional }
     it { is_expected.to belong_to(:court).optional }
+    it { is_expected.to have_many :hearings }
   end
 end

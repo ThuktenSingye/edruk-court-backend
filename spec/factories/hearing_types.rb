@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :hearing_type do
-    name { Faker::Internet.unique.name }
+    name { Faker::Internet.name }
   end
 end

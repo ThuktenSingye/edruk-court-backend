@@ -11,10 +11,12 @@ module Api
         before_action :case_service, only: :statistics
 
         def index
+          # binding.pry
           @cases = current_tenant.cases.all
           @cases = policy_scope(@cases)
+          authorize @cases
           @cases = @cases.order(created_at: :desc).includes(:case_participants)
-          render_json :ok, nil, serialized_cases(@cases)
+          render_json :ok, nil, @cases
         end
 
         def show
