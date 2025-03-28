@@ -9,7 +9,7 @@ class CasePolicy < ApplicationPolicy
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
   def index?
-    user.admin? || user.registrar? || user.judge? || user.clerk?
+    court_user? && (user.admin? || user.registrar? || assigned_to_clerk? || assigned_to_judge?)
   end
 
   def show?
@@ -17,15 +17,15 @@ class CasePolicy < ApplicationPolicy
   end
 
   def update?
-    user.registrar? || user.clerk?
+    court_user? && (user.registrar? || assigned_to_clerk?)
   end
 
   def create?
-    user.registrar?
+    court_user? && user.registrar?
   end
 
   def statistics?
-    user.admin? || user.registrar? || user.judge? || user.clerk?
+    court_user? && (user.admin? || user.registrar? || assigned_to_judge? || assigned_to_clerk?)
   end
 
   # Case Scope
@@ -40,6 +40,14 @@ class CasePolicy < ApplicationPolicy
   end
 
   private
+
+  def assigned_to_judge?
+    user.judge? && record.case_participants.where(user: user, role: Role.where(name: 'Judge'))
+  end
+
+  def assigned_to_clerk?
+    user.clerk? && record.case_participants.exists?(user: user, role: Role.where(name: 'Clerk'))
+  end
 
   def judge_and_clerk_role_ids
     @judge_and_clerk_role_ids ||= Role.where(name: %w[Judge Clerk]).pluck(:id)
