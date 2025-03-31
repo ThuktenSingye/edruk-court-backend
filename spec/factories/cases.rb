@@ -14,6 +14,7 @@ FactoryBot.define do
     is_reopened { false }
     case_status { :filed }
     association :case_subtype, factory: :case_subtype
+    association :case_type, factory: :case_type
     association :court, factory: :court
   end
 end

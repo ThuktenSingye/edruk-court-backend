@@ -5,9 +5,9 @@ require 'rails_helper'
 RSpec.describe 'Api::V1::Case::Cases', type: :request do
   let(:court) { FactoryBot.create(:court) }
   let!(:user) { FactoryBot.create(:user, :court_user, court: court, confirmed_at: Time.zone.now) }
-  let(:case_type) { FactoryBot.create(:case_type) }
+  let(:case_type) { FactoryBot.create(:case_type, :civil) }
   let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
-  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: court) }
+  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, case_type: case_type, court: court) }
   let(:case_params) do
     {
       case_number: Faker::Number.number(digits: 2).to_s,
