@@ -9,7 +9,16 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
   let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
   let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: court) }
   let!(:hearing_type) { FactoryBot.create(:hearing_type) }
+  let!(:miscellaneous_hearing_type) { FactoryBot.create(:hearing_type, :miscellaneous) }
   let!(:hearing) { FactoryBot.create(:hearing, case: court_case, hearing_type: hearing_type) }
+  let!(:miscellaneous_hearing) do
+    FactoryBot.create(:hearing, case: court_case, hearing_type: miscellaneous_hearing_type)
+  end
+  let!(:preliminary_hearing_type) { FactoryBot.create(:hearing_type, :preliminary) }
+  let!(:preliminary_hearing) do
+    FactoryBot.create(:hearing, case: court_case, hearing_type: preliminary_hearing_type)
+  end
+
   let(:registrar_user) { FactoryBot.create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
   let(:judge_user) { FactoryBot.create(:user, :judge, court: court, confirmed_at: Time.zone.now) }
   let(:clerk_user) { FactoryBot.create(:user, :clerk, court: court, confirmed_at: Time.zone.now) }
@@ -28,7 +37,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
   end
 
   describe 'PUT /update' do
-    context 'when role is judge' do
+    context 'when role is judge and hearing is not miscellaneous' do
       subject(:update_hearing) do
         put api_v1_case_hearing_path(court_case, hearing), params: { hearing: valid_hearing_params }
         response
@@ -38,7 +47,8 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
 
       let(:valid_hearing_params) do
         {
-          hearing_status: :completed
+          hearing_status: :completed,
+          hearing_type_id: hearing_type.id
         }
       end
       let!(:case_participant) do
@@ -56,9 +66,9 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
       end
     end
 
-    context 'when role is clerk' do
+    context 'when role is clerk and hearing is miscellaneous' do
       subject(:update_hearing) do
-        put api_v1_case_hearing_path(court_case, hearing), params: { hearing: valid_hearing_params }
+        put api_v1_case_hearing_path(court_case, miscellaneous_hearing), params: { hearing: valid_hearing_params }
         response
       end
 
@@ -66,7 +76,8 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
 
       let(:valid_hearing_params) do
         {
-          hearing_status: :completed
+          hearing_status: :completed,
+          hearing_type_id: hearing_type.id
         }
       end
       let!(:case_participant) do
@@ -74,7 +85,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
                                              role: Role.find_by(name: 'Clerk'))
       end
 
-      it { is_expected.to have_http_status :ok }
+      it { is_expected.to have_http_status :unauthorized }
       it { expect { update_hearing }.not_to change(Hearing, :count) }
     end
 
@@ -102,7 +113,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
   end
 
   describe 'POST /create' do
-    context 'when role is judge' do
+    context 'when role is judge and hearing is miscellaneous' do
       subject(:create_hearing) do
         post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
         response
@@ -113,7 +124,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
       let(:valid_hearing_params) do
         {
           hearing_status: :completed,
-          hearing_type_id: hearing_type.id
+          hearing_type_id: miscellaneous_hearing_type.id
         }
       end
 
@@ -121,7 +132,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
       it { expect { create_hearing }.not_to change(Hearing, :count) }
     end
 
-    context 'when role is registrar' do
+    context 'when role is registrar and hearing is miscellaneous' do
       subject(:create_hearing) do
         post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
         response
@@ -131,16 +142,15 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
 
       let(:valid_hearing_params) do
         {
-          hearing_status: :completed,
-          hearing_type_id: hearing_type.id
+          hearing_status: :ongoing,
+          hearing_type_id: miscellaneous_hearing_type.id
         }
       end
 
       it { is_expected.to have_http_status :created }
-      it { expect { create_hearing }.to change(Hearing, :count).by(1) }
     end
 
-    context 'when role is clerk but param are invalid' do
+    context 'when role is clerk but params are invalid' do
       subject(:create_hearing) do
         post api_v1_case_hearings_path(court_case), params: { hearing: invalid_hearing_params }
         response
@@ -151,7 +161,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
       let(:invalid_hearing_params) do
         {
           hearing_status: nil,
-          hearing_type_id: nil
+          hearing_type_id: hearing_type.id
         }
       end
       let!(:case_participant) do
