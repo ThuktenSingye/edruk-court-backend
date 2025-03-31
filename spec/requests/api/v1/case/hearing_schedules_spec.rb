@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+
 # rubocop:disable  RSpec/MultipleMemoizedHelpers,RSpec/LetSetup
-RSpec.describe 'Api::V1::Case::Hearings', type: :request do
+RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
+  # index
+  # create
+  # update
+  # destroy
   let(:court) { FactoryBot.create(:court) }
   let(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
   let(:case_type) { FactoryBot.create(:case_type) }
@@ -44,7 +49,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
 
       let!(:case_participant) do
         FactoryBot.create(:case_participant, case: court_case, user: judge_user,
-                                             role: Role.find_by(name: 'Judge'))
+                          role: Role.find_by(name: 'Judge'))
       end
 
       it { is_expected.to have_http_status :ok }
@@ -67,7 +72,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
 
       let!(:case_participant) do
         FactoryBot.create(:case_participant, case: court_case, user: clerk_user,
-                                             role: Role.find_by(name: 'Clerk'))
+                          role: Role.find_by(name: 'Clerk'))
       end
 
       it { is_expected.to have_http_status :ok }
@@ -132,7 +137,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
       end
       let!(:case_participant) do
         FactoryBot.create(:case_participant, case: court_case, user: clerk_user,
-                                             role: Role.find_by(name: 'Clerk'))
+                          role: Role.find_by(name: 'Clerk'))
       end
 
       it { is_expected.to have_http_status :unprocessable_entity }
