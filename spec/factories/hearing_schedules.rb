@@ -6,6 +6,6 @@ FactoryBot.define do
     schedule_status { 1 }
     reschedule_reason { Faker::Lorem.sentence }
     association :hearing, factory: :hearing
-    association :author, factory: :user
+    association :scheduled_by, factory: :user
   end
 end

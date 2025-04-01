@@ -8,16 +8,37 @@ module Cases
     end
 
     def case_statistics
-      stats_data = {
-        total: @params.count,
-        civil: @params.where(case_type: 'Civil').count,
-        criminal: @params.where(case_type: 'Criminal').count,
-        others: @params.where(case_type: 'Other').count,
-        active: @params.where(case_status: :active).count,
-        decided: @params.where(case_status: :decided).count,
-        appeal: @params.where(is_appeal: true).count
+      StatisticsSerializer.new(case_stats_data).serializable_hash[:data][:attributes]
+    end
+
+    private
+
+    def case_stats_data
+      {
+        total: total_cases,
+        civil: count_by_case_type('Civil'),
+        criminal: count_by_case_type('Criminal'),
+        others: count_by_case_type('Other'),
+        active: count_by_status(:active),
+        decided: count_by_status(:decided),
+        appeal: count_appeals
       }
-      StatisticsSerializer.new(stats_data).serializable_hash
+    end
+
+    def total_cases
+      @params.count
+    end
+
+    def count_by_case_type(type)
+      @params.joins(:case_type).where(case_types: { title: type }).count
+    end
+
+    def count_by_status(status)
+      @params.where(case_status: status).count
+    end
+
+    def count_appeals
+      @params.where(is_appeal: true).count
     end
   end
 end

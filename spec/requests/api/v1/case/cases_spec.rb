@@ -5,9 +5,22 @@ require 'rails_helper'
 RSpec.describe 'Api::V1::Case::Cases', type: :request do
   let(:court) { FactoryBot.create(:court) }
   let!(:user) { FactoryBot.create(:user, :court_user, court: court, confirmed_at: Time.zone.now) }
-  let(:case_type) { FactoryBot.create(:case_type) }
+  let(:case_type) { FactoryBot.create(:case_type, :civil) }
   let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
-  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: court) }
+  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, case_type: case_type, court: court) }
+  let(:case_params) do
+    {
+      case_number: Faker::Number.number(digits: 2).to_s,
+      registration_number: Faker::Number.number(digits: 2).to_s,
+      judgement_number: Faker::Number.number(digits: 2).to_s,
+      title: Faker::Lorem.word,
+      summary: Faker::Lorem.sentence,
+      case_priority: :low,
+      case_status: :filed,
+      case_subtype: case_subtype,
+      court: court
+    }
+  end
 
   describe 'GET /index' do
     let(:registrar_user) { FactoryBot.create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
@@ -61,9 +74,7 @@ RSpec.describe 'Api::V1::Case::Cases', type: :request do
         response
       end
 
-      before do
-        sign_in registrar_user
-      end
+      before { sign_in registrar_user }
 
       let(:case_params) { FactoryBot.attributes_for(:case) }
 
@@ -84,20 +95,6 @@ RSpec.describe 'Api::V1::Case::Cases', type: :request do
 
       before { sign_in judge_user }
 
-      let(:case_params) do
-        {
-          case_number: Faker::Number.number(digits: 2).to_s,
-          registration_number: Faker::Number.number(digits: 2).to_s,
-          judgement_number: Faker::Number.number(digits: 2).to_s,
-          title: Faker::Lorem.word,
-          summary: Faker::Lorem.sentence,
-          case_priority: :low,
-          case_status: :filed,
-          case_subtype: case_subtype,
-          court: court
-        }
-      end
-
       it { is_expected.to have_http_status :unauthorized }
       it { expect { update_case }.not_to change(Case, :count) }
 
@@ -114,20 +111,6 @@ RSpec.describe 'Api::V1::Case::Cases', type: :request do
       end
 
       before { sign_in registrar_user }
-
-      let(:case_params) do
-        {
-          case_number: Faker::Number.number(digits: 2).to_s,
-          registration_number: Faker::Number.number(digits: 2).to_s,
-          judgement_number: Faker::Number.number(digits: 2).to_s,
-          title: Faker::Lorem.word,
-          summary: Faker::Lorem.sentence,
-          case_priority: :low,
-          case_status: :filed,
-          case_subtype: case_subtype,
-          court: court
-        }
-      end
 
       it { is_expected.to have_http_status :ok }
       it { expect { update_case }.not_to change(Case, :count) }
