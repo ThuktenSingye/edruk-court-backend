@@ -19,6 +19,8 @@ module Api
           @hearing = @case.hearings.build(hearing_params)
           authorize @hearing
           if @hearing.save
+            binding.pry
+            notify_hearing_created(@hearing)
             render_json :created, 'Hearing created Successfully', serialized_hearing(@hearing)
           else
             render_json :unprocessable_entity, nil, @hearing.errors
@@ -48,6 +50,33 @@ module Api
 
         def serialized_hearing(hearing)
           HearingSerializer.new(hearing).serializable_hash[:data][:attributes]
+        end
+
+        def notify_hearing_created(hearing)
+          schedule = hearing.hearing_schedules.last
+          recipients = notification_recipients
+
+          HearingNotifier.with(
+            record: hearing,
+            message: 'New Hearing Created',
+            hearing: hearing,
+            hearing_schedule: schedule,
+            case: @case
+          ).deliver(recipients)
+        end
+
+        def notification_recipients
+          # Get the single judge for this case
+          judge = @case.case_participants.joins(user: :roles)
+                       .find_by(roles: { name: 'Judge' })
+                    &.user
+
+          binding.pry
+          # Get tenant admins
+          admins = current_tenant.users.with_role(:admin, current_tenant)
+
+          # Return array with judge (if found) and admins
+          [judge, *admins].compact
         end
 
         def hearing_params

@@ -21,7 +21,7 @@ module Api
 
         def authenticate_user
           @user = current_tenant.users.find_by(email: params[:user][:email])
-          if @user
+          if @user&.valid_password?(params[:user][:password])
             sign_in(@user)
             respond_with(@user, success: true)
           else

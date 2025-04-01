@@ -89,3 +89,5 @@ gem 'dotenv-rails'
 gem 'pundit'
 
 gem 'openssl'
+
+gem 'noticed'
