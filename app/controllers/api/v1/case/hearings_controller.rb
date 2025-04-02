@@ -17,9 +17,9 @@ module Api
 
         def create
           @hearing = @case.hearings.build(hearing_params)
+
           authorize @hearing
           if @hearing.save
-            binding.pry
             notify_hearing_created(@hearing)
             render_json :created, 'Hearing created Successfully', serialized_hearing(@hearing)
           else
@@ -52,38 +52,65 @@ module Api
           HearingSerializer.new(hearing).serializable_hash[:data][:attributes]
         end
 
+        # constraint
+        # when creating miscellaneous hearing, check if bench exist
+        # if bench exist, assign the case, schedule and notify the judge
+        # if bench does not exist, default judge and notify the judge
+
+        # when creating preliminar hearing, check if bench exist
+        # if bench exist, assign the case to bench and bench clerk
+        # if bench does not then default judge and select bench clerk
+        # notify the user
+
+        # for the rest of the hearing, when hearing is created along with schedule, notify the participant.
+
+        # need method ot check if bench exisit
+        # need method to check type of prelimninary
+        # need method to assign the case to bench and clekr
+        #
         def notify_hearing_created(hearing)
           schedule = hearing.hearing_schedules.last
-          recipients = notification_recipients
+          recipient = notification_recipient
 
-          HearingNotifier.with(
+          return unless recipient
+
+          params = {
             record: hearing,
-            message: 'New Hearing Created',
+            message: 'new_hearing',
             hearing: hearing,
             hearing_schedule: schedule,
             case: @case
-          ).deliver(recipients)
+          }
+          notification = HearingNotifier.with(params).deliver(recipient)
+
+          if notification.persisted?
+            Rails.logger.info "Hearing notification delivered to #{recipient.email}"
+            true
+          else
+            Rails.logger.error "Failed to deliver hearing notification to #{recipient.email}"
+            false
+          end
         end
 
-        def notification_recipients
+        def notification_recipient
           # Get the single judge for this case
-          judge = @case.case_participants.joins(user: :roles)
-                       .find_by(roles: { name: 'Judge' })
-                    &.user
-
-          binding.pry
-          # Get tenant admins
-          admins = current_tenant.users.with_role(:admin, current_tenant)
-
-          # Return array with judge (if found) and admins
-          [judge, *admins].compact
+          @case.case_participants.joins(user: :roles)
+               .find_by(roles: { name: 'Judge' })
+               &.user
         end
 
         def hearing_params
           params.expect(
-            hearing: [:hearing_type_id, :hearing_status,
-                      { hearing_schedules_attributes: %i[id scheduled_date schedule_status
-                                                         reschedule_reason author _destroy] }]
+            hearing: [:hearing_type_id,
+                      :hearing_status, :case_id,
+                      { hearing_schedules_attributes: [
+                        :id,
+                        :scheduled_date,
+                        :schedule_status,
+                        :reschedule_reason,
+                        :scheduled_by_id, # Changed to match your database column
+                        :_destroy
+                      ] }]
           )
         end
       end

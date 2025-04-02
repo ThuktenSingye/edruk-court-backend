@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
 class ApplicationNotifier < Noticed::Event
-  deliver_by :database
-  deliver_by :action_cable
-
-  param :message, :record
-
   def to_database
     {
       type: self.class.name,
@@ -27,12 +22,14 @@ class ApplicationNotifier < Noticed::Event
     }
   end
 
-  def message
-    params[:message] || ''
-  end
+  notification_methods do
+    def message
+      params[:message] || ''
+    end
 
-  def url
-    '#'
+    def url
+      '#'
+    end
   end
 
   private
