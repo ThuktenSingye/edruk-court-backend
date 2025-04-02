@@ -13,7 +13,7 @@ module Api
           super do |resource|
             if resource.persisted?
               default_role = Role.find_or_create_by!(name: 'User')
-              UserRole.find_or_create_by!(user: resource, role: default_role)
+              resource.add_role(default_role.name)
             end
           end
         end

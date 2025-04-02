@@ -2,7 +2,9 @@
 
 # Role Model
 class Role < ApplicationRecord
-  has_many :user_roles, dependent: :nullify
+  rolify
+
+  belongs_to :resource, polymorphic: true, optional: true
 
   validates :name, presence: true, uniqueness: true
 end

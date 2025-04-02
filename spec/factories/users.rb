@@ -19,30 +19,26 @@ FactoryBot.define do
   # Associate user with roles
   trait :admin do
     after(:create) do |user|
-      role = Role.find_or_create_by(name: 'Admin')
-      user.roles << role
+      user.add_role('Admin')
     end
   end
 
   trait :clerk do
     after(:create) do |user|
-      role = Role.find_or_create_by(name: 'Clerk')
-      user.roles << role
+      user.add_role('Clerk')
     end
   end
 
   # Associate user with roles
   trait :registrar do
     after(:create) do |user|
-      role = Role.find_or_create_by(name: 'Registrar')
-      user.roles << role
+      user.add_role('Registrar')
     end
   end
 
   trait :judge do
     after(:create) do |user|
-      role = Role.find_or_create_by(name: 'Judge')
-      user.roles << role
+      user.add_role('Judge')
     end
   end
 
