@@ -4,32 +4,482 @@ info:
   title: API V1
   version: v1
 paths:
+  "/api/v1/users/{user_id}/profile/addresses":
+    parameters:
+    - name: user_id
+      in: path
+      description: User ID
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Create Address
+      tags:
+      - Addresses
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '201':
+          description: Address created
+        '422':
+          description: Invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: object
+                  properties:
+                    dzongkhag:
+                      type: string
+                    gewog:
+                      type: string
+                    street_address:
+                      type: string
+                    address_type:
+                      type: string
+                  required:
+                  - dzongkhag
+                  - gewog
+                  - street_address
+                  - address_type
+              required:
+              - address
+  "/api/v1/auth/confirmation":
+    get:
+      summary: Confirm user account
+      tags:
+      - Authentication
+      parameters:
+      - name: confirmation_token
+        in: query
+        required: true
+        description: Confirmation token sent to user email
+        schema:
+          type: string
+      responses:
+        '200':
+          description: account successfully confirmed
+        '422':
+          description: unprocessable entity
+  "/api/v1/auth/password":
+    put:
+      summary: Reset user password
+      tags:
+      - Authentication
+      parameters: []
+      responses:
+        '200':
+          description: password successfully reset
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                    reset_password_token:
+                      type: string
+                  required:
+                  - email
+                  - password
+                  - password_confirmation
+                  - reset_password_token
+  "/api/v1/signup":
+    post:
+      summary: User registration
+      tags:
+      - Authentication
+      parameters: []
+      responses:
+        '201':
+          description: user created
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                    profile_attributes:
+                      type: object
+                      properties:
+                        first_name:
+                          type: string
+                        last_name:
+                          type: string
+                        cid_no:
+                          type: string
+                        phone_number:
+                          type: string
+                        gender:
+                          type: string
+                      required:
+                      - first_name
+                      - last_name
+                      - cid_no
+                      - phone_number
+                      - gender
+                  required:
+                  - email
+                  - password
+                  - password_confirmation
+                  - profile_attributes
+  "/api/v1/signin":
+    post:
+      summary: User login
+      tags:
+      - Authentication
+      parameters: []
+      responses:
+        '200':
+          description: successful login
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+                  required:
+                  - email
+                  - password
+  "/api/v1/cases":
+    get:
+      summary: List all cases
+      tags:
+      - Cases
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: Cases found
+    post:
+      summary: Create a case
+      tags:
+      - Cases
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '401':
+          description: Unauthorized
+        '201':
+          description: Case created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                case_number:
+                  type: string
+                registration_number:
+                  type: string
+                judgement_number:
+                  type: string
+                title:
+                  type: string
+                summary:
+                  type: string
+                case_priority:
+                  type: string
+                case_status:
+                  type: string
+                case_subtype:
+                  type: integer
+                court:
+                  type: integer
+  "/api/v1/cases/{case_id}":
+    parameters:
+    - name: case_id
+      in: path
+      description: Case ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Show a case
+      tags:
+      - Cases
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: Case found
+    put:
+      summary: Update a case
+      tags:
+      - Cases
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '401':
+          description: Unauthorized
+        '200':
+          description: Case updated
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                case_number:
+                  type: string
+                registration_number:
+                  type: string
+                judgement_number:
+                  type: string
+                title:
+                  type: string
+                summary:
+                  type: string
+                case_priority:
+                  type: string
+                case_status:
+                  type: string
+  "/api/v1/cases/statistics":
+    get:
+      summary: Get case statistics
+      tags:
+      - Cases
+      security:
+      - Bearer: []
+      responses:
+        '401':
+          description: Unauthorized
+        '200':
+          description: Statistics found
+  "/api/v1/cases/{case_id}/hearings/{hearing_id}/hearing_schedules":
+    get:
+      summary: List all hearing schedules for a hearing
+      tags:
+      - Hearing Schedules
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Hearing schedules found
+  "/api/v1/cases/{case_id}/hearings/{hearing_id}/hearing_schedules/{id}":
+    parameters:
+    - name: case_id
+      in: path
+      description: Case ID
+      required: true
+      schema:
+        type: integer
+    - name: hearing_id
+      in: path
+      description: Hearing ID
+      required: true
+      schema:
+        type: integer
+    - name: id
+      in: path
+      description: Hearing Schedule ID
+      required: true
+      schema:
+        type: integer
+    put:
+      summary: Update a hearing schedule
+      tags:
+      - Hearing Schedules
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '200':
+          description: Hearing schedule updated
+        '401':
+          description: Unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scheduled_date:
+                  type: string
+                  format: date
+                schedule_status:
+                  type: string
+                reschedule_reason:
+                  type: string
+    delete:
+      summary: Delete a hearing schedule
+      tags:
+      - Hearing Schedules
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: Hearing schedule deleted
+        '401':
+          description: Unauthorized
+  "/api/v1/cases/{case_id}/hearings":
+    get:
+      summary: List all hearings for a case
+      tags:
+      - Hearings
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Hearings found
+    post:
+      summary: Create a hearing
+      tags:
+      - Hearings
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '401':
+          description: Unauthorized
+        '201':
+          description: Hearing created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                hearing_status:
+                  type: string
+                hearing_type_id:
+                  type: integer
+                case_id:
+                  type: integer
+                hearing_schedules_attributes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      scheduled_date:
+                        type: string
+                        format: date
+                      schedule_status:
+                        type: string
+                      reschedule_reason:
+                        type: string
+                      scheduled_by_id:
+                        type: integer
+  "/api/v1/cases/{case_id}/hearings/{hearing_id}":
+    parameters:
+    - name: case_id
+      in: path
+      description: Case ID
+      required: true
+      schema:
+        type: integer
+    - name: hearing_id
+      in: path
+      description: Hearing ID
+      required: true
+      schema:
+        type: integer
+    put:
+      summary: Update a hearing
+      tags:
+      - Hearings
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '200':
+          description: Hearing updated
+        '401':
+          description: Unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                hearing_status:
+                  type: string
+                hearing_type_id:
+                  type: integer
   "/api/v1/users/{user_id}/profile":
     parameters:
     - name: user_id
       in: path
-      description: user_id
+      description: User ID
       required: true
       schema:
-        type: string
-    - name: Authorization
-      in: header
-      description: Bearer token
-      schema:
-        type: string
+        type: integer
     get:
-      summary: show profile
+      summary: Get User Profile
       tags:
       - Profiles
       security:
       - Bearer: []
       responses:
         '200':
-          description: successful
-        '401':
-          description: unauthorized
+          description: Profile found
     put:
-      summary: update profile
+      summary: Update User Profile
       tags:
       - Profiles
       security:
@@ -37,11 +487,9 @@ paths:
       parameters: []
       responses:
         '200':
-          description: successful with valid params
+          description: Profile updated
         '422':
-          description: unsuccessful with invalid params
-        '401':
-          description: unauthorized
+          description: Invalid request
       requestBody:
         content:
           application/json:
@@ -67,10 +515,6 @@ paths:
                       type: integer
                     gender:
                       type: string
-                      enum:
-                      - male
-                      - female
-                      - other
                     addresses_attributes:
                       type: array
                       items:
@@ -84,23 +528,11 @@ paths:
                             type: string
                           address_type:
                             type: string
-                            enum:
-                            - present
-                            - permanent
-                        required:
-                        - dzongkhag
-                        - gewog
-                        - street_address
-                        - address_type
                   required:
                   - first_name
                   - last_name
                   - cid_no
                   - phone_number
-                  - house_no
-                  - thram_no
-                  - age
-                  - gender
               required:
               - profile
 servers:
