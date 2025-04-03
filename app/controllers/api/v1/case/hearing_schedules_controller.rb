@@ -37,12 +37,10 @@ module Api
 
         def case
           @case ||= current_tenant.cases.find(params[:case_id])
-          # authorize @case
         end
 
         def hearing
           @hearing ||= @case.hearings.find(params[:hearing_id])
-          # authorize @hearing
         end
 
         def hearing_schedule
