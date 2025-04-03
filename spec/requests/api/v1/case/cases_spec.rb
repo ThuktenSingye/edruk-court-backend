@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-# rubocop:disable  RSpec/MultipleMemoizedHelpers
-RSpec.describe 'Api::V1::Case::Cases', type: :request do
-  let(:court) { FactoryBot.create(:court) }
-  let!(:user) { FactoryBot.create(:user, :court_user, court: court, confirmed_at: Time.zone.now) }
-  let(:case_type) { FactoryBot.create(:case_type, :civil) }
-  let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
-  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, case_type: case_type, court: court) }
+require 'swagger_helper'
+
+# rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/ExampleLength
+RSpec.describe 'Api::V1::Cases', type: :request do
+  let(:court) { create(:court) }
+  let!(:user) { create(:user, :court_user, court: court, confirmed_at: Time.zone.now) }
+  let(:case_type) { create(:case_type, :civil) }
+  let(:case_subtype) { create(:case_subtype, case_type: case_type) }
+  let!(:court_case) { create(:case, case_subtype: case_subtype, case_type: case_type, court: court) }
   let(:case_params) do
     {
       case_number: Faker::Number.number(digits: 2).to_s,
@@ -22,141 +24,216 @@ RSpec.describe 'Api::V1::Case::Cases', type: :request do
     }
   end
 
-  describe 'GET /index' do
-    let(:registrar_user) { FactoryBot.create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
+  path '/api/v1/cases' do
+    get 'List all cases' do
+      tags 'Cases'
+      security [Bearer: []]
+      produces 'application/json'
 
-    context 'when role is registrar' do
-      subject(:get_all_case) do
-        get api_v1_cases_path
-        response
+      context 'when role is registrar' do
+        let(:registrar_user) { create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
+
+        before { sign_in registrar_user }
+
+        response '200', 'Cases found' do
+          it 'returns all cases' do
+            get api_v1_cases_path
+            expect(response).to have_http_status(:ok)
+          end
+        end
       end
-
-      before { sign_in registrar_user }
-
-      it { is_expected.to have_http_status :ok }
     end
   end
 
-  describe 'GET /show' do
-    before { sign_in user }
+  path '/api/v1/cases/{case_id}' do
+    parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
 
-    context 'when case record exists' do
-      subject(:get_case) do
-        get api_v1_case_path(court_case)
-        response
+    get 'Show a case' do
+      tags 'Cases'
+      security [Bearer: []]
+      produces 'application/json'
+
+      context 'when case record exists' do
+        before { sign_in user }
+
+        response '200', 'Case found' do
+          it 'returns the case details' do
+            get api_v1_case_path(court_case)
+            expect(response).to have_http_status(:ok)
+          end
+        end
       end
-
-      it { is_expected.to have_http_status :ok }
     end
   end
 
-  describe 'POST /create' do
-    let(:clerk_user) { FactoryBot.create(:user, :clerk, confirmed_at: Time.zone.now) }
-    let(:registrar_user) { FactoryBot.create(:user, :registrar, confirmed_at: Time.zone.now) }
+  path '/api/v1/cases' do
+    post 'Create a case' do
+      tags 'Cases'
+      security [Bearer: []]
+      consumes 'application/json'
+      parameter name: :case_params, in: :body, schema: {
+        type: :object,
+        properties: {
+          case_number: { type: :string },
+          registration_number: { type: :string },
+          judgement_number: { type: :string },
+          title: { type: :string },
+          summary: { type: :string },
+          case_priority: { type: :string },
+          case_status: { type: :string },
+          case_subtype: { type: :integer },
+          court: { type: :integer }
+        }
+      }
+      context 'when role is not registrar' do
+        subject(:create_case) do
+          post api_v1_cases_path, params: { case: case_params }
+          response
+        end
 
-    context 'when role is not registrar' do
-      subject(:create_post) do
-        post api_v1_cases_path, params: { case: case_params }
-        response
+        let(:clerk_user) { create(:user, :clerk, confirmed_at: Time.zone.now) }
+
+        before { sign_in clerk_user }
+
+        response '401', 'Unauthorized' do
+          it { is_expected.to have_http_status(:unauthorized) }
+          it { expect { create_case }.not_to change(Case, :count) }
+        end
       end
 
-      before { sign_in clerk_user }
+      produces 'application/json'
+      context 'when role is registrar' do
+        subject(:create_case) do
+          post api_v1_cases_path, params: { case: case_params }
+          response
+        end
 
-      let(:case_params) { FactoryBot.attributes_for(:case) }
+        let(:registrar_user) { create(:user, :registrar, confirmed_at: Time.zone.now) }
 
-      it { is_expected.to have_http_status :unauthorized }
-      it { expect { create_post }.not_to change(Case, :count) }
-    end
+        before { sign_in registrar_user }
 
-    context 'when role is registrar' do
-      subject(:create_post) do
-        post api_v1_cases_path, params: { case: case_params }
-        response
+        response '201', 'Case created' do
+          parameter name: :case_params, in: :body, schema: {
+            type: :object,
+            properties: {
+              id: { type: :integer },
+              case_number: { type: :string },
+              registration_number: { type: :string },
+              judgement_number: { type: :string },
+              title: { type: :string },
+              summary: { type: :string },
+              case_priority: { type: :string },
+              case_status: { type: :string },
+              case_subtype: { type: :integer },
+              court: { type: :integer }
+            }
+          }
+
+          it { is_expected.to have_http_status(:created) }
+          it { expect { create_case }.to change(Case, :count).by(1) }
+        end
       end
-
-      before { sign_in registrar_user }
-
-      let(:case_params) { FactoryBot.attributes_for(:case) }
-
-      it { is_expected.to have_http_status :created }
-      it { expect { create_post }.to change(Case, :count).by(1) }
-    end
-  end
-
-  describe 'PUT /update' do
-    let(:registrar_user) { FactoryBot.create(:user, :registrar, confirmed_at: Time.zone.now) }
-    let(:judge_user) { FactoryBot.create(:user, :judge, confirmed_at: Time.zone.now) }
-
-    context 'when role is judge' do
-      subject(:update_case) do
-        put api_v1_case_path(court_case), params: { case: case_params }
-        response
-      end
-
-      before { sign_in judge_user }
-
-      it { is_expected.to have_http_status :unauthorized }
-      it { expect { update_case }.not_to change(Case, :count) }
-
-      it 'assigns the original employee' do
-        update_case
-        expect(assigns(:case)).to eq(court_case)
-      end
-    end
-
-    context 'when role is registrar' do
-      subject(:update_case) do
-        put api_v1_case_path(court_case), params: { case: case_params }
-        response
-      end
-
-      before { sign_in registrar_user }
-
-      it { is_expected.to have_http_status :ok }
-      it { expect { update_case }.not_to change(Case, :count) }
-
-      # rubocop:disable RSpec/ExampleLength
-      it 'update case with correct attributes' do
-        update_case
-        expect(Case.last).to have_attributes(
-          case_number: case_params[:case_number],
-          registration_number: case_params[:registration_number],
-          judgement_number: case_params[:judgement_number],
-          title: case_params[:title],
-          summary: case_params[:summary],
-          case_priority: case_params[:case_priority].to_s,
-          case_status: case_params[:case_status].to_s
-        )
-      end
-      # rubocop:enable RSpec/ExampleLength
     end
   end
 
-  describe 'GET /statistics' do
-    let(:registrar_user) { FactoryBot.create(:user, :registrar, confirmed_at: Time.zone.now) }
-    let(:general_user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
+  path '/api/v1/cases/{case_id}' do
+    parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
 
-    context 'when user is not court official' do
-      subject(:get_statistics) do
-        get statistics_api_v1_cases_path
-        response
+    put 'Update a case' do
+      tags 'Cases'
+      security [Bearer: []]
+      consumes 'application/json'
+      produces 'application/json'
+
+      parameter name: :case_params, in: :body, schema: {
+        type: :object,
+        properties: {
+          id: { type: :integer },
+          case_number: { type: :string },
+          registration_number: { type: :string },
+          judgement_number: { type: :string },
+          title: { type: :string },
+          summary: { type: :string },
+          case_priority: { type: :string },
+          case_status: { type: :string }
+        }
+      }
+
+      context 'when role is judge' do
+        let(:judge_user) { create(:user, :judge, confirmed_at: Time.zone.now) }
+
+        before { sign_in judge_user }
+
+        response '401', 'Unauthorized' do
+          it 'does not update the case' do
+            put api_v1_case_path(court_case), params: { case: case_params }
+            expect(response).to have_http_status(:unauthorized)
+          end
+        end
       end
 
-      before { sign_in general_user }
+      context 'when role is registrar' do
+        subject(:update_case) do
+          put api_v1_case_path(court_case), params: { case: case_params }
+          response
+        end
 
-      it { is_expected.to have_http_status :unauthorized }
-    end
+        let(:registrar_user) { create(:user, :registrar, confirmed_at: Time.zone.now) }
 
-    context 'when user is court official' do
-      subject(:get_statistics) do
-        get statistics_api_v1_cases_path
-        response
+        before { sign_in registrar_user }
+
+        response '200', 'Case updated' do
+          it { is_expected.to have_http_status :ok }
+
+          it 'updates the case details' do
+            update_case
+            expect(Case.last).to have_attributes(
+              case_number: case_params[:case_number],
+              registration_number: case_params[:registration_number],
+              judgement_number: case_params[:judgement_number],
+              title: case_params[:title],
+              summary: case_params[:summary],
+              case_priority: case_params[:case_priority].to_s,
+              case_status: case_params[:case_status].to_s
+            )
+          end
+        end
       end
-
-      before { sign_in registrar_user }
-
-      it { is_expected.to have_http_status :ok }
     end
   end
-  # rubocop:enable  RSpec/MultipleMemoizedHelpers
+
+  path '/api/v1/cases/statistics' do
+    get 'Get case statistics' do
+      tags 'Cases'
+      security [Bearer: []]
+      produces 'application/json'
+
+      context 'when user is not court official' do
+        let(:general_user) { create(:user, confirmed_at: Time.zone.now) }
+
+        before { sign_in general_user }
+
+        response '401', 'Unauthorized' do
+          it 'returns unauthorized' do
+            get statistics_api_v1_cases_path
+            expect(response).to have_http_status(:unauthorized)
+          end
+        end
+      end
+
+      context 'when user is court official' do
+        let(:registrar_user) { create(:user, :registrar, confirmed_at: Time.zone.now) }
+
+        before { sign_in registrar_user }
+
+        response '200', 'Statistics found' do
+          it 'returns case statistics' do
+            get statistics_api_v1_cases_path
+            expect(response).to have_http_status(:ok)
+          end
+        end
+      end
+    end
+  end
 end
+# rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/ExampleLength

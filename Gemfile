@@ -93,3 +93,5 @@ gem 'openssl'
 gem 'noticed'
 
 gem 'rolify'
+
+gem 'rswag'

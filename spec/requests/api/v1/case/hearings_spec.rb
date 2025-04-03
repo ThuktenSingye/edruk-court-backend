@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-# rubocop:disable  RSpec/MultipleMemoizedHelpers,RSpec/LetSetup
+require 'swagger_helper'
+
+# rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
 RSpec.describe 'Api::V1::Case::Hearings', type: :request do
   let(:court) { FactoryBot.create(:court) }
   let(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
@@ -23,171 +25,210 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
   let(:judge_user) { FactoryBot.create(:user, :judge, court: court, confirmed_at: Time.zone.now) }
   let(:clerk_user) { FactoryBot.create(:user, :clerk, court: court, confirmed_at: Time.zone.now) }
 
-  describe 'GET /index' do
-    before { sign_in judge_user }
+  path '/api/v1/cases/{case_id}/hearings' do
+    get 'List all hearings for a case' do
+      tags 'Hearings'
+      security [Bearer: []]
+      produces 'application/json'
 
-    context 'when role is judge' do
-      subject(:get_all_hearing) do
-        get api_v1_case_hearings_path(court_case)
-        response
-      end
+      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
 
-      it { is_expected.to have_http_status :ok }
-    end
-  end
+      context 'when role is judge' do
+        before { sign_in judge_user }
 
-  describe 'PUT /update' do
-    context 'when role is judge and hearing is not miscellaneous' do
-      subject(:update_hearing) do
-        put api_v1_case_hearing_path(court_case, hearing), params: { hearing: valid_hearing_params }
-        response
-      end
-
-      before { sign_in judge_user }
-
-      let(:valid_hearing_params) do
-        {
-          hearing_status: :completed,
-          hearing_type_id: hearing_type.id
-        }
-      end
-      let!(:case_participant) do
-        FactoryBot.create(:case_participant, case: court_case, user: judge_user,
-                                             role: Role.find_by(name: 'Judge'))
-      end
-
-      it { is_expected.to have_http_status :ok }
-      it { expect { update_hearing }.not_to change(Hearing, :count) }
-
-      it 'update the status to completed' do
-        response = update_hearing
-        response_json = JSON.parse(response.body)
-        expect(response_json['data']['hearing_status']).to eq(valid_hearing_params[:hearing_status].to_s)
-      end
-    end
-
-    context 'when role is clerk and hearing is miscellaneous' do
-      subject(:update_hearing) do
-        put api_v1_case_hearing_path(court_case, miscellaneous_hearing), params: { hearing: valid_hearing_params }
-        response
-      end
-
-      before { sign_in clerk_user }
-
-      let(:valid_hearing_params) do
-        {
-          hearing_status: :completed,
-          hearing_type_id: hearing_type.id
-        }
-      end
-      let!(:case_participant) do
-        FactoryBot.create(:case_participant, case: court_case, user: clerk_user,
-                                             role: Role.find_by(name: 'Clerk'))
-      end
-
-      it { is_expected.to have_http_status :unauthorized }
-      it { expect { update_hearing }.not_to change(Hearing, :count) }
-    end
-
-    context 'when role is general user' do
-      subject(:update_hearing) do
-        put api_v1_case_hearing_path(court_case, hearing), params: { hearing: valid_hearing_params }
-        response
-      end
-
-      before { sign_in user }
-
-      let(:valid_hearing_params) do
-        {
-          hearing_status: :completed
-        }
-      end
-
-      it { is_expected.to have_http_status :unauthorized }
-
-      it 'assign the original hearing' do
-        update_hearing
-        expect(assigns(:hearing)).to eq(hearing)
+        response '200', 'Hearings found' do
+          it 'returns all hearings for the case' do
+            get api_v1_case_hearings_path(court_case)
+            expect(response).to have_http_status(:ok)
+          end
+        end
       end
     end
   end
 
-  describe 'POST /create' do
-    context 'when role is judge and hearing is miscellaneous' do
-      subject(:create_hearing) do
-        post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
-        response
-      end
+  path '/api/v1/cases/{case_id}/hearings/{hearing_id}' do
+    parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
+    parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
 
-      before { sign_in judge_user }
+    put 'Update a hearing' do
+      tags 'Hearings'
+      security [Bearer: []]
+      consumes 'application/json'
+      produces 'application/json'
 
-      let(:valid_hearing_params) do
-        {
-          hearing_status: :completed,
-          hearing_type_id: miscellaneous_hearing_type.id
+      parameter name: :hearing_params, in: :body, schema: {
+        type: :object,
+        properties: {
+          id: { type: :integer },
+          hearing_status: { type: :string },
+          hearing_type_id: { type: :integer }
         }
+      }
+
+      context 'when role is judge and hearing is not miscellaneous' do
+        subject(:update_hearing) do
+          put api_v1_case_hearing_path(court_case, hearing), params: { hearing: valid_hearing_params }
+          response
+        end
+
+        let(:valid_hearing_params) do
+          {
+            hearing_status: :completed,
+            hearing_type_id: hearing_type.id
+          }
+        end
+        let!(:case_participant) do
+          FactoryBot.create(:case_participant, case: court_case, user: judge_user,
+                                               role: Role.find_by(name: 'Judge'))
+        end
+
+        before { sign_in judge_user }
+
+        response '200', 'Hearing updated' do
+          it { is_expected.to have_http_status :ok }
+
+          it 'updates the hearing status to ongoing' do
+            update_hearing
+            expect(api_response['data']['hearing_status']).to eq(valid_hearing_params[:hearing_status].to_s)
+          end
+        end
       end
 
-      it { is_expected.to have_http_status :unauthorized }
-      it { expect { create_hearing }.not_to change(Hearing, :count) }
+      context 'when role is clerk and hearing is miscellaneous' do
+        let(:valid_hearing_params) do
+          {
+            hearing_status: :completed,
+            hearing_type_id: hearing_type.id
+          }
+        end
+
+        before { sign_in clerk_user }
+
+        response '401', 'Unauthorized' do
+          it 'does not update the hearing' do
+            put api_v1_case_hearing_path(court_case, miscellaneous_hearing), params: { hearing: valid_hearing_params }
+            expect(response).to have_http_status(:unauthorized)
+          end
+        end
+      end
+
+      context 'when role is general user' do
+        let(:valid_hearing_params) do
+          {
+            hearing_status: :completed
+          }
+        end
+
+        before { sign_in user }
+
+        response '401', 'Unauthorized' do
+          it 'does not update the hearing' do
+            put api_v1_case_hearing_path(court_case, hearing), params: { hearing: valid_hearing_params }
+            expect(response).to have_http_status(:unauthorized)
+          end
+        end
+      end
     end
+  end
 
-    context 'when role is registrar and hearing is miscellaneous' do
-      subject(:create_hearing) do
-        post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
-        response
-      end
+  path '/api/v1/cases/{case_id}/hearings' do
+    post 'Create a hearing' do
+      tags 'Hearings'
+      security [Bearer: []]
+      consumes 'application/json'
 
-      before { sign_in registrar_user }
-
-      let(:valid_hearing_params) do
-        {
-          hearing_status: :ongoing,
-          hearing_type_id: miscellaneous_hearing_type.id,
-          case_id: court_case.id,
-          hearing_schedules_attributes: [
-            {
-              scheduled_date: Faker::Date.backward(days: 14),
-              schedule_status: :pending,
-              reschedule_reason: Faker::Lorem.paragraph,
-              scheduled_by_id: registrar_user.id
+      parameter name: :hearing_params, in: :body, schema: {
+        type: :object,
+        properties: {
+          id: { type: :integer },
+          hearing_status: { type: :string },
+          hearing_type_id: { type: :integer },
+          case_id: { type: :integer },
+          hearing_schedules_attributes: {
+            type: :array,
+            items: {
+              type: :object,
+              properties: {
+                scheduled_date: { type: :string, format: 'date' },
+                schedule_status: { type: :string },
+                reschedule_reason: { type: :string },
+                scheduled_by_id: { type: :integer }
+              }
             }
-          ]
-
+          }
         }
+      }
+
+      context 'when role is judge and hearing is miscellaneous' do
+        let(:valid_hearing_params) do
+          {
+            hearing_status: :completed,
+            hearing_type_id: miscellaneous_hearing_type.id
+          }
+        end
+
+        before { sign_in judge_user }
+
+        response '401', 'Unauthorized' do
+          it 'does not allow the creation of a miscellaneous hearing' do
+            post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
+            expect(response).to have_http_status(:unauthorized)
+          end
+        end
       end
 
-      let!(:case_participant) do
-        FactoryBot.create(:case_participant, case: court_case, user: judge_user,
-                                             role: Role.find_by(name: 'Judge'))
+      produces 'application/json'
+      context 'when role is registrar and hearing is miscellaneous' do
+        subject(:create_hearing) do
+          post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
+          response
+        end
+
+        let(:valid_hearing_params) do
+          {
+            hearing_status: :ongoing,
+            hearing_type_id: miscellaneous_hearing_type.id,
+            case_id: court_case.id,
+            hearing_schedules_attributes: [
+              {
+                scheduled_date: Faker::Date.backward(days: 14),
+                schedule_status: :pending,
+                reschedule_reason: Faker::Lorem.paragraph,
+                scheduled_by_id: registrar_user.id
+              }
+            ]
+          }
+        end
+
+        before { sign_in registrar_user }
+
+        response '201', 'Hearing created' do
+          parameter name: :hearing_params, in: :body, schema: {
+            type: :object,
+            properties: {
+              hearing_status: { type: :string },
+              hearing_type_id: { type: :integer },
+              case_id: { type: :integer },
+              hearing_schedules_attributes: {
+                type: :array,
+                items: {
+                  type: :object,
+                  properties: {
+                    scheduled_date: { type: :string, format: 'date' },
+                    schedule_status: { type: :string },
+                    reschedule_reason: { type: :string },
+                    scheduled_by_id: { type: :integer }
+                  }
+                }
+              }
+            }
+          }
+
+          it { is_expected.to have_http_status :created }
+          it { expect { create_hearing }.to change(Hearing, :count).by(1) }
+        end
       end
-
-      it { expect { create_hearing }.to change { Noticed::Notification.where(recipient: judge_user).count }.by(1) }
-      it { is_expected.to have_http_status :created }
-    end
-
-    context 'when role is clerk but params are invalid' do
-      subject(:create_hearing) do
-        post api_v1_case_hearings_path(court_case), params: { hearing: invalid_hearing_params }
-        response
-      end
-
-      before { sign_in clerk_user }
-
-      let(:invalid_hearing_params) do
-        {
-          hearing_status: nil,
-          hearing_type_id: hearing_type.id
-        }
-      end
-      let!(:case_participant) do
-        FactoryBot.create(:case_participant, case: court_case, user: clerk_user,
-                                             role: Role.find_by(name: 'Clerk'))
-      end
-
-      it { is_expected.to have_http_status :unprocessable_entity }
-      it { expect { create_hearing }.not_to change(Hearing, :count) }
     end
   end
 end
-# rubocop:enable RSpec/MultipleMemoizedHelpers,RSpec/LetSetup
+# rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup

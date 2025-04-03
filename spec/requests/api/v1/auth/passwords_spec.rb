@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Auth::Passwords', type: :request do
   let!(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
@@ -14,52 +15,82 @@ RSpec.describe 'Api::V1::Auth::Passwords', type: :request do
     raw
   end
 
-  context 'when valid attributes' do
-    subject(:reset_user_password) do
-      put user_password_path, params: { user: valid_user_attributes }
-      response
-    end
+  path '/api/v1/auth/password' do
+    put 'Reset user password' do
+      tags 'Authentication'
+      consumes 'application/json'
 
-    let(:valid_user_attributes) do
-      {
-        email: user.email,
-        password: 'new_password',
-        password_confirmation: 'new_password',
-        reset_password_token: reset_password_token
+      parameter name: :user_params, in: :body, schema: {
+        type: :object,
+        properties: {
+          user: {
+            type: :object,
+            properties: {
+              email: { type: :string, format: :email },
+              password: { type: :string },
+              password_confirmation: { type: :string },
+              reset_password_token: { type: :string }
+            },
+            required: %w[email password password_confirmation reset_password_token]
+          }
+        }
       }
-    end
 
-    it { is_expected.to have_http_status(:ok) }
-    it { expect { reset_user_password }.not_to change(User, :count) }
+      produces 'application/json'
+      context 'with valid attributes' do
+        subject(:password_reset) do
+          put user_password_path, params: user_params, as: :json
+          response
+        end
 
-    it 'changes the user password' do
-      reset_user_password
-      user.reload
-      expect(user).to be_valid_password('new_password')
-    end
-  end
+        let(:valid_user_attributes) do
+          {
+            email: user.email,
+            password: 'new_password',
+            password_confirmation: 'new_password',
+            reset_password_token: reset_password_token
+          }
+        end
+        let(:user_params) { { user: valid_user_attributes } }
 
-  context 'when invalid attributes' do
-    subject(:reset_user_password) do
-      put user_password_path, params: { user: invalid_user_attributes }
-      response
-    end
+        response '200', 'password successfully reset' do
+          it { is_expected.to have_http_status :ok }
+          it { expect { password_reset }.not_to change(User, :count) }
 
-    let(:invalid_user_attributes) do
-      {
-        email: user.email,
-        password: 'new_password',
-        password_confirmation: 'wrong_password',
-        reset_password_token: reset_password_token
-      }
-    end
+          it 'changes the user password' do
+            password_reset
+            user.reload
+            expect(user).to be_valid_password('new_password')
+          end
+        end
+      end
 
-    it { is_expected.to have_http_status(:unprocessable_entity) }
+      context 'with invalid attributes' do
+        subject(:password_reset) do
+          put user_password_path, params: user_params, as: :json
+          response
+        end
 
-    it 'does not change the user password' do
-      reset_user_password
-      user.reload
-      expect(user).not_to be_valid_password('new_password')
+        let(:invalid_user_attributes) do
+          {
+            email: user.email,
+            password: 'new_password',
+            password_confirmation: 'wrong_password',
+            reset_password_token: reset_password_token
+          }
+        end
+        let(:user_params) { { user: invalid_user_attributes } }
+
+        response '422', 'unprocessable entity' do
+          it { is_expected.to have_http_status :unprocessable_entity }
+
+          it 'does not change the user password' do
+            password_reset
+            user.reload
+            expect(user).not_to be_valid_password('new_password')
+          end
+        end
+      end
     end
   end
 end

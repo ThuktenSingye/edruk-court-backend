@@ -13,6 +13,8 @@ require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 require 'support/subdomain_helpers'
+require 'support/auth_helper'
+require 'support/api_helpers'
 require 'pundit/rspec'
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -65,6 +67,8 @@ RSpec.configure do |config|
   # https://rspec.info/features/7-0/rspec-rails
   config.infer_spec_type_from_file_location!
 
+  config.include FactoryBot::Syntax::Methods
+
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
@@ -72,6 +76,8 @@ RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Warden::Test::Helpers
+  config.include AuthHelper, type: :request
+  config.include ApiHelpers, type: :request
 
   # Subdomain Helpers
   config.include SubdomainHelpers, type: :request
