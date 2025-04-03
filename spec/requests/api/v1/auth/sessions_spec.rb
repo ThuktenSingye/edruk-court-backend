@@ -1,32 +1,66 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Auth::Sessions', type: :request do
-  let(:court) { FactoryBot.create(:court) }
   let(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
 
-  describe 'POST /api/v1/signin' do
-    context 'with valid user attributes' do
-      subject(:login_user) do
-        post user_session_path, params: { user: valid_user }, as: :json
-        response
+  path '/api/v1/signin' do
+    post 'User login' do
+      tags 'Authentication'
+      consumes 'application/json'
+      produces 'application/json'
+
+      parameter name: :user_params, in: :body, schema: {
+        type: :object,
+        properties: {
+          user: {
+            type: :object,
+            properties: {
+              email: { type: :string, format: :email },
+              password: { type: :string }
+            },
+            required: %w[email password]
+          }
+        }
+      }
+
+      context 'with valid credentials' do
+        let(:user_params) do
+          {
+            user: {
+              email: user.email,
+              password: user.password
+            }
+          }
+        end
+
+        response '200', 'successful login' do
+          it 'returns a successful response' do
+            post user_session_path, params: user_params, as: :json
+            expect(response).to have_http_status(:ok)
+          end
+        end
       end
 
-      let(:valid_user) { { email: user.email, password: user.password } }
+      context 'with invalid credentials' do
+        let(:user_params) do
+          {
+            user: {
+              email: '',
+              password: 'wrong_password'
+            }
+          }
+        end
 
-      it { is_expected.to have_http_status(:ok) }
-    end
-
-    context 'with invalid user attributes' do
-      subject(:login_user) do
-        post user_session_path, params: { user: invalid_user }
-        response
+        response '401', 'unauthorized' do
+          it 'returns an unauthorized response' do
+            post user_session_path, params: user_params, as: :json
+            expect(response).to have_http_status(:unauthorized)
+          end
+        end
       end
-
-      let(:invalid_user) { { email: '', password: 'wrong_password' } }
-
-      it { is_expected.to have_http_status(:unauthorized) }
     end
   end
 end

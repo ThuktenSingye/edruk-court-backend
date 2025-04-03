@@ -1,0 +1,110 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/api/v1/users/{user_id}/profile":
+    parameters:
+    - name: user_id
+      in: path
+      description: user_id
+      required: true
+      schema:
+        type: string
+    - name: Authorization
+      in: header
+      description: Bearer token
+      schema:
+        type: string
+    get:
+      summary: show profile
+      tags:
+      - Profiles
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: successful
+        '401':
+          description: unauthorized
+    put:
+      summary: update profile
+      tags:
+      - Profiles
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '200':
+          description: successful with valid params
+        '422':
+          description: unsuccessful with invalid params
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profile:
+                  type: object
+                  properties:
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                    cid_no:
+                      type: string
+                    phone_number:
+                      type: string
+                    house_no:
+                      type: string
+                    thram_no:
+                      type: string
+                    age:
+                      type: integer
+                    gender:
+                      type: string
+                      enum:
+                      - male
+                      - female
+                      - other
+                    addresses_attributes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          dzongkhag:
+                            type: string
+                          gewog:
+                            type: string
+                          street_address:
+                            type: string
+                          address_type:
+                            type: string
+                            enum:
+                            - present
+                            - permanent
+                        required:
+                        - dzongkhag
+                        - gewog
+                        - street_address
+                        - address_type
+                  required:
+                  - first_name
+                  - last_name
+                  - cid_no
+                  - phone_number
+                  - house_no
+                  - thram_no
+                  - age
+                  - gender
+              required:
+              - profile
+servers:
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: www.example.com

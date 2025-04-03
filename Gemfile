@@ -91,3 +91,5 @@ gem 'pundit'
 gem 'openssl'
 
 gem 'noticed'
+
+gem 'rswag'

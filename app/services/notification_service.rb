@@ -2,7 +2,4 @@
 
 # Notification Service Class
 class NotificationService
-  def initialize
-
-  end
 end
