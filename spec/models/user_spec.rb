@@ -11,8 +11,7 @@ RSpec.describe User, type: :model do
   end
 
   context 'when associating model' do
-    it { is_expected.to have_many(:user_roles).dependent(:destroy) }
-    it { is_expected.to have_many(:roles).through(:user_roles) }
+    it { is_expected.to have_and_belong_to_many(:roles) }
     it { is_expected.to belong_to(:court).optional }
     it { is_expected.to have_one :profile }
   end

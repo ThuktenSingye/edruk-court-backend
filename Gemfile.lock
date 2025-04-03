@@ -359,6 +359,7 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     rexml (3.4.1)
+    rolify (6.0.1)
     rspec-core (3.13.2)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.3)
@@ -527,6 +528,7 @@ DEPENDENCIES
   rails (~> 8.0.1)
   rails-controller-testing
   rails-erd
+  rolify
   rspec-rails (~> 7.0.0)
   rubocop-performance
   rubocop-rails

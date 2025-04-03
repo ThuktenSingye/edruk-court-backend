@@ -2,6 +2,8 @@
 
 # User Model
 class User < ApplicationRecord
+  rolify
+
   include Devise::JWT::RevocationStrategies::JTIMatcher
 
   # Include default devise modules. Others available are:
@@ -13,8 +15,6 @@ class User < ApplicationRecord
   validates :email, :password, presence: true
   validates :email, uniqueness: { case_sensitive: false }
 
-  has_many :user_roles, dependent: :destroy
-  has_many :roles, through: :user_roles
   has_one :profile, dependent: :destroy
   accepts_nested_attributes_for :profile
 
