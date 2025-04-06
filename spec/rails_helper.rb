@@ -111,6 +111,18 @@ RSpec.configure do |config|
       contact_no: '12345678',
       location_id: $default_location.id
     )
+
+    # # Create a bench court as child of default account
+    Court.find_or_create_by!(
+      name: 'Default Bench',
+      court_type: 4,
+      parent_court: $default_account,
+      email: 'bench@example.com',
+      subdomain: 'bench@example.com',
+      domain: 'example.com',
+      contact_no: '87654321',
+      location_id: $default_location.id
+    )
   end
 
   config.before do |example|

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_02_193918) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_03_174153) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -68,9 +68,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_02_193918) do
     t.bigint "case_subtype_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "bench_id_id"
     t.bigint "case_type_id"
-    t.index ["bench_id_id"], name: "index_cases_on_bench_id_id"
+    t.bigint "bench_id"
+    t.index ["bench_id"], name: "index_cases_on_bench_id"
     t.index ["case_number"], name: "index_cases_on_case_number", unique: true
     t.index ["case_status"], name: "index_cases_on_case_status"
     t.index ["case_subtype_id"], name: "index_cases_on_case_subtype_id"
@@ -237,7 +237,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_02_193918) do
   add_foreign_key "cases", "case_subtypes"
   add_foreign_key "cases", "case_types"
   add_foreign_key "cases", "courts"
-  add_foreign_key "cases", "courts", column: "bench_id_id"
+  add_foreign_key "cases", "courts", column: "bench_id"
   add_foreign_key "courts", "courts", column: "parent_court_id"
   add_foreign_key "courts", "locations"
   add_foreign_key "hearing_notes", "hearings"

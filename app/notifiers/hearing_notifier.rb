@@ -17,7 +17,6 @@ class HearingNotifier < ApplicationNotifier
   validates :record, presence: true
 
   def to_database
-    Rails.logger.debug { "Saving notification to database: #{params}" }
     {
       type: self.class.name,
       params: params,
@@ -44,22 +43,14 @@ class HearingNotifier < ApplicationNotifier
 
   notification_methods do
     def message
-      hearing_type_name = params.dig(:hearing, :hearing_type, :name) || 'Hearing'
-
-      case params[:message].to_s
-      when 'new_hearing'
-        scheduled_date = params.dig(:hearing_schedule, :scheduled_date)
-        formatted_date = scheduled_date&.strftime('%Y-%m-%d %H:%M:%S') || 'a future date'
-        "#{hearing_type_name} Hearing scheduled at #{formatted_date}"
-
-      when 'hearing_update'
-        hearing_status = params.dig(:hearing, :hearing_status) || 'updated'
-        "#{hearing_type_name} Hearing #{hearing_status}"
-
-      else
-        # Default fallback message
-        'New hearing notification'
-      end
+      HearingMessageBuilder.new(
+        message_type: params[:message],
+        hearing_type: params.dig(:hearing, :hearing_type, :name),
+        case_id: params.dig(:case, :id),
+        scheduled_date: params.dig(:hearing_schedule, :scheduled_date),
+        new_scheduled_date: params.dig(:hearing, :new_scheduled_date),
+        schedule_status: params.dig(:hearing, :schedule_status)
+      ).build
     end
 
     def url

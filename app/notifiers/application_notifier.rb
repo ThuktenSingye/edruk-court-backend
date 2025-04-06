@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Application Notifier extend from based noticed event class
 class ApplicationNotifier < Noticed::Event
   def to_database
     {

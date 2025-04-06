@@ -16,11 +16,10 @@ module Api
         end
 
         def create
-          @hearing = @case.hearings.build(hearing_params)
-
+          @hearing = @case.hearings.build(hearing_params.except(:bench_id, :judge_id, :clerk_id))
           authorize @hearing
           if @hearing.save
-            notify_hearing_created(@hearing)
+            Hearings::HearingService.new(current_tenant, @case, @hearing, hearing_params).hearing_type
             render_json :created, 'Hearing created Successfully', serialized_hearing(@hearing)
           else
             render_json :unprocessable_entity, nil, @hearing.errors
@@ -35,6 +34,8 @@ module Api
             render_json :unprocessable_entity, nil, @hearing.errors
           end
         end
+
+        private
 
         def case
           @case ||= current_tenant.cases.find(params[:case_id])
@@ -52,64 +53,13 @@ module Api
           HearingSerializer.new(hearing).serializable_hash[:data][:attributes]
         end
 
-        # constraint
-        # when creating miscellaneous hearing, check if bench exist
-        # if bench exist, assign the case, schedule and notify the judge
-        # if bench does not exist, default judge and notify the judge
-
-        # when creating preliminar hearing, check if bench exist
-        # if bench exist, assign the case to bench and bench clerk
-        # if bench does not then default judge and select bench clerk
-        # notify the user
-
-        # for the rest of the hearing, when hearing is created along with schedule, notify the participant.
-
-        # need method ot check if bench exisit
-        # need method to check type of prelimninary
-        # need method to assign the case to bench and clekr
-        #
-        def notify_hearing_created(hearing)
-          schedule = hearing.hearing_schedules.last
-          recipient = notification_recipient
-
-          return unless recipient
-
-          params = {
-            record: hearing,
-            message: 'new_hearing',
-            hearing: hearing,
-            hearing_schedule: schedule,
-            case: @case
-          }
-          notification = HearingNotifier.with(params).deliver(recipient)
-
-          if notification.persisted?
-            Rails.logger.info "Hearing notification delivered to #{recipient.email}"
-            true
-          else
-            Rails.logger.error "Failed to deliver hearing notification to #{recipient.email}"
-            false
-          end
-        end
-
-        def notification_recipient
-          # Get the single judge for this case
-          @case.case_participants.joins(user: :roles)
-               .find_by(roles: { name: 'Judge' })
-               &.user
-        end
-
         def hearing_params
           params.expect(
             hearing: [:hearing_type_id,
-                      :hearing_status, :case_id,
-                      { hearing_schedules_attributes: [
-                        :id,
-                        :scheduled_date,
-                        :schedule_status,
-                        :reschedule_reason,
-                        :scheduled_by_id, # Changed to match your database column
-                        :_destroy
+                      :hearing_status, :case_id, :bench_id, :clerk_id, :judge_id,
+                      { hearing_schedules_attributes: %i[
+                        id scheduled_date schedule_status
+                        reschedule_reason scheduled_by_id _destroy
                       ] }]
           )
         end

@@ -6,6 +6,7 @@ require 'swagger_helper'
 # rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
 RSpec.describe 'Api::V1::Case::Hearings', type: :request do
   let(:court) { FactoryBot.create(:court) }
+  let!(:bench) { Court.find_by(court_type: 'bench') }
   let(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
   let(:case_type) { FactoryBot.create(:case_type) }
   let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
@@ -22,8 +23,8 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
   end
 
   let(:registrar_user) { FactoryBot.create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
-  let(:judge_user) { FactoryBot.create(:user, :judge, court: court, confirmed_at: Time.zone.now) }
-  let(:clerk_user) { FactoryBot.create(:user, :clerk, court: court, confirmed_at: Time.zone.now) }
+  let!(:judge_user) { FactoryBot.create(:user, :judge, court: court, confirmed_at: Time.zone.now) }
+  let!(:clerk_user) { FactoryBot.create(:user, :clerk, court: bench, confirmed_at: Time.zone.now) }
 
   path '/api/v1/cases/{case_id}/hearings' do
     get 'List all hearings for a case' do
@@ -144,6 +145,8 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
           hearing_status: { type: :string },
           hearing_type_id: { type: :integer },
           case_id: { type: :integer },
+          bench_id: { type: :integer },
+          judge_id: { type: :integer },
           hearing_schedules_attributes: {
             type: :array,
             items: {
@@ -178,7 +181,31 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
       end
 
       produces 'application/json'
-      context 'when role is registrar and hearing is miscellaneous' do
+      parameter name: :hearing_params, in: :body, schema: {
+        type: :object,
+        properties: {
+          id: { type: :integer },
+          hearing_status: { type: :string },
+          hearing_type_id: { type: :integer },
+          case_id: { type: :integer },
+          judge_id: { type: :integer },
+          bench_id: { type: :integer },
+          clerk_id: { type: :integer },
+          hearing_schedules_attributes: {
+            type: :array,
+            items: {
+              type: :object,
+              properties: {
+                scheduled_date: { type: :string, format: 'date' },
+                schedule_status: { type: :string },
+                reschedule_reason: { type: :string },
+                scheduled_by_id: { type: :integer }
+              }
+            }
+          }
+        }
+      }
+      context 'when role is registrar and hearing is preliminary' do
         subject(:create_hearing) do
           post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
           response
@@ -187,8 +214,11 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         let(:valid_hearing_params) do
           {
             hearing_status: :ongoing,
-            hearing_type_id: miscellaneous_hearing_type.id,
+            hearing_type_id: preliminary_hearing_type.id,
             case_id: court_case.id,
+            judge_id: judge_user.id,
+            bench_id: bench.id,
+            clerk_id: clerk_user.id,
             hearing_schedules_attributes: [
               {
                 scheduled_date: Faker::Date.backward(days: 14),
@@ -203,29 +233,100 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         before { sign_in registrar_user }
 
         response '201', 'Hearing created' do
-          parameter name: :hearing_params, in: :body, schema: {
-            type: :object,
-            properties: {
-              hearing_status: { type: :string },
-              hearing_type_id: { type: :integer },
-              case_id: { type: :integer },
-              hearing_schedules_attributes: {
-                type: :array,
-                items: {
-                  type: :object,
-                  properties: {
-                    scheduled_date: { type: :string, format: 'date' },
-                    schedule_status: { type: :string },
-                    reschedule_reason: { type: :string },
-                    scheduled_by_id: { type: :integer }
-                  }
-                }
-              }
-            }
-          }
+          it { is_expected.to have_http_status :created }
+          it { expect { create_hearing }.to change(Noticed::Notification, :count).by(1) }
+          it { expect { create_hearing }.to change(Hearing, :count).by(1) }
 
+          # rubocop:disable RSpec/MultipleExpectations
+          it 'send pre-hearing notification to judge' do
+            create_hearing
+            notification = Noticed::Notification.last
+            expect(notification.recipient).to eq(judge_user)
+            expect(notification.params[:message]).to eq('pre_hearing')
+          end
+          # rubocop:enable RSpec/MultipleExpectations
+        end
+      end
+
+      context 'when role is registrar and hearing is miscellaneous' do
+        subject(:create_hearing) do
+          post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
+          response
+        end
+
+        let(:valid_hearing_params) do
+          {
+            hearing_status: :ongoing,
+            hearing_type_id: miscellaneous_hearing_type.id,
+            case_id: court_case.id,
+            judge_id: nil,
+            bench_id: nil,
+            clerk_id: nil,
+            hearing_schedules_attributes: [
+              {
+                scheduled_date: Faker::Date.backward(days: 14),
+                schedule_status: :pending,
+                reschedule_reason: Faker::Lorem.paragraph,
+                scheduled_by_id: registrar_user.id
+              }
+            ]
+          }
+        end
+
+        before { sign_in registrar_user }
+
+        response '201', 'Hearing created' do
           it { is_expected.to have_http_status :created }
           it { expect { create_hearing }.to change(Hearing, :count).by(1) }
+        end
+      end
+
+      context 'when role is clerk and hearing is post hearing' do
+        subject(:create_hearing) do
+          post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
+          response
+        end
+
+        let(:valid_hearing_params) do
+          {
+            hearing_status: :ongoing,
+            hearing_type_id: hearing_type.id,
+            case_id: court_case.id,
+            hearing_schedules_attributes: [
+              {
+                scheduled_date: Faker::Date.backward(days: 14),
+                schedule_status: :pending,
+                reschedule_reason: Faker::Lorem.paragraph,
+                scheduled_by_id: registrar_user.id
+              }
+            ]
+          }
+        end
+
+        let!(:judge_participant) do
+          create(:case_participant, case: court_case, user: judge_user,
+                                    role: Role.find_by(name: 'Judge'))
+        end
+        let!(:clerk_participant) do
+          create(:case_participant, case: court_case, user: clerk_user,
+                                    role: Role.find_by(name: 'Clerk'))
+        end
+
+        before { sign_in clerk_user }
+
+        response '201', 'Hearing created' do
+          it { is_expected.to have_http_status :created }
+          it { expect { create_hearing }.to change(Hearing, :count).by(1) }
+          it { expect { create_hearing }.to change(Noticed::Notification, :count).by(1) }
+
+          # rubocop:disable RSpec/MultipleExpectations
+          it 'send pre-hearing notification to judge' do
+            create_hearing
+            notification = Noticed::Notification.last
+            expect(notification.recipient).to eq(judge_user)
+            expect(notification.params[:message]).to eq('post_hearing')
+          end
+          # rubocop:enable RSpec/MultipleExpectations
         end
       end
     end

@@ -44,8 +44,7 @@ RSpec.describe HearingPolicy, type: :policy do
         FactoryBot.build(:hearing, case: court_case, hearing_type: preliminary_hearing_type)
       end
 
-      it { is_expected.to permit_actions(:index) }
-      it { is_expected.to forbid_actions(%i[create update]) }
+      it { is_expected.to permit_actions(%i[index create update]) }
     end
 
     context 'when role is clerk and hearing is miscellaneous' do
@@ -70,12 +69,12 @@ RSpec.describe HearingPolicy, type: :policy do
                                              role: Role.find_by(name: 'Judge'))
       end
 
-      let(:preliminary_hearing_type) { FactoryBot.create(:hearing_type, :preliminary) }
-      let(:preliminary_hearing) do
+      let!(:preliminary_hearing_type) { FactoryBot.create(:hearing_type, :preliminary) }
+      let!(:preliminary_hearing) do
         FactoryBot.create(:hearing, case: court_case, hearing_type: preliminary_hearing_type)
       end
 
-      it { is_expected.to permit_actions(%i[update create]) }
+      it { is_expected.to forbid_actions(%i[update create]) }
     end
 
     context 'when role is judge and hearing is not either miscellanoues or prelimi' do

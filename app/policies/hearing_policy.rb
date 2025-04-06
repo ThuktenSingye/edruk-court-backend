@@ -32,7 +32,7 @@ class HearingPolicy < ApplicationPolicy
   end
 
   def first_hearing?
-    no_existing_hearings? || miscellaneous_hearing?
+    no_existing_hearings? || miscellaneous_hearing? || preliminary_hearing?
   end
 
   def no_existing_hearings?
