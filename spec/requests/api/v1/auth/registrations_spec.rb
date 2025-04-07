@@ -56,6 +56,21 @@ RSpec.describe 'Api::V1::Auth::Registrations', type: :request do
         let(:user_params) { { user: valid_user_attributes } }
 
         response '201', 'user created' do
+          schema type: :object,
+                 properties: {
+                   email: { type: :string, format: :email },
+                   profile_attributes: {
+                     type: :object,
+                     properties: {
+                       first_name: { type: :string },
+                       last_name: { type: :string },
+                       cid_no: { type: :string },
+                       phone_number: { type: :string },
+                       gender: { type: :string }
+                     },
+                     required: %w[first_name last_name cid_no phone_number gender]
+                   }
+                 }
           it { expect { register_user }.to change(User, :count).by(1) }
           it { is_expected.to have_http_status(:created) }
 

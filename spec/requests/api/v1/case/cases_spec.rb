@@ -36,6 +36,23 @@ RSpec.describe 'Api::V1::Cases', type: :request do
         before { sign_in registrar_user }
 
         response '200', 'Cases found' do
+          schema type: :array,
+                 items: {
+                   type: :object,
+                   properties: {
+                     id: { type: :integer },
+                     case_number: { type: :string },
+                     registration_number: { type: :string },
+                     judgement_number: { type: :string },
+                     title: { type: :string },
+                     summary: { type: :string },
+                     case_priority: { type: :string },
+                     case_status: { type: :string },
+                     case_subtype: { type: :integer },
+                     court: { type: :integer }
+                   }
+                 }
+
           it 'returns all cases' do
             get api_v1_cases_path
             expect(response).to have_http_status(:ok)
@@ -113,22 +130,19 @@ RSpec.describe 'Api::V1::Cases', type: :request do
         before { sign_in registrar_user }
 
         response '201', 'Case created' do
-          parameter name: :case_params, in: :body, schema: {
-            type: :object,
-            properties: {
-              id: { type: :integer },
-              case_number: { type: :string },
-              registration_number: { type: :string },
-              judgement_number: { type: :string },
-              title: { type: :string },
-              summary: { type: :string },
-              case_priority: { type: :string },
-              case_status: { type: :string },
-              case_subtype: { type: :integer },
-              court: { type: :integer }
-            }
-          }
-
+          schema type: :object,
+                 properties: {
+                   id: { type: :integer },
+                   case_number: { type: :string },
+                   registration_number: { type: :string },
+                   judgement_number: { type: :string },
+                   title: { type: :string },
+                   summary: { type: :string },
+                   case_priority: { type: :string },
+                   case_status: { type: :string },
+                   case_subtype: { type: :integer },
+                   court: { type: :integer }
+                 }
           it { is_expected.to have_http_status(:created) }
           it { expect { create_case }.to change(Case, :count).by(1) }
         end
@@ -183,6 +197,19 @@ RSpec.describe 'Api::V1::Cases', type: :request do
         before { sign_in registrar_user }
 
         response '200', 'Case updated' do
+          schema type: :object,
+                 properties: {
+                   id: { type: :integer },
+                   case_number: { type: :string },
+                   registration_number: { type: :string },
+                   judgement_number: { type: :string },
+                   title: { type: :string },
+                   summary: { type: :string },
+                   case_priority: { type: :string },
+                   case_status: { type: :string },
+                   case_subtype: { type: :integer },
+                   court: { type: :integer }
+                 }
           it { is_expected.to have_http_status :ok }
 
           it 'updates the case details' do
@@ -227,6 +254,17 @@ RSpec.describe 'Api::V1::Cases', type: :request do
         before { sign_in registrar_user }
 
         response '200', 'Statistics found' do
+          schema type: :object,
+                 properties: {
+                   total: { type: :integer },
+                   civil: { type: :integer },
+                   criminal: { type: :integer },
+                   others: { type: :integer },
+                   active: { type: :integer },
+                   decided: { type: :integer },
+                   appeal: { type: :integer }
+                 }
+
           it 'returns case statistics' do
             get statistics_api_v1_cases_path
             expect(response).to have_http_status(:ok)

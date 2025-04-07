@@ -22,6 +22,21 @@ paths:
       responses:
         '201':
           description: Address created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  dzongkhag:
+                    type: string
+                  gewog:
+                    type: string
+                  street_address:
+                    type: string
+                  address_type:
+                    type: string
         '422':
           description: Invalid request
       requestBody:
@@ -108,6 +123,33 @@ paths:
       responses:
         '201':
           description: user created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    format: email
+                  profile_attributes:
+                    type: object
+                    properties:
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      cid_no:
+                        type: string
+                      phone_number:
+                        type: string
+                      gender:
+                        type: string
+                    required:
+                    - first_name
+                    - last_name
+                    - cid_no
+                    - phone_number
+                    - gender
         '422':
           description: unprocessable entity
       requestBody:
@@ -188,6 +230,33 @@ paths:
       responses:
         '200':
           description: Cases found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    case_number:
+                      type: string
+                    registration_number:
+                      type: string
+                    judgement_number:
+                      type: string
+                    title:
+                      type: string
+                    summary:
+                      type: string
+                    case_priority:
+                      type: string
+                    case_status:
+                      type: string
+                    case_subtype:
+                      type: integer
+                    court:
+                      type: integer
     post:
       summary: Create a case
       tags:
@@ -200,6 +269,31 @@ paths:
           description: Unauthorized
         '201':
           description: Case created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  case_number:
+                    type: string
+                  registration_number:
+                    type: string
+                  judgement_number:
+                    type: string
+                  title:
+                    type: string
+                  summary:
+                    type: string
+                  case_priority:
+                    type: string
+                  case_status:
+                    type: string
+                  case_subtype:
+                    type: integer
+                  court:
+                    type: integer
       requestBody:
         content:
           application/json:
@@ -253,6 +347,31 @@ paths:
           description: Unauthorized
         '200':
           description: Case updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  case_number:
+                    type: string
+                  registration_number:
+                    type: string
+                  judgement_number:
+                    type: string
+                  title:
+                    type: string
+                  summary:
+                    type: string
+                  case_priority:
+                    type: string
+                  case_status:
+                    type: string
+                  case_subtype:
+                    type: integer
+                  court:
+                    type: integer
       requestBody:
         content:
           application/json:
@@ -287,6 +406,25 @@ paths:
           description: Unauthorized
         '200':
           description: Statistics found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  civil:
+                    type: integer
+                  criminal:
+                    type: integer
+                  others:
+                    type: integer
+                  active:
+                    type: integer
+                  decided:
+                    type: integer
+                  appeal:
+                    type: integer
   "/api/v1/cases/{case_id}/hearings/{hearing_id}/hearing_schedules":
     get:
       summary: List all hearing schedules for a hearing
@@ -310,6 +448,22 @@ paths:
       responses:
         '200':
           description: Hearing schedules found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    scheduled_date:
+                      type: string
+                      format: date
+                    schedule_status:
+                      type: string
+                    reschedule_reason:
+                      type: string
+                    scheduled_by_id:
+                      type: integer
   "/api/v1/cases/{case_id}/hearings/{hearing_id}/today":
     get:
       summary: 'List all hearing schedules for today '
@@ -333,6 +487,22 @@ paths:
       responses:
         '200':
           description: Hearing schedules found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    scheduled_date:
+                      type: string
+                      format: date
+                    schedule_status:
+                      type: string
+                    reschedule_reason:
+                      type: string
+                    scheduled_by_id:
+                      type: integer
   "/api/v1/cases/{case_id}/hearings/{hearing_id}/pending":
     get:
       summary: List all pending hearing schedules
@@ -356,6 +526,22 @@ paths:
       responses:
         '200':
           description: Hearing schedules found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    scheduled_date:
+                      type: string
+                      format: date
+                    schedule_status:
+                      type: string
+                    reschedule_reason:
+                      type: string
+                    scheduled_by_id:
+                      type: integer
   "/api/v1/cases/{case_id}/hearings/{hearing_id}/overdue":
     get:
       summary: List all overdue hearing schedules
@@ -379,6 +565,22 @@ paths:
       responses:
         '200':
           description: Hearing schedules found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    scheduled_date:
+                      type: string
+                      format: date
+                    schedule_status:
+                      type: string
+                    reschedule_reason:
+                      type: string
+                    scheduled_by_id:
+                      type: integer
   "/api/v1/cases/{case_id}/hearings/{hearing_id}/reminders":
     get:
       summary: List reminders on hearing schedules if user is not court official
@@ -402,6 +604,22 @@ paths:
       responses:
         '200':
           description: Hearing schedules found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    scheduled_date:
+                      type: string
+                      format: date
+                    schedule_status:
+                      type: string
+                    reschedule_reason:
+                      type: string
+                    scheduled_by_id:
+                      type: integer
   "/api/v1/cases/{case_id}/hearings/{hearing_id}/hearing_schedules/{id}":
     parameters:
     - name: case_id
@@ -432,6 +650,20 @@ paths:
       responses:
         '200':
           description: Hearing schedule updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scheduled_date:
+                    type: string
+                    format: date
+                  schedule_status:
+                    type: string
+                  reschedule_reason:
+                    type: string
+                  scheduled_by_id:
+                    type: integer
         '401':
           description: Unauthorized
       requestBody:
@@ -475,6 +707,19 @@ paths:
       responses:
         '200':
           description: Hearings found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    hearing_status:
+                      type: string
+                    hearing_type_id:
+                      type: integer
     post:
       summary: Create a hearing
       tags:
@@ -487,6 +732,39 @@ paths:
           description: Unauthorized
         '201':
           description: Hearing created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  hearing_status:
+                    type: string
+                  hearing_type_id:
+                    type: integer
+                  case_id:
+                    type: integer
+                  judge_id:
+                    type: integer
+                  bench_id:
+                    type: integer
+                  clerk_id:
+                    type: integer
+                  hearing_schedules_attributes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scheduled_date:
+                          type: string
+                          format: date
+                        schedule_status:
+                          type: string
+                        reschedule_reason:
+                          type: string
+                        scheduled_by_id:
+                          type: integer
       requestBody:
         content:
           application/json:
@@ -543,6 +821,17 @@ paths:
       responses:
         '200':
           description: Hearing updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  hearing_status:
+                    type: string
+                  hearing_type_id:
+                    type: integer
         '401':
           description: Unauthorized
       requestBody:
@@ -574,6 +863,40 @@ paths:
       responses:
         '200':
           description: Profile found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  cid_no:
+                    type: string
+                  phone_number:
+                    type: string
+                  house_no:
+                    type: string
+                  thram_no:
+                    type: string
+                  age:
+                    type: integer
+                  gender:
+                    type: string
+                  addresses_attributes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        dzongkhag:
+                          type: string
+                        gewog:
+                          type: string
+                        street_address:
+                          type: string
+                        address_type:
+                          type: string
     put:
       summary: Update User Profile
       tags:
@@ -584,6 +907,40 @@ paths:
       responses:
         '200':
           description: Profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  cid_no:
+                    type: string
+                  phone_number:
+                    type: string
+                  house_no:
+                    type: string
+                  thram_no:
+                    type: string
+                  age:
+                    type: integer
+                  gender:
+                    type: string
+                  addresses_attributes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        dzongkhag:
+                          type: string
+                        gewog:
+                          type: string
+                        street_address:
+                          type: string
+                        address_type:
+                          type: string
         '422':
           description: Invalid request
       requestBody:

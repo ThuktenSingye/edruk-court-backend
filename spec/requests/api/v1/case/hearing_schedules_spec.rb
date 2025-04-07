@@ -30,6 +30,16 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         before { sign_in judge_user }
 
         response '200', 'Hearing schedules found' do
+          schema type: :array,
+                 items: {
+                   type: :object,
+                   properties: {
+                     scheduled_date: { type: :string, format: 'date' },
+                     schedule_status: { type: :string },
+                     reschedule_reason: { type: :string },
+                     scheduled_by_id: { type: :integer }
+                   }
+                 }
           it 'returns all hearing schedules for the hearing' do
             get api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
             expect(response).to have_http_status(:ok)
@@ -52,6 +62,16 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         before { sign_in judge_user }
 
         response '200', 'Hearing schedules found' do
+          schema type: :array,
+                 items: {
+                   type: :object,
+                   properties: {
+                     scheduled_date: { type: :string, format: 'date' },
+                     schedule_status: { type: :string },
+                     reschedule_reason: { type: :string },
+                     scheduled_by_id: { type: :integer }
+                   }
+                 }
           it 'returns all hearing schedules for the hearing today' do
             get today_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
             expect(response).to have_http_status(:ok)
@@ -74,6 +94,16 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         before { sign_in judge_user }
 
         response '200', 'Hearing schedules found' do
+          schema type: :array,
+                 items: {
+                   type: :object,
+                   properties: {
+                     scheduled_date: { type: :string, format: 'date' },
+                     schedule_status: { type: :string },
+                     reschedule_reason: { type: :string },
+                     scheduled_by_id: { type: :integer }
+                   }
+                 }
           it 'returns all pending hearing schedules' do
             get pending_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
             expect(response).to have_http_status(:ok)
@@ -96,6 +126,16 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         before { sign_in judge_user }
 
         response '200', 'Hearing schedules found' do
+          schema type: :array,
+                 items: {
+                   type: :object,
+                   properties: {
+                     scheduled_date: { type: :string, format: 'date' },
+                     schedule_status: { type: :string },
+                     reschedule_reason: { type: :string },
+                     scheduled_by_id: { type: :integer }
+                   }
+                 }
           it 'returns all overdue hearing schedules' do
             get overdue_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
             expect(response).to have_http_status(:ok)
@@ -118,6 +158,16 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         before { sign_in judge_user }
 
         response '200', 'Hearing schedules found' do
+          schema type: :array,
+                 items: {
+                   type: :object,
+                   properties: {
+                     scheduled_date: { type: :string, format: 'date' },
+                     schedule_status: { type: :string },
+                     reschedule_reason: { type: :string },
+                     scheduled_by_id: { type: :integer }
+                   }
+                 }
           it 'returns all hearing schedules reminders' do
             get reminders_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
             expect(response).to have_http_status(:ok)
@@ -138,6 +188,11 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         before { sign_in general_user }
 
         response '200', 'Hearing schedules found' do
+          schema type: :array,
+                 items: {
+                   type: :object,
+                   properties: {}
+                 }
           it 'returns all hearing schedules for the hearing today' do
             get reminders_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
             expect(api_response['data']).to eq([])
@@ -201,6 +256,14 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         before { sign_in judge_user }
 
         response '200', 'Hearing schedule updated' do
+          schema type: :object,
+                 properties: {
+                   scheduled_date: { type: :string, format: 'date' },
+                   schedule_status: { type: :string },
+                   reschedule_reason: { type: :string },
+                   scheduled_by_id: { type: :integer }
+                 }
+
           it { is_expected.to have_http_status :ok }
           it { expect { update_hearing_schedule }.to change(Noticed::Notification, :count).by(1) }
 
@@ -249,6 +312,13 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         before { sign_in judge_user }
 
         response '200', 'Hearing schedule updated' do
+          schema type: :object,
+                 properties: {
+                   scheduled_date: { type: :string, format: 'date' },
+                   schedule_status: { type: :string },
+                   reschedule_reason: { type: :string },
+                   scheduled_by_id: { type: :integer }
+                 }
           it { is_expected.to have_http_status :ok }
           it { expect { update_hearing_schedule }.to change(Noticed::Notification, :count).by(1) }
 
@@ -293,6 +363,13 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         before { sign_in registrar_user }
 
         response '200', 'Hearing schedule updated' do
+          schema type: :object,
+                 properties: {
+                   scheduled_date: { type: :string, format: 'date' },
+                   schedule_status: { type: :string },
+                   reschedule_reason: { type: :string },
+                   scheduled_by_id: { type: :integer }
+                 }
           it { is_expected.to have_http_status :ok }
           it { expect { update_hearing_schedule }.to change(Noticed::Notification, :count).by(1) }
 

@@ -38,6 +38,16 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         before { sign_in judge_user }
 
         response '200', 'Hearings found' do
+          schema type: :array,
+                 items: {
+                   type: :object,
+                   properties: {
+                     id: { type: :integer },
+                     hearing_status: { type: :string },
+                     hearing_type_id: { type: :integer }
+                   }
+                 }
+
           it 'returns all hearings for the case' do
             get api_v1_case_hearings_path(court_case)
             expect(response).to have_http_status(:ok)
@@ -90,6 +100,12 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         before { sign_in clerk_user }
 
         response '200', 'Hearing updated' do
+          schema type: :object,
+                 properties: {
+                   id: { type: :integer },
+                   hearing_status: { type: :string },
+                   hearing_type_id: { type: :integer }
+                 }
           it { is_expected.to have_http_status :ok }
           it { expect { update_hearing }.to change(Noticed::Notification, :count).by(1) }
 
@@ -151,6 +167,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
       tags 'Hearings'
       security [Bearer: []]
       consumes 'application/json'
+      produces 'application/json'
 
       parameter name: :hearing_params, in: :body, schema: {
         type: :object,
@@ -194,31 +211,6 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         end
       end
 
-      produces 'application/json'
-      parameter name: :hearing_params, in: :body, schema: {
-        type: :object,
-        properties: {
-          id: { type: :integer },
-          hearing_status: { type: :string },
-          hearing_type_id: { type: :integer },
-          case_id: { type: :integer },
-          judge_id: { type: :integer },
-          bench_id: { type: :integer },
-          clerk_id: { type: :integer },
-          hearing_schedules_attributes: {
-            type: :array,
-            items: {
-              type: :object,
-              properties: {
-                scheduled_date: { type: :string, format: 'date' },
-                schedule_status: { type: :string },
-                reschedule_reason: { type: :string },
-                scheduled_by_id: { type: :integer }
-              }
-            }
-          }
-        }
-      }
       context 'when role is registrar and hearing is preliminary' do
         subject(:create_hearing) do
           post api_v1_case_hearings_path(court_case), params: { hearing: valid_hearing_params }
@@ -247,6 +239,29 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         before { sign_in registrar_user }
 
         response '201', 'Hearing created' do
+          schema type: :object,
+                 properties: {
+                   id: { type: :integer },
+                   hearing_status: { type: :string },
+                   hearing_type_id: { type: :integer },
+                   case_id: { type: :integer },
+                   judge_id: { type: :integer },
+                   bench_id: { type: :integer },
+                   clerk_id: { type: :integer },
+                   hearing_schedules_attributes: {
+                     type: :array,
+                     items: {
+                       type: :object,
+                       properties: {
+                         scheduled_date: { type: :string, format: 'date' },
+                         schedule_status: { type: :string },
+                         reschedule_reason: { type: :string },
+                         scheduled_by_id: { type: :integer }
+                       }
+                     }
+                   }
+                 }
+
           it { is_expected.to have_http_status :created }
           it { expect { create_hearing }.to change(Noticed::Notification, :count).by(1) }
           it { expect { create_hearing }.to change(Hearing, :count).by(1) }
@@ -290,6 +305,28 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         before { sign_in registrar_user }
 
         response '201', 'Hearing created' do
+          schema type: :object,
+                 properties: {
+                   id: { type: :integer },
+                   hearing_status: { type: :string },
+                   hearing_type_id: { type: :integer },
+                   case_id: { type: :integer },
+                   judge_id: { type: :integer },
+                   bench_id: { type: :integer },
+                   clerk_id: { type: :integer },
+                   hearing_schedules_attributes: {
+                     type: :array,
+                     items: {
+                       type: :object,
+                       properties: {
+                         scheduled_date: { type: :string, format: 'date' },
+                         schedule_status: { type: :string },
+                         reschedule_reason: { type: :string },
+                         scheduled_by_id: { type: :integer }
+                       }
+                     }
+                   }
+                 }
           it { is_expected.to have_http_status :created }
           it { expect { create_hearing }.to change(Hearing, :count).by(1) }
         end
@@ -329,6 +366,28 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         before { sign_in clerk_user }
 
         response '201', 'Hearing created' do
+          schema type: :object,
+                 properties: {
+                   id: { type: :integer },
+                   hearing_status: { type: :string },
+                   hearing_type_id: { type: :integer },
+                   case_id: { type: :integer },
+                   judge_id: { type: :integer },
+                   bench_id: { type: :integer },
+                   clerk_id: { type: :integer },
+                   hearing_schedules_attributes: {
+                     type: :array,
+                     items: {
+                       type: :object,
+                       properties: {
+                         scheduled_date: { type: :string, format: 'date' },
+                         schedule_status: { type: :string },
+                         reschedule_reason: { type: :string },
+                         scheduled_by_id: { type: :integer }
+                       }
+                     }
+                   }
+                 }
           it { is_expected.to have_http_status :created }
           it { expect { create_hearing }.to change(Hearing, :count).by(1) }
           it { expect { create_hearing }.to change(Noticed::Notification, :count).by(1) }

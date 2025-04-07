@@ -49,6 +49,14 @@ RSpec.describe 'Api::V1::Addresses', type: :request do
         let(:valid_address_params) { FactoryBot.attributes_for(:address) }
 
         response '201', 'Address created' do
+          schema type: :object,
+                 properties: {
+                   id: { type: :integer },
+                   dzongkhag: { type: :string },
+                   gewog: { type: :string },
+                   street_address: { type: :string },
+                   address_type: { type: :string }
+                 }
           it { is_expected.to have_http_status :created }
           it { expect { create_address }.to change(Address, :count).by(1) }
 
