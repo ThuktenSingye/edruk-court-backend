@@ -14,6 +14,16 @@ module Hearings
       @hearing = hearing
     end
 
+    def create_and_notify
+      hearing_type
+    end
+
+    def notify_on_update
+      NotificationService.new(@case, @hearing).notify_case_participant('hearing_update')
+    end
+
+    private
+
     def hearing_type
       return unless @hearing.hearing_type
 
@@ -26,8 +36,6 @@ module Hearings
         notify_post_hearing
       end
     end
-
-    private
 
     def notify_post_hearing
       judge = current_tenant.users.with_role(:Judge).first
@@ -84,7 +92,7 @@ module Hearings
     end
 
     def notify_judge(judge)
-      NotificationService.new(@case, @hearing).notify_judge(judge)
+      NotificationService.new(@case, @hearing).notify_user(judge)
     end
 
     def find_judge

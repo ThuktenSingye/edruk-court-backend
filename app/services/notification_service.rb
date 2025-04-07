@@ -7,17 +7,18 @@ class NotificationService
     @hearing = hearing
   end
 
-  def notify_judge(judge)
-    return unless judge
+  def notify_user(user)
+    return unless user
 
     message_type = find_message_type
 
-    HearingNotifier.with(notifications_params(message_type)).deliver(judge)
+    HearingNotifier.with(notifications_params(message_type)).deliver(user)
   end
 
-  def notify_clerk; end
-
-  def notify_case_participant; end
+  def notify_case_participant(message_type)
+    users = @case.case_participants.map(&:user)
+    HearingNotifier.with(notifications_params(message_type)).deliver(users)
+  end
 
   private
 

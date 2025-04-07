@@ -48,8 +48,7 @@ class HearingNotifier < ApplicationNotifier
         hearing_type: params.dig(:hearing, :hearing_type, :name),
         case_id: params.dig(:case, :id),
         scheduled_date: params.dig(:hearing_schedule, :scheduled_date),
-        new_scheduled_date: params.dig(:hearing, :new_scheduled_date),
-        schedule_status: params.dig(:hearing, :schedule_status)
+        hearing_status: params.dig(:hearing, :hearing_status)
       ).build
     end
 

@@ -2,13 +2,13 @@
 
 # Hearing Message Builder
 class HearingMessageBuilder
+  # :message, :case, :hearing, :hearing_schedule
   def initialize(params)
     @message_type = params[:message_type]
     @hearing_type = params[:hearing_type] || 'Hearing'
     @case_id = params[:case_id] || 'N/A'
     @scheduled_date = params[:scheduled_date]
-    @new_scheduled_date = params[:new_scheduled_date]
-    @schedule_status = params[:schedule_status] || 'pending'
+    @hearing_status = params[:hearing_status] || 'ongoing'
   end
 
   def build
@@ -32,22 +32,21 @@ class HearingMessageBuilder
   end
 
   def status_update_message
-    case @schedule_status.to_sym
-    when :approved then approved_message
-    when :rescheduled then rescheduled_message
-    when :cancelled then cancelled_message
+    case @hearing_status.to_sym
+    when :ongoing then ongoing_message
+    when :completed then completed_message
     when :pending then pending_review_message
+    when :dismissed then cancelled_message
     else generic_status_message
     end
   end
 
-  def approved_message
-    "#{@hearing_type} hearing for Case #{@case_id} confirmed for #{formatted_date(@scheduled_date)}."
+  def ongoing_message
+    "Ongoing #{@hearing_type} hearing for Case #{@case_id}."
   end
 
-  def rescheduled_message
-    date = @new_scheduled_date || @scheduled_date
-    "#{@hearing_type} hearing for Case #{@case_id} rescheduled to #{formatted_date(date)}."
+  def completed_message
+    "#{@hearing_type} hearing for Case #{@case_id} is Completed on #{@scheduled_date}."
   end
 
   def cancelled_message
@@ -55,7 +54,7 @@ class HearingMessageBuilder
   end
 
   def pending_review_message
-    "#{@hearing_type} hearing for Case #{@case_id} requires your review."
+    "#{@hearing_type} hearing for Case #{@case_id} is on pending."
   end
 
   def generic_status_message

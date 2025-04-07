@@ -87,11 +87,21 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
 
         response '200', 'Hearing updated' do
           it { is_expected.to have_http_status :ok }
+          it { expect { update_hearing }.to change(Noticed::Notification, :count).by(1) }
 
           it 'updates the hearing status to ongoing' do
             update_hearing
             expect(api_response['data']['hearing_status']).to eq(valid_hearing_params[:hearing_status].to_s)
           end
+
+          # rubocop:disable RSpec/MultipleExpectations
+          it 'send pre-hearing notification to judge' do
+            update_hearing
+            notification = Noticed::Notification.last
+            expect(notification.recipient).to eq(case_participant.user)
+            expect(notification.params[:message]).to eq('hearing_update')
+          end
+          # rubocop:enable RSpec/MultipleExpectations
         end
       end
 
