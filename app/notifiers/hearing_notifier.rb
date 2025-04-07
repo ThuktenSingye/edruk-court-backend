@@ -53,7 +53,7 @@ class HearingNotifier < ApplicationNotifier
     end
 
     def url
-      Rails.application.routes.url_helpers.hearing_path(params[:hearing])
+      Rails.application.routes.url_helpers.api_v1_case_hearing_path(params[:case].id, params[:hearing].id)
     end
   end
 
