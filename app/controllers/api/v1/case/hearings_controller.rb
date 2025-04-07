@@ -19,7 +19,7 @@ module Api
           @hearing = @case.hearings.build(hearing_params.except(:bench_id, :judge_id, :clerk_id))
           authorize @hearing
           if @hearing.save
-            Hearings::HearingService.new(current_tenant, @case, @hearing, hearing_params).create_and_notify
+            Hearings::HearingService.new(current_tenant, @case, @hearing, hearing_params).hearing_type
             render_json :created, 'Hearing created Successfully', serialized_hearing(@hearing)
           else
             render_json :unprocessable_entity, nil, @hearing.errors
@@ -29,7 +29,7 @@ module Api
         def update
           authorize @hearing
           if @hearing.update(hearing_params)
-            Hearings::HearingService.new(current_tenant, @case, @hearing, hearing_params).notify_on_update
+            Hearings::HearingService.new(@case, @hearing, hearing_params, current_user).notify_on_update
             render_json :ok, 'Hearing Updated', serialized_hearing(@hearing)
           else
             render_json :unprocessable_entity, nil, @hearing.errors

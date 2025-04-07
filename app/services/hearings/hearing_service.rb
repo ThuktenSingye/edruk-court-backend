@@ -7,22 +7,12 @@ module Hearings
 
     delegate :current_tenant, to: :ActsAsTenant
 
-    def initialize(court, court_case, hearing, hearing_params)
-      @court = court
+    def initialize(court_case, hearing, hearing_params, current_user)
       @case = court_case
-      @hearing_params = hearing_params
       @hearing = hearing
+      @hearing_params = hearing_params
+      @current_user = current_user
     end
-
-    def create_and_notify
-      hearing_type
-    end
-
-    def notify_on_update
-      NotificationService.new(@case, @hearing).notify_case_participant('hearing_update')
-    end
-
-    private
 
     def hearing_type
       return unless @hearing.hearing_type
@@ -36,6 +26,27 @@ module Hearings
         notify_post_hearing
       end
     end
+
+
+    def notify_on_update
+      # binding.pry
+      Hearings::HearingNotificationService.new(@case, @hearing).notify_case_participant('hearing_update', @current_user)
+    end
+
+    private
+
+    # def hearing_type
+    #   return unless @hearing.hearing_type
+    #
+    #   case @hearing.hearing_type.name.downcase
+    #   when 'miscellaneous'
+    #     create_miscellaneous_hearing
+    #   when 'preliminary'
+    #     create_preliminary_hearing
+    #   else
+    #     notify_post_hearing
+    #   end
+    # end
 
     def notify_post_hearing
       judge = current_tenant.users.with_role(:Judge).first
@@ -92,7 +103,7 @@ module Hearings
     end
 
     def notify_judge(judge)
-      NotificationService.new(@case, @hearing).notify_user(judge)
+      Hearings::HearingNotificationService.new(@case, @hearing).notify_user(judge)
     end
 
     def find_judge

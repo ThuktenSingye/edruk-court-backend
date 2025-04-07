@@ -19,6 +19,7 @@ module Api
 
         def update
           if @hearing_schedule.update(hearing_schedules_params)
+            Schedules::HearingScheduleService.new(@case, @hearing, @hearing_schedule, current_user).notify
             render_json :ok, 'Schedule Updated Successfully', serialized_hearing_schedule(@hearing_schedule)
           else
             render_json :unprocessable_entity, 'Failed to Update Schedule', @hearing_schedule.errors

@@ -60,37 +60,116 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
       }
 
       context 'when role is clerk and hearing is preliminary' do
+        subject(:update_hearing_schedule) do
+          put api_v1_case_hearing_hearing_schedule_path(court_case, preliminary_hearing, hearing_schedule),
+              params: { hearing_schedule: valid_params }
+          response
+        end
+
+        let(:valid_params) do
+          {
+            scheduled_date: Faker::Date.forward(days: 2),
+            schedule_status: 'approved',
+            reschedule_reason: Faker::Lorem.paragraph
+          }
+        end
+
         let!(:preliminary_hearing_type) { FactoryBot.create(:hearing_type, :preliminary) }
         let!(:preliminary_hearing) do
           FactoryBot.create(:hearing, case: court_case, hearing_type: preliminary_hearing_type)
         end
-        let!(:case_participant) do
+        let!(:clerk_participant) do
           FactoryBot.create(:case_participant, case: court_case, user: clerk_user, role: Role.find_by(name: 'Clerk'))
         end
+
+        let!(:judge_participant) do
+          FactoryBot.create(:case_participant, case: court_case, user: judge_user, role: Role.find_by(name: 'Judge'))
+        end
+
         let!(:hearing_schedule) do
           FactoryBot.create(:hearing_schedule, hearing: preliminary_hearing, scheduled_by: clerk_user)
         end
 
-        before { sign_in clerk_user }
+        before { sign_in judge_user }
 
         response '200', 'Hearing schedule updated' do
-          let(:valid_params) do
-            {
-              scheduled_date: Faker::Date.forward(days: 2),
-              schedule_status: 'pending',
-              reschedule_reason: Faker::Lorem.paragraph
-            }
-          end
+          it { is_expected.to have_http_status :ok }
+          it { expect { update_hearing_schedule }.to change(Noticed::Notification, :count).by(1) }
 
-          it 'updates the hearing schedule' do
-            put api_v1_case_hearing_hearing_schedule_path(court_case, preliminary_hearing, hearing_schedule),
-                params: { hearing_schedule: valid_params }
-            expect(response).to have_http_status(:ok)
+          # rubocop:disable RSpec/MultipleExpectations
+          it 'send notification' do
+            update_hearing_schedule
+            notification = Noticed::Notification.last
+            expect(notification.recipient).to eq(clerk_participant.user)
+            expect(notification.params[:message]).to eq('schedule_update')
           end
+          # rubocop:enable RSpec/MultipleExpectations
+        end
+      end
+
+      context 'when role is judge but requested hearing schedule changes' do
+        subject(:update_hearing_schedule) do
+          put api_v1_case_hearing_hearing_schedule_path(court_case, preliminary_hearing, hearing_schedule),
+              params: { hearing_schedule: valid_params }
+          response
+        end
+
+        let(:valid_params) do
+          {
+            scheduled_date: Faker::Date.forward(days: 2),
+            schedule_status: 'changes_requested',
+            reschedule_reason: Faker::Lorem.paragraph
+          }
+        end
+
+        let!(:preliminary_hearing_type) { FactoryBot.create(:hearing_type, :preliminary) }
+        let!(:preliminary_hearing) do
+          FactoryBot.create(:hearing, case: court_case, hearing_type: preliminary_hearing_type)
+        end
+        let!(:clerk_participant) do
+          FactoryBot.create(:case_participant, case: court_case, user: clerk_user, role: Role.find_by(name: 'Clerk'))
+        end
+
+        let!(:judge_participant) do
+          FactoryBot.create(:case_participant, case: court_case, user: judge_user, role: Role.find_by(name: 'Judge'))
+        end
+
+        let!(:hearing_schedule) do
+          FactoryBot.create(:hearing_schedule, hearing: preliminary_hearing, scheduled_by: clerk_user)
+        end
+
+        before { sign_in judge_user }
+
+        response '200', 'Hearing schedule updated' do
+          it { is_expected.to have_http_status :ok }
+          it { expect { update_hearing_schedule }.to change(Noticed::Notification, :count).by(1) }
+
+          # rubocop:disable RSpec/MultipleExpectations
+          it 'send notification' do
+            update_hearing_schedule
+            notification = Noticed::Notification.last
+            expect(notification.recipient).to eq(clerk_participant.user)
+            expect(notification.params[:message]).to eq('schedule_update')
+          end
+          # rubocop:enable RSpec/MultipleExpectations
         end
       end
 
       context 'when role is registrar and hearing is miscellaneous' do
+        subject(:update_hearing_schedule) do
+          put api_v1_case_hearing_hearing_schedule_path(court_case, miscellaneous_hearing, hearing_schedule),
+              params: { hearing_schedule: valid_params }
+          response
+        end
+
+        let(:valid_params) do
+          {
+            scheduled_date: Faker::Date.forward(days: 2),
+            schedule_status: 'rescheduled',
+            reschedule_reason: Faker::Lorem.paragraph
+          }
+        end
+
         let!(:miscellaneous_hearing_type) { FactoryBot.create(:hearing_type, :miscellaneous) }
         let!(:miscellaneous_hearing) do
           FactoryBot.create(:hearing, case: court_case, hearing_type: miscellaneous_hearing_type)
@@ -99,22 +178,25 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
           FactoryBot.create(:hearing_schedule, hearing: miscellaneous_hearing, scheduled_by: registrar_user)
         end
 
+        let!(:judge_participant) do
+          FactoryBot.create(:case_participant, case: court_case, user: judge_user, role: Role.find_by(name: 'Judge'))
+        end
+
         before { sign_in registrar_user }
 
         response '200', 'Hearing schedule updated' do
-          let(:valid_params) do
-            {
-              scheduled_date: Faker::Date.forward(days: 2),
-              schedule_status: 'pending',
-              reschedule_reason: Faker::Lorem.paragraph
-            }
-          end
+          it { is_expected.to have_http_status :ok }
+          it { expect { update_hearing_schedule }.to change(Noticed::Notification, :count).by(1) }
 
-          it 'updates the hearing schedule' do
-            put api_v1_case_hearing_hearing_schedule_path(court_case, miscellaneous_hearing, hearing_schedule),
-                params: { hearing_schedule: valid_params }
-            expect(response).to have_http_status(:ok)
+          # rubocop:disable RSpec/MultipleExpectations
+          it 'send notification' do
+            update_hearing_schedule
+            notification = Noticed::Notification.last
+            expect(notification.recipient).to eq(judge_participant.user)
+            expect(notification.params[:message]).to eq('schedule_update')
           end
+          # rubocop:enable RSpec/MultipleExpectations
+
         end
       end
 
