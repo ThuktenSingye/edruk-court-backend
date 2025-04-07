@@ -6,7 +6,7 @@ require 'swagger_helper'
 # rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
 RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
   let(:court) { FactoryBot.create(:court) }
-  let(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
+  let(:general_user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
   let(:case_type) { FactoryBot.create(:case_type, :civil) }
   let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
   let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, case_type: case_type, court: court) }
@@ -33,6 +33,114 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
           it 'returns all hearing schedules for the hearing' do
             get api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
             expect(response).to have_http_status(:ok)
+          end
+        end
+      end
+    end
+  end
+
+  path '/api/v1/cases/{case_id}/hearings/{hearing_id}/today' do
+    get 'List all hearing schedules for today ' do
+      tags 'Hearing Schedules'
+      security [Bearer: []]
+      produces 'application/json'
+
+      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
+      parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
+
+      context 'when role is judge' do
+        before { sign_in judge_user }
+
+        response '200', 'Hearing schedules found' do
+          it 'returns all hearing schedules for the hearing today' do
+            get today_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
+            expect(response).to have_http_status(:ok)
+          end
+        end
+      end
+    end
+  end
+
+  path '/api/v1/cases/{case_id}/hearings/{hearing_id}/pending' do
+    get 'List all pending hearing schedules' do
+      tags 'Hearing Schedules'
+      security [Bearer: []]
+      produces 'application/json'
+
+      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
+      parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
+
+      context 'when role is judge' do
+        before { sign_in judge_user }
+
+        response '200', 'Hearing schedules found' do
+          it 'returns all pending hearing schedules' do
+            get pending_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
+            expect(response).to have_http_status(:ok)
+          end
+        end
+      end
+    end
+  end
+
+  path '/api/v1/cases/{case_id}/hearings/{hearing_id}/overdue' do
+    get 'List all overdue hearing schedules' do
+      tags 'Hearing Schedules'
+      security [Bearer: []]
+      produces 'application/json'
+
+      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
+      parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
+
+      context 'when role is judge' do
+        before { sign_in judge_user }
+
+        response '200', 'Hearing schedules found' do
+          it 'returns all overdue hearing schedules' do
+            get overdue_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
+            expect(response).to have_http_status(:ok)
+          end
+        end
+      end
+    end
+  end
+
+  path '/api/v1/cases/{case_id}/hearings/{hearing_id}/reminders' do
+    get 'List all reminder hearing schedules' do
+      tags 'Hearing Schedules'
+      security [Bearer: []]
+      produces 'application/json'
+
+      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
+      parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
+
+      context 'when role is judge' do
+        before { sign_in judge_user }
+
+        response '200', 'Hearing schedules found' do
+          it 'returns all hearing schedules reminders' do
+            get reminders_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
+            expect(response).to have_http_status(:ok)
+          end
+        end
+      end
+    end
+
+    get 'List reminders on hearing schedules if user is not court official' do
+      tags 'Hearing Schedules'
+      security [Bearer: []]
+      produces 'application/json'
+
+      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
+      parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
+
+      context 'when role is general user, it return empty array' do
+        before { sign_in general_user }
+
+        response '200', 'Hearing schedules found' do
+          it 'returns all hearing schedules for the hearing today' do
+            get reminders_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
+            expect(api_response['data']).to eq([])
           end
         end
       end
@@ -196,7 +304,6 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
             expect(notification.params[:message]).to eq('schedule_update')
           end
           # rubocop:enable RSpec/MultipleExpectations
-
         end
       end
 
@@ -235,6 +342,11 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
       produces 'application/json'
 
       context 'when role is clerk and hearing is preliminary' do
+        subject(:cancel_hearing_schedule) do
+          delete api_v1_case_hearing_hearing_schedule_path(court_case, preliminary_hearing, hearing_schedule)
+          response
+        end
+
         let!(:preliminary_hearing_type) { FactoryBot.create(:hearing_type, :preliminary) }
         let!(:preliminary_hearing) do
           FactoryBot.create(:hearing, case: court_case, hearing_type: preliminary_hearing_type)
@@ -249,10 +361,7 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         before { sign_in clerk_user }
 
         response '200', 'Hearing schedule deleted' do
-          it 'deletes the hearing schedule' do
-            delete api_v1_case_hearing_hearing_schedule_path(court_case, preliminary_hearing, hearing_schedule)
-            expect(response).to have_http_status(:ok)
-          end
+          it { is_expected.to have_http_status :ok }
         end
       end
 

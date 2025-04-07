@@ -3,7 +3,6 @@
 module Schedules
   # Hearing Schedule Service
   class HearingScheduleService
-
     delegate :current_tenant, to: :ActsAsTenant
 
     def initialize(court_case, hearing, hearing_schedule, current_user)

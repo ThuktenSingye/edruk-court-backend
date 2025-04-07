@@ -44,6 +44,22 @@ class HearingSchedulePolicy < ApplicationPolicy
     true
   end
 
+  def today?
+    true
+  end
+
+  def pending?
+    true
+  end
+
+  def overdue?
+    true
+  end
+
+  def reminders?
+    true
+  end
+
   def update?
     court_user? && authorized_for_update?
   end

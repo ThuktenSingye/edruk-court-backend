@@ -35,7 +35,14 @@ Rails.application.routes.draw do
               get :statistics
             end
             resources :hearings, except: %i[destroy] do
-              resources :hearing_schedules
+              resources :hearing_schedules do
+                collection do
+                  get :today
+                  get :pending
+                  get :reminders
+                  get :overdue
+                end
+              end
             end
           end
         end

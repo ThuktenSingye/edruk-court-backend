@@ -310,6 +310,98 @@ paths:
       responses:
         '200':
           description: Hearing schedules found
+  "/api/v1/cases/{case_id}/hearings/{hearing_id}/today":
+    get:
+      summary: 'List all hearing schedules for today '
+      tags:
+      - Hearing Schedules
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Hearing schedules found
+  "/api/v1/cases/{case_id}/hearings/{hearing_id}/pending":
+    get:
+      summary: List all pending hearing schedules
+      tags:
+      - Hearing Schedules
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Hearing schedules found
+  "/api/v1/cases/{case_id}/hearings/{hearing_id}/overdue":
+    get:
+      summary: List all overdue hearing schedules
+      tags:
+      - Hearing Schedules
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Hearing schedules found
+  "/api/v1/cases/{case_id}/hearings/{hearing_id}/reminders":
+    get:
+      summary: List reminders on hearing schedules if user is not court official
+      tags:
+      - Hearing Schedules
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Hearing schedules found
   "/api/v1/cases/{case_id}/hearings/{hearing_id}/hearing_schedules/{id}":
     parameters:
     - name: case_id
@@ -408,6 +500,10 @@ paths:
                 hearing_type_id:
                   type: integer
                 case_id:
+                  type: integer
+                bench_id:
+                  type: integer
+                judge_id:
                   type: integer
                 hearing_schedules_attributes:
                   type: array

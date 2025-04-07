@@ -66,7 +66,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         }
       }
 
-      context 'when role is judge and hearing is not miscellaneous' do
+      context 'when role is clerk and hearing is not miscellaneous' do
         subject(:update_hearing) do
           put api_v1_case_hearing_path(court_case, hearing), params: { hearing: valid_hearing_params }
           response
@@ -78,12 +78,16 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
             hearing_type_id: hearing_type.id
           }
         end
-        let!(:case_participant) do
+        let!(:clerk_participant) do
+          FactoryBot.create(:case_participant, case: court_case, user: clerk_user,
+                                               role: Role.find_by(name: 'Clerk'))
+        end
+        let!(:judge_participant) do
           FactoryBot.create(:case_participant, case: court_case, user: judge_user,
                                                role: Role.find_by(name: 'Judge'))
         end
 
-        before { sign_in judge_user }
+        before { sign_in clerk_user }
 
         response '200', 'Hearing updated' do
           it { is_expected.to have_http_status :ok }
@@ -98,7 +102,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
           it 'send pre-hearing notification to judge' do
             update_hearing
             notification = Noticed::Notification.last
-            expect(notification.recipient).to eq(case_participant.user)
+            expect(notification.recipient).to eq(judge_participant.user)
             expect(notification.params[:message]).to eq('hearing_update')
           end
           # rubocop:enable RSpec/MultipleExpectations
