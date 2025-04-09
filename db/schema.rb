@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_03_174153) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_09_171123) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -148,6 +148,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_03_174153) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "notes", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "hearing_id", null: false
+    t.string "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hearing_id"], name: "index_notes_on_hearing_id"
+    t.index ["user_id"], name: "index_notes_on_user_id"
+  end
+
   create_table "noticed_events", force: :cascade do |t|
     t.string "type"
     t.string "record_type"
@@ -246,6 +256,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_03_174153) do
   add_foreign_key "hearing_schedules", "users", column: "scheduled_by_id"
   add_foreign_key "hearings", "cases"
   add_foreign_key "hearings", "hearing_types"
+  add_foreign_key "notes", "hearings"
+  add_foreign_key "notes", "users"
   add_foreign_key "profiles", "users"
   add_foreign_key "users", "courts"
   add_foreign_key "users_roles", "roles"
