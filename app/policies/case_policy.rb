@@ -9,7 +9,7 @@ class CasePolicy < ApplicationPolicy
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
   def index?
-    user.admin? || user.registrar? || assigned_to_clerk? || assigned_to_judge?
+    user.admin? || user.registrar? || user.judge? || user.clerk?
   end
 
   def show?
@@ -43,27 +43,19 @@ class CasePolicy < ApplicationPolicy
     private
 
     def judge_and_clerk_role_ids
-      @judge_and_clerk_role_ids ||= Role.where(name: %w[Judge Clerk]).pluck(:id)
+      Role.where(name: %w[Judge Clerk]).pluck(:id)
     end
 
     def cases_assigned_to_user
       scope.joins(:case_participants)
            .where(case_participants: {
                     user: user,
-                    role_id: @judge_and_clerk_role_ids
+                    role_id: judge_and_clerk_role_ids
                   })
     end
   end
 
   private
-
-  def assigned_to_judge?
-    user.judge? && record.case_participants.exists?(user: user, role: Role.where(name: 'Judge'))
-  end
-
-  def assigned_to_clerk?
-    user.clerk? && record.case_participants.exists?(user: user, role: Role.where(name: 'Clerk'))
-  end
 
   def court_user?
     user.court_id == record.court_id
