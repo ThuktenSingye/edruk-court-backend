@@ -35,6 +35,7 @@ Rails.application.routes.draw do
               get :statistics
             end
             resources :hearings, except: %i[destroy] do
+              resources :notes
               resources :hearing_schedules do
                 collection do
                   get :today

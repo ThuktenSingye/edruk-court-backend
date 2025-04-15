@@ -10,5 +10,6 @@ RSpec.describe Hearing, type: :model do
   context 'when associating model' do
     it { is_expected.to belong_to :case }
     it { is_expected.to have_many :hearing_schedules }
+    it { is_expected.to have_many :notes }
   end
 end

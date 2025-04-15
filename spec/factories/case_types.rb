@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :case_type do
-    title { Faker::Lorem.unique.word }
+    title { Faker::Lorem.word }
   end
 
   trait :civil do

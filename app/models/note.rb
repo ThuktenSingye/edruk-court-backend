@@ -6,4 +6,6 @@ class Note < ApplicationRecord
   belongs_to :hearing
 
   validates :content, presence: true
+
+  # delegate to hearing, hearing_type and case_participant
 end

@@ -22,42 +22,18 @@ class User < ApplicationRecord
 
   encrypts :private_key
 
+  ROLES = %w[Judge Clerk Registrar Plaintiff Defendant Prosecutor Lawyer Admin].freeze
+
   def after_confirmation
     super
     generate_key_pair
     save!(validate: false)
   end
 
-  def judge?
-    role?('Judge')
-  end
-
-  def clerk?
-    role?('Clerk')
-  end
-
-  def registrar?
-    role?('Registrar')
-  end
-
-  def plaintiff?
-    role?('Plaintiff')
-  end
-
-  def defendant?
-    role?('Defendant')
-  end
-
-  def prosecutor?
-    role?('Prosecutor')
-  end
-
-  def lawyer?
-    role?('Lawyer')
-  end
-
-  def admin?
-    role?('Admin')
+  ROLES.each do |role|
+    define_method(:"#{role.downcase}?") do
+      role?(role)
+    end
   end
 
   def role?(role_name)

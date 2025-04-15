@@ -11,7 +11,6 @@ module Api
         before_action :case_service, only: :statistics
 
         def index
-          # based on assign user
           @cases = current_tenant.cases.all
           @cases = policy_scope(@cases)
           authorize @cases

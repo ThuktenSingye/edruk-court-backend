@@ -57,6 +57,10 @@ class CasePolicy < ApplicationPolicy
 
   private
 
+  def assigned_to_clerk?
+    user.clerk? && record.case_participants.exists?(user: user, role: Role.where(name: 'Clerk'))
+  end
+
   def court_user?
     user.court_id == record.court_id
   end
