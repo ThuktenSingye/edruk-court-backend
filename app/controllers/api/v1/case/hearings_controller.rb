@@ -10,13 +10,15 @@ module Api
         before_action :hearing, only: [:update]
 
         def index
-          @hearings = policy_scope(@case.hearings).includes(:hearing_type, :hearing_schedules)
+          # binding.pry
+          @hearings = policy_scope(@case.hearings.includes(:hearing_type, :hearing_schedules))
           authorize @hearings
           render_json :ok, nil, serialized_hearings(@hearings)
         end
 
         def create
-          @hearing = @case.hearings.build(hearing_params.except(:bench_id, :judge_id, :clerk_id))
+          final_params = assign_scheduler(hearing_params)
+          @hearing = @case.hearings.build(final_params.except(:bench_id, :judge_id, :clerk_id))
           authorize @hearing
           if @hearing.save
             Hearings::HearingService.new(@case, @hearing, hearing_params, current_user).create_and_notify
@@ -27,8 +29,9 @@ module Api
         end
 
         def update
+          final_params = assign_scheduler(hearing_params)
           authorize @hearing
-          if @hearing.update(hearing_params)
+          if @hearing.update(final_params.except(:bench_id, :judge_id, :clerk_id))
             Hearings::HearingService.new(@case, @hearing, hearing_params, current_user).notify_on_update
             render_json :ok, 'Hearing Updated', serialized_hearing(@hearing)
           else
@@ -54,15 +57,27 @@ module Api
           HearingSerializer.new(hearing).serializable_hash[:data][:attributes]
         end
 
+        def assign_scheduler(params)
+          return params if params[:hearing_schedules_attributes].blank?
+
+          params[:hearing_schedules_attributes].each do |schedule|
+            schedule[:scheduled_by_id] = current_user.id
+          end
+
+          params
+        end
+
+        # rubocop:disable Rails/StrongParametersExpect
         def hearing_params
-          params.expect(
-            hearing: [:hearing_type_id,
-                      :hearing_status, :case_id, :bench_id, :clerk_id, :judge_id,
-                      { hearing_schedules_attributes: %i[
-                        id scheduled_date schedule_status
-                        reschedule_reason scheduled_by_id _destroy
-                      ] }]
+          params.require(:hearing).permit(
+            :hearing_type_id,
+            :hearing_status, :case_id, :bench_id, :clerk_id, :judge_id,
+            { hearing_schedules_attributes: %i[
+              id scheduled_date schedule_status
+              reschedule_reason _destroy
+            ] }
           )
+          # rubocop:enable Rails/StrongParametersExpect
         end
       end
     end

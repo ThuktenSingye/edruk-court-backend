@@ -17,7 +17,7 @@ module Api
         end
 
         def update
-          if @hearing_schedule.update(hearing_schedules_params)
+          if @hearing_schedule.update(hearing_schedules_params.merge(scheduled_by: current_user))
             Schedules::HearingScheduleService.new(@case, @hearing, @hearing_schedule, current_user).notify
             render_json :ok, 'Schedule Updated Successfully', serialized_hearing_schedule(@hearing_schedule)
           else
@@ -41,7 +41,6 @@ module Api
         end
 
         def reminders
-          # binding.pry
           @hearing_schedules = policy_scope(current_tenant.hearing_schedules_reminder)
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
@@ -89,7 +88,7 @@ module Api
         end
 
         def hearing_schedules_params
-          params.expect(hearing_schedule: %i[scheduled_date schedule_status reschedule_reason scheduled_by])
+          params.expect(hearing_schedule: %i[scheduled_date schedule_status reschedule_reason])
         end
       end
     end

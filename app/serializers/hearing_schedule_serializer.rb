@@ -21,4 +21,6 @@ class HearingScheduleSerializer
   attribute :hearing_type_name do |object|
     object.hearing_type_name.humanize
   end
+
+  attribute :scheduled_by, &:scheduled_by_id
 end

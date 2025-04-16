@@ -35,7 +35,7 @@ class HearingSchedule < ApplicationRecord
   }
 
   scope :reminder, lambda {
-    where(scheduled_date: [Time.zone.today, Time.zone.tomorrow])
+    where(scheduled_date: Time.zone.now.beginning_of_day..(Time.zone.now.end_of_day + 1.day))
       .where(schedule_status: 'approved')
       .order(scheduled_date: :asc)
       .limit(10)
