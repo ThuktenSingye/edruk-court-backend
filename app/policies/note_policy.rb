@@ -20,13 +20,26 @@ class NotePolicy < ApplicationPolicy
       if user.admin?
         scope.all
       elsif user.registrar?
-        scope.joins(hearing: :case).where(cases: { court_id: user.court_id })
+        registrar_notes
       elsif user.judge? || user.clerk?
-        scope.joins(hearing: { case: :case_participants })
-             .where(case_participants: { user_id: user.id })
+        assigned_case_notes
       else
         scope.where(user_id: user.id)
       end
+    end
+
+    private
+
+    def registrar_notes
+      scope.joins(hearing: :case)
+           .where(cases: { court_id: user.court_id })
+           .where(user_id: user.id)
+    end
+
+    def assigned_case_notes
+      scope.joins(hearing: { case: :case_participants })
+           .where(case_participants: { user_id: user.id })
+           .where(user_id: user.id)
     end
   end
 
@@ -66,16 +79,6 @@ class NotePolicy < ApplicationPolicy
 
   def miscellaneous_hearing?
     hearing_type_name&.casecmp?('miscellaneous')
-  end
-
-  def registrar_notes
-    scope.joins(hearing: :case)
-         .where(cases: { court_id: user.court_id })
-  end
-
-  def assigned_case_notes
-    scope.joins(hearing: { case: :case_participants })
-         .where(case_participants: { user_id: user.id })
   end
 
   def assigned_to_judge?

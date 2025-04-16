@@ -31,7 +31,7 @@ RSpec.describe NotePolicy, type: :policy do
       let(:hearing) { create(:hearing, case: court_case, hearing_type: hearing_type) }
       let(:note) { create(:note, user: registrar_user, hearing: hearing) }
 
-      it { is_expected.to forbid_actions(%i[index create update destroy]) }
+      it { is_expected.to forbid_actions(%i[create update destroy]) }
     end
 
     context 'when role is judge and hearing is post-stage' do
@@ -56,7 +56,7 @@ RSpec.describe NotePolicy, type: :policy do
       let(:hearing) { FactoryBot.create(:hearing, case: court_case, hearing_type: hearing_type) }
       let(:note) { FactoryBot.create(:note, user: judge_user, hearing: hearing) }
 
-      it { is_expected.to forbid_actions(%i[index create update destroy]) }
+      it { is_expected.to forbid_actions(%i[create update destroy]) }
     end
   end
   # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup

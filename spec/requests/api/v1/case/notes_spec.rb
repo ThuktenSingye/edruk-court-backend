@@ -27,7 +27,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
   let!(:clerk_user) { FactoryBot.create(:user, :clerk, court: bench, confirmed_at: Time.zone.now) }
 
   # index
-  path '/api/v1/case/{case_id}/hearings/{hearing_id}/notes' do
+  path '/api/v1/case/:case_id/hearings/:hearing_id/notes' do
     get 'List all notes for a hearing' do
       tags 'Notes'
       security [Bearer: []]
@@ -77,6 +77,8 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
       consumes 'application/json'
       produces 'application/json'
 
+      parameter name: :case_id, in: :path, type: :string, required: true, description: 'ID of the case'
+      parameter name: :hearing_id, in: :path, type: :string, required: true, description: 'ID of the hearing'
       parameter name: :note_params, in: :body, schema: {
         type: :object,
         properties: {
@@ -190,6 +192,9 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
       consumes 'application/json'
       produces 'application/json'
 
+      parameter name: :case_id, in: :path, type: :string, required: true, description: 'ID of the case'
+      parameter name: :hearing_id, in: :path, type: :string, required: true, description: 'ID of the hearing'
+      parameter name: :id, in: :path, type: :string, required: true, description: 'ID of the note'
       parameter name: :note_params, in: :body, schema: {
         type: :object,
         properties: {
@@ -333,16 +338,16 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
       end
     end
   end
-  # destroy
+
   path '/api/v1/cases/:case_id/hearings/:hearing_id/notes/:id' do
     delete 'Destroy a Hearing Note' do
       tags 'Notes'
       security [Bearer: []]
       produces 'application/json'
 
-      parameter name: :case_id, in: :path, type: :string, required: true
-      parameter name: :hearing_id, in: :path, type: :string, required: true
-      parameter name: :id, in: :path, type: :string, required: true
+      parameter name: :case_id, in: :path, type: :string, required: true, description: 'ID of the case'
+      parameter name: :hearing_id, in: :path, type: :string, required: true, description: 'ID of the hearing'
+      parameter name: :id, in: :path, type: :string, required: true, description: 'ID of the note'
 
       context 'when user is registrar and pre_hearing' do
         subject(:delete_note) do
@@ -359,82 +364,78 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         response '201', 'Note Deleted' do
           schema type: :object,
                  properties: {
-                   id: { type: :integer },
-                   content: { type: :string },
-                   created_at: { type: :string, format: 'date-time' },
-                   user_id: { type: :integer }
+                   id: { type: :integer }
                  }
 
           it { is_expected.to have_http_status :ok }
           it { expect { delete_note }.to change(Note, :count).by(-1) }
         end
       end
-    end
 
-    context 'when user is registrar and post_hearing' do
-      subject(:delete_note) do
-        delete api_v1_case_hearing_note_path(court_case, hearing, note),
-               params: { note: valid_note_params }
-        response
+      context 'when user is registrar and post_hearing' do
+        subject(:delete_note) do
+          delete api_v1_case_hearing_note_path(court_case, hearing, note),
+                 params: { note: valid_note_params }
+          response
+        end
+
+        let(:valid_note_params) { { content: Faker::Lorem.sentence } }
+        let!(:note) { create(:note, hearing: hearing, user: registrar_user) }
+
+        before { sign_in registrar_user }
+
+        response '401', 'Unauthorized' do
+          it { is_expected.to have_http_status :unauthorized }
+          it { expect { delete_note }.not_to change(Note, :count) }
+        end
       end
 
-      let(:valid_note_params) { { content: Faker::Lorem.sentence } }
-      let!(:note) { create(:note, hearing: hearing, user: registrar_user) }
+      context 'when user is judge and post_hearing' do
+        subject(:delete_note) do
+          delete api_v1_case_hearing_note_path(court_case, hearing, note),
+                 params: { note: valid_note_params }
+          response
+        end
 
-      before { sign_in registrar_user }
+        let(:valid_note_params) { { content: Faker::Lorem.sentence } }
+        let!(:note) { create(:note, hearing: hearing, user: judge_user) }
 
-      response '401', 'Unauthorized' do
-        it { is_expected.to have_http_status :unauthorized }
-        it { expect { delete_note }.not_to change(Note, :count) }
-      end
-    end
+        let!(:judge_participant) do
+          create(:case_participant, case: court_case, user: judge_user,
+                                    role: Role.find_by(name: 'Judge'))
+        end
 
-    context 'when user is judge and post_hearing' do
-      subject(:delete_note) do
-        delete api_v1_case_hearing_note_path(court_case, hearing, note),
-               params: { note: valid_note_params }
-        response
-      end
+        before { sign_in judge_user }
 
-      let(:valid_note_params) { { content: Faker::Lorem.sentence } }
-      let!(:note) { create(:note, hearing: hearing, user: judge_user) }
+        response '200', 'Note Deleted' do
+          schema type: :object,
+                 properties: {
+                   id: { type: :integer }
+                 }
 
-      let!(:judge_participant) do
-        create(:case_participant, case: court_case, user: judge_user,
-                                  role: Role.find_by(name: 'Judge'))
-      end
-
-      before { sign_in judge_user }
-
-      response '200', 'Note Deleted' do
-        schema type: :object,
-               properties: {
-                 id: { type: :integer }
-               }
-
-        it { is_expected.to have_http_status :ok }
-        it { expect { delete_note }.to change(Note, :count).by(-1) }
-      end
-    end
-
-    context 'when user is judge and pre_hearing' do
-      subject(:delete_note) do
-        delete api_v1_case_hearing_note_path(court_case, miscellaneous_hearing, note),
-               params: { note: valid_note_params }
-        response
+          it { is_expected.to have_http_status :ok }
+          it { expect { delete_note }.to change(Note, :count).by(-1) }
+        end
       end
 
-      let(:valid_note_params) { { content: Faker::Lorem.sentence } }
-      let!(:note) { create(:note, hearing: miscellaneous_hearing, user: judge_user) }
+      context 'when user is judge and pre_hearing' do
+        subject(:delete_note) do
+          delete api_v1_case_hearing_note_path(court_case, miscellaneous_hearing, note),
+                 params: { note: valid_note_params }
+          response
+        end
 
-      before { sign_in judge_user }
+        let(:valid_note_params) { { content: Faker::Lorem.sentence } }
+        let!(:note) { create(:note, hearing: miscellaneous_hearing, user: judge_user) }
 
-      response '401', 'Unauthorized' do
-        it { is_expected.to have_http_status :unauthorized }
-        it { expect { delete_note }.not_to change(Note, :count) }
+        before { sign_in judge_user }
+
+        response '401', 'Unauthorized' do
+          it { is_expected.to have_http_status :unauthorized }
+          it { expect { delete_note }.not_to change(Note, :count) }
+        end
       end
     end
   end
-  # end
   # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
 end
