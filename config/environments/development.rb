@@ -71,4 +71,7 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
   config.hosts << "lvh.me"
   config.hosts << ".lvh.me"
+
+  config.action_cable.url = "ws://nganglam.lvh.me:3001/cable"
+  config.action_cable.allowed_request_origins = [ "http://nganglam.lvh.me:3001", "https://nganglam.lvh.me:3001" ]
 end
