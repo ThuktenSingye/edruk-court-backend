@@ -29,6 +29,16 @@ Rails.application.routes.draw do
             resources :addresses, only: %i[create]
           end
         end
+
+        resources :hearing_schedules, controller: '/api/v1/case/hearing_schedules' do
+          collection do
+            get :today
+            get :pending
+            get :reminders
+            get :overdue
+          end
+        end
+
         scope module: :case do
           resources :cases, except: %i[destroy] do
             collection do
@@ -36,14 +46,7 @@ Rails.application.routes.draw do
             end
             resources :hearings, except: %i[destroy] do
               resources :notes
-              resources :hearing_schedules do
-                collection do
-                  get :today
-                  get :pending
-                  get :reminders
-                  get :overdue
-                end
-              end
+              resources :hearing_schedules
             end
           end
         end

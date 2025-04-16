@@ -8,10 +8,17 @@ class Court < ApplicationRecord
                           inverse_of: :parent_court
   has_many :users, dependent: :nullify
   has_many :cases, dependent: :nullify
+  has_many :hearings, through: :cases
+  has_many :hearing_schedules, through: :hearings
 
   enum :court_type, { supreme: 0, high: 1, dzongkhag: 2, dungkhag: 3, bench: 4 }
 
   validates :name, :court_type, :email, :contact_no, presence: true
-
   validates :domain, :subdomain, :name, :email, uniqueness: { case_sensitive: false }
+
+  delegate :today_approved,
+           :pending,
+           :overdue,
+           :reminder,
+           to: :hearing_schedules, prefix: true
 end

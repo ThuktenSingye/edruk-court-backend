@@ -6,8 +6,8 @@ module Api
       # Hearing Schedule Controller
       class HearingSchedulesController < ApplicationController
         before_action :authenticate_user!
-        before_action :case
-        before_action :hearing
+        before_action :case, except: %i[today pending reminders overdue]
+        before_action :hearing, except: %i[today pending reminders overdue]
         before_action :hearing_schedule, only: %i[update destroy]
 
         def index
@@ -35,25 +35,26 @@ module Api
         end
 
         def today
-          @hearing_schedules = policy_scope(hearing_schedule_query.for_today)
+          @hearing_schedules = policy_scope(current_tenant.hearing_schedules_today_approved)
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
 
         def reminders
-          @hearing_schedules = policy_scope(hearing_schedule_query.for_reminders)
+          # binding.pry
+          @hearing_schedules = policy_scope(current_tenant.hearing_schedules_reminder)
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
 
         def pending
-          @hearing_schedules = policy_scope(hearing_schedule_query.for_pending)
+          @hearing_schedules = policy_scope(current_tenant.hearing_schedules_pending)
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
 
         def overdue
-          @hearing_schedules = policy_scope(hearing_schedule_query.for_overdue)
+          @hearing_schedules = policy_scope(current_tenant.hearing_schedules_overdue)
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end

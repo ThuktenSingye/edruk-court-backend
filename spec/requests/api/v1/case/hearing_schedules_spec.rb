@@ -49,15 +49,12 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
     end
   end
 
-  path '/api/v1/cases/{case_id}/hearings/{hearing_id}/today' do
+  path '/api/v1/hearing_schedules/today' do
     get 'List all hearing schedules for today ' do
       tags 'Hearing Schedules'
       security [Bearer: []]
       produces 'application/json'
 
-      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
-      parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
-
       context 'when role is judge' do
         before { sign_in judge_user }
 
@@ -66,14 +63,19 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
                  items: {
                    type: :object,
                    properties: {
+                     id: { type: :integer },
                      scheduled_date: { type: :string, format: 'date' },
                      schedule_status: { type: :string },
                      reschedule_reason: { type: :string },
-                     scheduled_by_id: { type: :integer }
+                     scheduled_by_id: { type: :integer },
+                     case_title: { type: :string },
+                     case_number: { type: :string },
+                     hearing_status: { type: :string },
+                     hearing_type: { type: :string }
                    }
                  }
           it 'returns all hearing schedules for the hearing today' do
-            get today_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
+            get today_api_v1_hearing_schedules_path
             expect(response).to have_http_status(:ok)
           end
         end
@@ -81,15 +83,12 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
     end
   end
 
-  path '/api/v1/cases/{case_id}/hearings/{hearing_id}/pending' do
+  path '/api/v1/hearing_schedules/pending' do
     get 'List all pending hearing schedules' do
       tags 'Hearing Schedules'
       security [Bearer: []]
       produces 'application/json'
 
-      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
-      parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
-
       context 'when role is judge' do
         before { sign_in judge_user }
 
@@ -98,14 +97,19 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
                  items: {
                    type: :object,
                    properties: {
+                     id: { type: :integer },
                      scheduled_date: { type: :string, format: 'date' },
                      schedule_status: { type: :string },
                      reschedule_reason: { type: :string },
-                     scheduled_by_id: { type: :integer }
+                     scheduled_by_id: { type: :integer },
+                     case_title: { type: :string },
+                     case_number: { type: :string },
+                     hearing_status: { type: :string },
+                     hearing_type: { type: :string }
                    }
                  }
           it 'returns all pending hearing schedules' do
-            get pending_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
+            get pending_api_v1_hearing_schedules_path
             expect(response).to have_http_status(:ok)
           end
         end
@@ -113,15 +117,12 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
     end
   end
 
-  path '/api/v1/cases/{case_id}/hearings/{hearing_id}/overdue' do
+  path '/api/v1/hearing_schedules/overdue' do
     get 'List all overdue hearing schedules' do
       tags 'Hearing Schedules'
       security [Bearer: []]
       produces 'application/json'
 
-      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
-      parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
-
       context 'when role is judge' do
         before { sign_in judge_user }
 
@@ -130,14 +131,19 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
                  items: {
                    type: :object,
                    properties: {
+                     id: { type: :integer },
                      scheduled_date: { type: :string, format: 'date' },
                      schedule_status: { type: :string },
                      reschedule_reason: { type: :string },
-                     scheduled_by_id: { type: :integer }
+                     scheduled_by_id: { type: :integer },
+                     case_title: { type: :string },
+                     case_number: { type: :string },
+                     hearing_status: { type: :string },
+                     hearing_type: { type: :string }
                    }
                  }
           it 'returns all overdue hearing schedules' do
-            get overdue_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
+            get overdue_api_v1_hearing_schedules_path
             expect(response).to have_http_status(:ok)
           end
         end
@@ -145,33 +151,39 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
     end
   end
 
-  path '/api/v1/cases/{case_id}/hearings/{hearing_id}/reminders' do
+  path '/api/v1/hearing_schedules/reminders' do
     get 'List all reminder hearing schedules' do
       tags 'Hearing Schedules'
       security [Bearer: []]
       produces 'application/json'
 
-      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
-      parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
-
       context 'when role is judge' do
+        subject(:get_reminder) do
+          get reminders_api_v1_hearing_schedules_path
+          response
+        end
+
         before { sign_in judge_user }
+
+        let!(:hearing_schedule) { create(:hearing_schedule, hearing: hearing, scheduled_by: judge_user) }
 
         response '200', 'Hearing schedules found' do
           schema type: :array,
                  items: {
                    type: :object,
                    properties: {
+                     id: { type: :integer },
                      scheduled_date: { type: :string, format: 'date' },
                      schedule_status: { type: :string },
                      reschedule_reason: { type: :string },
-                     scheduled_by_id: { type: :integer }
+                     scheduled_by_id: { type: :integer },
+                     case_title: { type: :string },
+                     case_number: { type: :string },
+                     hearing_status: { type: :string },
+                     hearing_type: { type: :string }
                    }
                  }
-          it 'returns all hearing schedules reminders' do
-            get reminders_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
-            expect(response).to have_http_status(:ok)
-          end
+          it { is_expected.to have_http_status :ok }
         end
       end
     end
@@ -180,9 +192,6 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
       tags 'Hearing Schedules'
       security [Bearer: []]
       produces 'application/json'
-
-      parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
-      parameter name: :hearing_id, in: :path, type: :integer, description: 'Hearing ID'
 
       context 'when role is general user, it return empty array' do
         before { sign_in general_user }
@@ -194,7 +203,7 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
                    properties: {}
                  }
           it 'returns all hearing schedules for the hearing today' do
-            get reminders_api_v1_case_hearing_hearing_schedules_path(court_case, hearing)
+            get reminders_api_v1_hearing_schedules_path
             expect(api_response['data']).to eq([])
           end
         end
