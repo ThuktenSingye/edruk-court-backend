@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_09_171123) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_17_143944) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -63,6 +63,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_171123) do
     t.boolean "is_enforced", default: false
     t.boolean "is_remanded", default: false
     t.boolean "is_reopened", default: false
+    t.boolean "can_appeal", default: false
     t.integer "case_status"
     t.bigint "court_id", null: false
     t.bigint "case_subtype_id"
@@ -94,11 +95,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_171123) do
     t.bigint "parent_court_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "location_id"
+    t.bigint "location_id", null: false
     t.index ["domain"], name: "index_courts_on_domain", unique: true
     t.index ["location_id"], name: "index_courts_on_location_id"
     t.index ["parent_court_id"], name: "index_courts_on_parent_court_id"
     t.index ["subdomain"], name: "index_courts_on_subdomain", unique: true
+  end
+
+  create_table "document_signatures", force: :cascade do |t|
+    t.text "signature_data"
+    t.datetime "signed_at"
+    t.bigint "signer_id", null: false
+    t.string "signable_type", null: false
+    t.bigint "signable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["signable_type", "signable_id"], name: "index_document_signatures_on_signable"
+    t.index ["signer_id"], name: "index_document_signatures_on_signer_id"
   end
 
   create_table "hearing_notes", force: :cascade do |t|
@@ -250,6 +263,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_171123) do
   add_foreign_key "cases", "courts", column: "bench_id"
   add_foreign_key "courts", "courts", column: "parent_court_id"
   add_foreign_key "courts", "locations"
+  add_foreign_key "document_signatures", "case_participants", column: "signer_id"
   add_foreign_key "hearing_notes", "hearings"
   add_foreign_key "hearing_notes", "users", column: "author_id"
   add_foreign_key "hearing_schedules", "hearings"
