@@ -5,5 +5,5 @@ class DocumentSignature < ApplicationRecord
   belongs_to :signable, polymorphic: true
   belongs_to :signer, class_name: 'CaseParticipant'
 
-  validates :signature_data, :signed_at, presence: true
+  validates :signature_data, presence: true
 end

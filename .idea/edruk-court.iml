@@ -85,12 +85,14 @@
     <orderEntry type="library" scope="PROVIDED" name="factory_bot (v6.5.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="factory_bot_rails (v6.4.4, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="faker (v3.5.1, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ffi (v1.17.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="flay (v2.13.3, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="flog (v4.8.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="fugit (v1.11.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="globalid (v1.2.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v1.14.7, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ice_nine (v0.11.2, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="image_processing (v1.13.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="io-console (v0.8.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="irb (v1.15.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="json (v2.10.1, RVM: ruby-3.3.6) [gem]" level="application" />
@@ -107,6 +109,7 @@
     <orderEntry type="library" scope="PROVIDED" name="mail (v2.8.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="marcel (v1.0.4, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="method_source (v1.1.0, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="mini_magick (v4.13.2, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mini_mime (v1.1.5, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="minitest (v5.25.4, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="msgpack (v1.8.0, RVM: ruby-3.3.6) [gem]" level="application" />
@@ -174,6 +177,7 @@
     <orderEntry type="library" scope="PROVIDED" name="rubocop-rspec (v3.3.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby-graphviz (v1.2.5, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby-progressbar (v1.13.0, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ruby-vips (v2.2.2, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby_parser (v3.21.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rubycritic (v4.9.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="securerandom (v0.4.1, RVM: ruby-3.3.6) [gem]" level="application" />

@@ -17,7 +17,7 @@ module Api
         end
 
         def update
-          if @hearing_schedule.update(hearing_schedules_params.merge(scheduled_by: current_user))
+          if @hearing_schedule.update(hearing_schedules_params)
             Schedules::HearingScheduleService.new(@case, @hearing, @hearing_schedule, current_user).notify
             render_json :ok, 'Schedule Updated Successfully', serialized_hearing_schedule(@hearing_schedule)
           else
