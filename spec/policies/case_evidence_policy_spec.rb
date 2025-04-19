@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 # rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
-RSpec.describe CaseDocumentPolicy, type: :policy do
+RSpec.describe CaseEvidencePolicy, type: :policy do
   let(:court) { create(:court) }
   let(:case_type) { create(:case_type) }
   let(:case_subtype) { create(:case_subtype, case_type: case_type) }
@@ -19,33 +19,34 @@ RSpec.describe CaseDocumentPolicy, type: :policy do
 
   describe 'permissions' do
     context 'when role is registrar and hearing is pre hearing' do
-      subject { described_class.new(registrar_user, case_document) }
+      subject { described_class.new(registrar_user, case_evidence) }
 
-      let(:case_document) { create(:case_document, :with_document, hearing: miscellaneous_hearing) }
+      let(:case_evidence) { create(:case_evidence, :with_image, hearing: miscellaneous_hearing) }
 
       it { is_expected.to permit_actions(%i[index create update destroy]) }
     end
 
     context 'when role is registrar and hearing is post hearing' do
-      subject { described_class.new(registrar_user, case_document) }
+      subject { described_class.new(registrar_user, case_evidence) }
 
-      let(:case_document) { create(:case_document, :with_document, hearing: hearing) }
+      let(:case_evidence) { create(:case_evidence, :with_image, hearing: hearing) }
 
       it { is_expected.to forbid_actions(%i[create update destroy]) }
     end
 
     context 'when role is judge and the hearing is pre hearing' do
-      subject { described_class.new(judge_user, case_document) }
+      subject { described_class.new(judge_user, case_evidence) }
 
-      let(:case_document) { create(:case_document, :with_document, hearing: miscellaneous_hearing) }
+      let(:case_evidence) { create(:case_evidence, :with_image, hearing: miscellaneous_hearing) }
 
       it { is_expected.to forbid_actions(%i[create update destroy]) }
     end
 
     context 'when role is judge and the hearing is post hearing' do
-      subject { described_class.new(judge_user, case_document) }
+      subject { described_class.new(judge_user, case_evidence) }
 
-      let(:case_document) { create(:case_document, :with_document, hearing: hearing) }
+      let(:case_evidence) { create(:case_evidence, :with_image, hearing: hearing) }
+
       let!(:case_participant) do
         create(:case_participant, case: court_case, user: judge_user,
                                   role: Role.find_by(name: 'Judge'))

@@ -13,4 +13,13 @@ FactoryBot.define do
     encrypted_key { Faker::Lorem.characters(number: 10) }
     association :hearing, factory: :hearing
   end
+
+  trait :with_image do
+    after(:build) do |case_evidence|
+      case_evidence.evidence.attach(
+        io: Rails.root.join('spec/support/images/banner.jpg').open,
+        filename: 'image/jpg'
+      )
+    end
+  end
 end

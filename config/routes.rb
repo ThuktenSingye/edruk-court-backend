@@ -48,6 +48,7 @@ Rails.application.routes.draw do
               resources :notes
               resources :hearing_schedules
               resources :case_documents, path: :documents
+              resources :case_evidences, path: :evidences
             end
           end
         end
