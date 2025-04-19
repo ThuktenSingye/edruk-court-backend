@@ -8,4 +8,8 @@ class CaseEvidence < ApplicationRecord
 
   enum :evidence_status, { pending: 0, verified: 1, rejected: 2 }
   validates :evidence_status, presence: true
+
+  def evidence_url
+    evidence.attached? ? Rails.application.routes.url_helpers.url_for(evidence) : nil
+  end
 end

@@ -28,6 +28,10 @@ class CasePolicy < ApplicationPolicy
     index?
   end
 
+  def files?
+    index?
+  end
+
   # Case Scope
   class Scope < ApplicationPolicy::Scope
     def resolve

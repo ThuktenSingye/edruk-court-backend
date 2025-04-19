@@ -122,7 +122,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_19_091933) do
     t.boolean "is_enforced", default: false
     t.boolean "is_remanded", default: false
     t.boolean "is_reopened", default: false
-    t.boolean "can_appeal", default: false
     t.integer "case_status"
     t.bigint "court_id", null: false
     t.bigint "case_subtype_id"
@@ -154,7 +153,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_19_091933) do
     t.bigint "parent_court_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "location_id", null: false
+    t.bigint "location_id"
     t.index ["domain"], name: "index_courts_on_domain", unique: true
     t.index ["location_id"], name: "index_courts_on_location_id"
     t.index ["parent_court_id"], name: "index_courts_on_parent_court_id"

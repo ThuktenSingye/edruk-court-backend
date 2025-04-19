@@ -6,7 +6,7 @@ module Api
       # Case Controller
       class CasesController < ApplicationController
         before_action :authenticate_user!
-        before_action :case, only: %i[show update]
+        before_action :case, only: %i[show update files]
         before_action :court_case
         before_action :case_service, only: :statistics
 
@@ -46,6 +46,12 @@ module Api
         def statistics
           authorize :case, :statistics?
           render_json :ok, nil, @case_service.case_statistics
+        end
+
+        def files
+          authorize :case, :files?
+          @files = CaseQuery.new(@case).call
+          render_json :ok, nil, @files
         end
 
         private

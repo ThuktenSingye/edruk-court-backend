@@ -23,6 +23,7 @@ RSpec.describe 'Api::V1::Cases', type: :request do
       court: court
     }
   end
+  let(:registrar_user) { create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
 
   path '/api/v1/cases' do
     get 'List all cases' do
@@ -78,6 +79,78 @@ RSpec.describe 'Api::V1::Cases', type: :request do
             get api_v1_case_path(court_case)
             expect(response).to have_http_status(:ok)
           end
+        end
+      end
+    end
+  end
+
+  path '/api/v1/cases/{case_id}/files' do
+    parameter name: :case_id, in: :path, type: :integer, description: 'Case ID'
+
+    get 'Get all case file of the given case' do
+      tags 'Cases'
+      security [Bearer: []]
+      produces 'multipart/form-date'
+
+      context 'when the role is registrar' do
+        subject(:get_case_file) do
+          get files_api_v1_case_path(court_case)
+          response
+        end
+
+        before { sign_in registrar_user }
+
+        response '200', 'Case files retrieved successfully' do
+          schema type: :object,
+                 properties: {
+                   status: { type: :string, example: 'ok' },
+                   message: { type: [:string, 'null'] },
+                   data: {
+                     type: :array,
+                     items: {
+                       type: :object,
+                       properties: {
+                         id: { type: :integer },
+                         hearing_status: { type: :string },
+                         case_id: { type: :integer },
+                         hearing_type: {
+                           type: :object,
+                           properties: {
+                             name: { type: :string }
+                           }
+                         },
+                         case_documents: {
+                           type: :array,
+                           items: {
+                             type: :object,
+                             properties: {
+                               id: { type: :integer },
+                               verified_by_judge: { type: :boolean },
+                               document_status: { type: :string },
+                               created_at: { type: :string, format: :date_time },
+                               document_url: { type: :string, format: :uri }
+                             }
+                           }
+                         },
+                         case_evidences: {
+                           type: :array,
+                           items: {
+                             type: :object,
+                             properties: {
+                               id: { type: :integer },
+                               verified_by_judge: { type: :boolean },
+                               evidence_status: { type: :string },
+                               created_at: { type: :string, format: :date_time },
+                               evidence_url: { type: :string, format: :uri }
+                             }
+                           }
+                         }
+                       }
+                     }
+                   }
+                 }
+
+          it { is_expected.to have_http_status :ok }
         end
       end
     end

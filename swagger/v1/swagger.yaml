@@ -220,6 +220,348 @@ paths:
                   required:
                   - email
                   - password
+  "/api/v1/cases/:case_id/hearings/:hearing_id/documents":
+    get:
+      summary: List all case documents for a given hearing
+      tags:
+      - Case Documents
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Case Documents found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    hearing_id:
+                      type: integer
+                    verified_by_judge:
+                      type: boolean
+                    verified_at:
+                      type: string
+                      format: date-time
+                    document_status:
+                      type: string
+                    document:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                        filename:
+                          type: string
+                        content_type:
+                          type: string
+                        byte_size:
+                          type: integer
+                  required:
+                  - hearing_id
+                  - document_status
+                  - document
+    post:
+      summary: Create new case documents record for a given hearing
+      tags:
+      - Case Documents
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Case Documents Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  hearing_id:
+                    type: integer
+                  verified_by_judge:
+                    type: boolean
+                  verified_at:
+                    type: string
+                    format: date-time
+                  document_status:
+                    type: string
+                  document:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                      filename:
+                        type: string
+                      content_type:
+                        type: string
+                      byte_size:
+                        type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                document_status:
+                  type: string
+                document:
+                  type: string
+                  format: binary
+                  description: Document file to upload
+              required:
+              - document
+  "/api/v1/cases/:case_id/hearings/:hearing_id/documents/:id":
+    put:
+      summary: Update the case document
+      tags:
+      - Case Documents
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Case Documents Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  hearing_id:
+                    type: integer
+                  document_status:
+                    type: string
+                  verified_by_judge:
+                    type: boolean
+                  verified_at:
+                    type: datetime
+                    format: date-time
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                document_status:
+                  type: string
+                verified_by_judge:
+                  type: boolean
+                verified_at:
+                  type: datetime
+                  format: date-time
+  "/api/v1/cases/:case_id/hearings/:hearing_id/evidences":
+    get:
+      summary: List all case evidences for a given hearing
+      tags:
+      - Case Evidences
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Case Evidences found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    hearing_id:
+                      type: integer
+                    verified_by_judge:
+                      type: boolean
+                    verified_at:
+                      type: string
+                      format: date-time
+                    evidence_status:
+                      type: string
+                    evidence:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                        filename:
+                          type: string
+                        content_type:
+                          type: string
+                        byte_size:
+                          type: integer
+                  required:
+                  - hearing_id
+                  - evidence_status
+                  - evidence
+    post:
+      summary: Create new case evidences record for a given hearing
+      tags:
+      - Case Evidences
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Case Evidence Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  hearing_id:
+                    type: integer
+                  verified_by_judge:
+                    type: boolean
+                  verified_at:
+                    type: string
+                    format: date-time
+                  evidence_status:
+                    type: string
+                  evidence:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                      filename:
+                        type: string
+                      content_type:
+                        type: string
+                      byte_size:
+                        type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                evidence_status:
+                  type: string
+                evidence:
+                  type: string
+                  format: binary
+                  description: Document file to upload
+              required:
+              - evidence
+  "/api/v1/cases/:case_id/hearings/:hearing_id/evidences/:id":
+    put:
+      summary: Update the case evidence
+      tags:
+      - Case Evidences
+      security:
+      - Bearer: []
+      parameters:
+      - name: case_id
+        in: path
+        description: Case ID
+        required: true
+        schema:
+          type: integer
+      - name: hearing_id
+        in: path
+        description: Hearing ID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Case Documents Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  hearing_id:
+                    type: integer
+                  evidence_status:
+                    type: string
+                  verified_by_judge:
+                    type: boolean
+                  verified_at:
+                    type: datetime
+                    format: date-time
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                evidence_status:
+                  type: string
+                verified_by_judge:
+                  type: boolean
+                verified_at:
+                  type: datetime
+                  format: date-time
   "/api/v1/cases":
     get:
       summary: List all cases
@@ -394,6 +736,85 @@ paths:
                   type: string
                 case_status:
                   type: string
+  "/api/v1/cases/{case_id}/files":
+    parameters:
+    - name: case_id
+      in: path
+      description: Case ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get all case file of the given case
+      tags:
+      - Cases
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: Case files retrieved successfully
+          content:
+            multipart/form-date:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  message:
+                    type:
+                    - string
+                    - 'null'
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        hearing_status:
+                          type: string
+                        case_id:
+                          type: integer
+                        hearing_type:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                        case_documents:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              verified_by_judge:
+                                type: boolean
+                              document_status:
+                                type: string
+                              created_at:
+                                type: string
+                                format: date_time
+                              document_url:
+                                type: string
+                                format: uri
+                        case_evidences:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              verified_by_judge:
+                                type: boolean
+                              evidence_status:
+                                type: string
+                              created_at:
+                                type: string
+                                format: date_time
+                              evidence_url:
+                                type: string
+                                format: uri
   "/api/v1/cases/statistics":
     get:
       summary: Get case statistics
@@ -652,6 +1073,8 @@ paths:
                     type: string
                   scheduled_by_id:
                     type: integer
+        '401':
+          description: Unauthorized
       requestBody:
         content:
           application/json:
