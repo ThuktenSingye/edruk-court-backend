@@ -79,12 +79,18 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
 
       parameter name: :case_id, in: :path, type: :string, required: true, description: 'ID of the case'
       parameter name: :hearing_id, in: :path, type: :string, required: true, description: 'ID of the hearing'
-      parameter name: :note_params, in: :body, schema: {
+      parameter name: :note, in: :body, schema: {
         type: :object,
         properties: {
-          content: { type: :string }
+          note: {
+            type: :object,
+            properties: {
+              content: { type: :string }
+            },
+            required: [:content]
+          }
         },
-        required: [:content]
+        required: [:note]
       }
 
       context 'when user is registrar and pre_hearing' do

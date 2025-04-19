@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_17_154528) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_19_091933) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -56,12 +56,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_17_154528) do
   create_table "case_documents", force: :cascade do |t|
     t.string "hash_value"
     t.bigint "hearing_id", null: false
-    t.boolean "verified_by_judge"
+    t.boolean "verified_by_judge", default: true
     t.datetime "verified_at"
     t.integer "document_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["hash_value", "hearing_id"], name: "index_case_documents_on_hash_value_and_hearing_id", unique: true
+    t.index ["hash_value"], name: "index_case_documents_on_hash_value", unique: true
     t.index ["hearing_id"], name: "index_case_documents_on_hearing_id"
   end
 
@@ -79,6 +80,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_17_154528) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["hash_value", "hearing_id"], name: "index_case_evidences_on_hash_value_and_hearing_id", unique: true
+    t.index ["hash_value"], name: "index_case_evidences_on_hash_value", unique: true
     t.index ["hearing_id"], name: "index_case_evidences_on_hearing_id"
   end
 

@@ -11,5 +11,6 @@ RSpec.describe Hearing, type: :model do
     it { is_expected.to belong_to :case }
     it { is_expected.to have_many :hearing_schedules }
     it { is_expected.to have_many :notes }
+    it { is_expected.to have_many :case_documents }
   end
 end

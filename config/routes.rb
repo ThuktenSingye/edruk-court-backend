@@ -47,6 +47,7 @@ Rails.application.routes.draw do
             resources :hearings, except: %i[destroy] do
               resources :notes
               resources :hearing_schedules
+              resources :case_documents, path: :documents
             end
           end
         end

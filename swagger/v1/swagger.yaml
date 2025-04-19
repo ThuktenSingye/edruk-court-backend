@@ -464,26 +464,13 @@ paths:
                       type: string
                     scheduled_by_id:
                       type: integer
-  "/api/v1/cases/{case_id}/hearings/{hearing_id}/today":
+  "/api/v1/hearing_schedules/today":
     get:
       summary: 'List all hearing schedules for today '
       tags:
       - Hearing Schedules
       security:
       - Bearer: []
-      parameters:
-      - name: case_id
-        in: path
-        description: Case ID
-        required: true
-        schema:
-          type: integer
-      - name: hearing_id
-        in: path
-        description: Hearing ID
-        required: true
-        schema:
-          type: integer
       responses:
         '200':
           description: Hearing schedules found
@@ -494,6 +481,8 @@ paths:
                 items:
                   type: object
                   properties:
+                    id:
+                      type: integer
                     scheduled_date:
                       type: string
                       format: date
@@ -503,26 +492,21 @@ paths:
                       type: string
                     scheduled_by_id:
                       type: integer
-  "/api/v1/cases/{case_id}/hearings/{hearing_id}/pending":
+                    case_title:
+                      type: string
+                    case_number:
+                      type: string
+                    hearing_status:
+                      type: string
+                    hearing_type:
+                      type: string
+  "/api/v1/hearing_schedules/pending":
     get:
       summary: List all pending hearing schedules
       tags:
       - Hearing Schedules
       security:
       - Bearer: []
-      parameters:
-      - name: case_id
-        in: path
-        description: Case ID
-        required: true
-        schema:
-          type: integer
-      - name: hearing_id
-        in: path
-        description: Hearing ID
-        required: true
-        schema:
-          type: integer
       responses:
         '200':
           description: Hearing schedules found
@@ -533,6 +517,8 @@ paths:
                 items:
                   type: object
                   properties:
+                    id:
+                      type: integer
                     scheduled_date:
                       type: string
                       format: date
@@ -542,26 +528,21 @@ paths:
                       type: string
                     scheduled_by_id:
                       type: integer
-  "/api/v1/cases/{case_id}/hearings/{hearing_id}/overdue":
+                    case_title:
+                      type: string
+                    case_number:
+                      type: string
+                    hearing_status:
+                      type: string
+                    hearing_type:
+                      type: string
+  "/api/v1/hearing_schedules/overdue":
     get:
       summary: List all overdue hearing schedules
       tags:
       - Hearing Schedules
       security:
       - Bearer: []
-      parameters:
-      - name: case_id
-        in: path
-        description: Case ID
-        required: true
-        schema:
-          type: integer
-      - name: hearing_id
-        in: path
-        description: Hearing ID
-        required: true
-        schema:
-          type: integer
       responses:
         '200':
           description: Hearing schedules found
@@ -572,6 +553,8 @@ paths:
                 items:
                   type: object
                   properties:
+                    id:
+                      type: integer
                     scheduled_date:
                       type: string
                       format: date
@@ -581,26 +564,21 @@ paths:
                       type: string
                     scheduled_by_id:
                       type: integer
-  "/api/v1/cases/{case_id}/hearings/{hearing_id}/reminders":
+                    case_title:
+                      type: string
+                    case_number:
+                      type: string
+                    hearing_status:
+                      type: string
+                    hearing_type:
+                      type: string
+  "/api/v1/hearing_schedules/reminders":
     get:
       summary: List reminders on hearing schedules if user is not court official
       tags:
       - Hearing Schedules
       security:
       - Bearer: []
-      parameters:
-      - name: case_id
-        in: path
-        description: Case ID
-        required: true
-        schema:
-          type: integer
-      - name: hearing_id
-        in: path
-        description: Hearing ID
-        required: true
-        schema:
-          type: integer
       responses:
         '200':
           description: Hearing schedules found
@@ -611,6 +589,8 @@ paths:
                 items:
                   type: object
                   properties:
+                    id:
+                      type: integer
                     scheduled_date:
                       type: string
                       format: date
@@ -620,6 +600,14 @@ paths:
                       type: string
                     scheduled_by_id:
                       type: integer
+                    case_title:
+                      type: string
+                    case_number:
+                      type: string
+                    hearing_status:
+                      type: string
+                    hearing_type:
+                      type: string
   "/api/v1/cases/{case_id}/hearings/{hearing_id}/hearing_schedules/{id}":
     parameters:
     - name: case_id
@@ -664,8 +652,6 @@ paths:
                     type: string
                   scheduled_by_id:
                     type: integer
-        '401':
-          description: Unauthorized
       requestBody:
         content:
           application/json:
@@ -928,10 +914,15 @@ paths:
             schema:
               type: object
               properties:
-                content:
-                  type: string
+                note:
+                  type: object
+                  properties:
+                    content:
+                      type: string
+                  required:
+                  - content
               required:
-              - content
+              - note
   "/api/v1/cases/:case_id/hearings/:hearing_id/notes/:id":
     put:
       summary: Update a Hearing Note
