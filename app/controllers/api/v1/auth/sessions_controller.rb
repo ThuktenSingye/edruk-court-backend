@@ -11,19 +11,28 @@ module Api
 
         def create
           if current_tenant
-            authenticate_user
+            authenticate_court_user
           else
-            handle_court_not_found
+            authenticate_user
           end
         end
 
         private
 
-        def authenticate_user
+        def authenticate_court_user
           @user = current_tenant.users.find_by(email: params[:user][:email])
-          if @user&.valid_password?(params[:user][:password])
-            sign_in(@user)
-            respond_with(@user, success: true)
+          login_user(@user)
+        end
+
+        def authenticate_user
+          @user = User.find_by(email: params[:user][:email])
+          login_user(@user)
+        end
+
+        def login_user(user)
+          if user&.valid_password?(params[:user][:password])
+            sign_in(user)
+            respond_with(user, success: true)
           else
             handle_invalid_credentials
           end

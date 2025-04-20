@@ -2,7 +2,7 @@
 
 # Court Model
 class Court < ApplicationRecord
-  belongs_to :location
+  has_many :jurisdictions, dependent: :nullify
   belongs_to :parent_court, class_name: 'Court', optional: true
   has_many :child_courts, class_name: 'Court', foreign_key: :parent_court_id, dependent: :destroy,
                           inverse_of: :parent_court

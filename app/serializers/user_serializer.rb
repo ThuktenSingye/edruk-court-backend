@@ -10,6 +10,6 @@ class UserSerializer
   end
 
   attribute :court_id do |object|
-    object.court.id
+    object&.court&.id
   end
 end

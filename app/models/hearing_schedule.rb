@@ -16,7 +16,7 @@ class HearingSchedule < ApplicationRecord
   delegate :name, to: :hearing_type, prefix: true, allow_nil: true
 
   scope :today_approved, lambda {
-    where(scheduled_date: Time.zone.today, schedule_status: 'approved')
+    where(scheduled_date: Time.zone.today.all_day, schedule_status: 'approved')
       .order(scheduled_date: :asc)
       .limit(20)
   }

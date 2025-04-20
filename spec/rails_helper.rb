@@ -15,6 +15,7 @@ require 'rspec/rails'
 require 'support/subdomain_helpers'
 require 'support/auth_helper'
 require 'support/api_helpers'
+require 'support/devise_jwt_helpers'
 require 'pundit/rspec'
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -78,6 +79,7 @@ RSpec.configure do |config|
   config.include Warden::Test::Helpers
   config.include AuthHelper, type: :request
   config.include ApiHelpers, type: :request
+  config.include DeviseJwtHelpers, type: :request
 
   # Subdomain Helpers
   config.include SubdomainHelpers, type: :request
@@ -99,17 +101,12 @@ RSpec.configure do |config|
   # rubocop:disable Style/GlobalVars
   config.before(:suite) do |_example|
     # Make the default tenant globally available to the tests
-    $default_location = Location.find_or_create_by!(
-      name: 'Default Location',
-      location_type: 0 # Assuming 0 for Dzongkhag
-    )
 
     $default_account = Court.find_or_create_by!(
       name: 'Default Court',
       court_type: 1,
       email: 'default@example.com',
-      contact_no: '12345678',
-      location_id: $default_location.id
+      contact_no: '12345678'
     )
 
     # # Create a bench court as child of default account
@@ -120,8 +117,7 @@ RSpec.configure do |config|
       email: 'bench@example.com',
       subdomain: 'bench@example.com',
       domain: 'example.com',
-      contact_no: '87654321',
-      location_id: $default_location.id
+      contact_no: '87654321'
     )
   end
 

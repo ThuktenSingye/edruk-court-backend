@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_19_091933) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_19_165210) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -153,9 +153,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_19_091933) do
     t.bigint "parent_court_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "location_id"
     t.index ["domain"], name: "index_courts_on_domain", unique: true
-    t.index ["location_id"], name: "index_courts_on_location_id"
     t.index ["parent_court_id"], name: "index_courts_on_parent_court_id"
     t.index ["subdomain"], name: "index_courts_on_subdomain", unique: true
   end
@@ -211,12 +209,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_19_091933) do
     t.index ["hearing_type_id"], name: "index_hearings_on_hearing_type_id"
   end
 
-  create_table "locations", force: :cascade do |t|
+  create_table "jurisdictions", force: :cascade do |t|
     t.string "name"
-    t.integer "location_type"
+    t.integer "jurisdiction_type"
     t.integer "parent_id"
+    t.bigint "court_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["court_id"], name: "index_jurisdictions_on_court_id"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -324,7 +324,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_19_091933) do
   add_foreign_key "cases", "courts"
   add_foreign_key "cases", "courts", column: "bench_id"
   add_foreign_key "courts", "courts", column: "parent_court_id"
-  add_foreign_key "courts", "locations"
   add_foreign_key "document_signatures", "case_participants", column: "signer_id"
   add_foreign_key "hearing_notes", "hearings"
   add_foreign_key "hearing_notes", "users", column: "author_id"
@@ -332,6 +331,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_19_091933) do
   add_foreign_key "hearing_schedules", "users", column: "scheduled_by_id"
   add_foreign_key "hearings", "cases"
   add_foreign_key "hearings", "hearing_types"
+  add_foreign_key "jurisdictions", "courts"
   add_foreign_key "notes", "hearings"
   add_foreign_key "notes", "users"
   add_foreign_key "profiles", "users"

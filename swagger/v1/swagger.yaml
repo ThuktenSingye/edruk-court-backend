@@ -63,6 +63,199 @@ paths:
                   - address_type
               required:
               - address
+  api/v1/admin/courts:
+    get:
+      summary: List all courts
+      tags:
+      - Courts
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    court_type:
+                      type: string
+                    email:
+                      type: string
+                    subdomain:
+                      type: string
+                    domain:
+                      type: string
+                    parent_court:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      court_type:
+                        type: string
+    post:
+      summary: Create a court
+      tags:
+      - Courts
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '201':
+          description: Court created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  court_type:
+                    type: string
+                  email:
+                    type: string
+                  contact_no:
+                    type: string
+                  subdomain:
+                    type: string
+                  domain:
+                    type: string
+                  parent_court:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    court_type:
+                      type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                court_type:
+                  type: string
+                email:
+                  type: string
+                contact_no:
+                  type: string
+                subdomain:
+                  type: string
+                domain:
+                  type: string
+                parent_court_id:
+                  type: integer
+  api/v1/admin/courts/:id:
+    get:
+      summary: show a courts
+      tags:
+      - Courts
+      security:
+      - Bearer: []
+      parameters:
+      - name: id
+        in: path
+        description: Court id.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    court_type:
+                      type: string
+                    email:
+                      type: string
+                    subdomain:
+                      type: string
+                    domain:
+                      type: string
+                    parent_court:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      court_type:
+                        type: string
+    put:
+      summary: Update a court
+      tags:
+      - Courts
+      security:
+      - Bearer: []
+      parameters:
+      - name: id
+        in: path
+        description: Court id.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Court updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  court_type:
+                    type: string
+                  email:
+                    type: string
+                  contact_no:
+                    type: string
+                  subdomain:
+                    type: string
+                  domain:
+                    type: string
+                  parent_court:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    court_type:
+                      type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                court_type:
+                  type: string
+                email:
+                  type: string
+                contact_no:
+                  type: string
+                subdomain:
+                  type: string
+                domain:
+                  type: string
+                parent_court_id:
+                  type: integer
   "/api/v1/auth/confirmation":
     get:
       summary: Confirm user account
