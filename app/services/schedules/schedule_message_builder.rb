@@ -12,7 +12,7 @@ module Schedules
     end
 
     def build
-      case @message_type.to_s
+      case @message_type
       when 'schedule_update' then schedule_update_message
       else default_message
       end

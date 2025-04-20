@@ -24,6 +24,12 @@ Rails.application.routes.draw do
 
     namespace :api do
       namespace :v1 do
+        resources :notifications, only: [ :index ] do
+          member do
+            post :mark_as_read
+          end
+        end
+
         resources :users, only: [] do
           resource :profile, only: %i[show update] do
             resources :addresses, only: %i[create]
