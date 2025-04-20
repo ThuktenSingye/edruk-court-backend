@@ -9,7 +9,7 @@ module Api
       def index
         @notifications = current_user.unread_notifications
         authorize @notifications
-        render_json :ok, nil, serialized_notifications: @notifications
+        render_json :ok, nil, serialized_notifications(@notifications)
       end
 
       def mark_as_reads

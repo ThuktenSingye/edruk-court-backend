@@ -24,22 +24,14 @@ class User < ApplicationRecord
 
   encrypts :private_key
 
-  ROLES = %w[Judge Clerk Registrar Plaintiff Defendant Prosecutor Lawyer Admin].freeze
-
   def after_confirmation
     super
     generate_key_pair
     save!(validate: false)
   end
 
-  ROLES.each do |role|
-    define_method(:"#{role.downcase}?") do
-      role?(role)
-    end
-  end
-
   def unread_notifications
-    notifications.unread.newest_first
+    notifications.unread.newest_first.limit(20)
   end
 
   def unread_notifications_count

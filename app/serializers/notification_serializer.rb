@@ -3,7 +3,7 @@
 # Notification Serializer
 class NotificationSerializer
   include JSONAPI::Serializer
-  attributes :id, :type, :created_at, :read_at, :params
+  attributes :id, :type, :created_at, :read_at, :params, :message, :url, :case_number
 
   attribute :message do |notification|
     notification.params[:message]
