@@ -12,8 +12,9 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable, :confirmable,
          :jwt_authenticatable, jwt_revocation_strategy: self
 
-  validates :email, :password, presence: true
+  validates :email, presence: true
   validates :email, uniqueness: { case_sensitive: false }
+  validates :password, presence: true, on: :create
 
   has_one :profile, dependent: :destroy
   accepts_nested_attributes_for :profile

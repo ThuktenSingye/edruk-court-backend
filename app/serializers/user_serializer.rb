@@ -11,7 +11,7 @@ class UserSerializer
       first_name: object.profile&.first_name,
       last_name: object.profile&.last_name,
       cid_no: object.profile&.cid_no,
-      phone_number: object.profile&.phone_number,
+      phone_number: object.profile&.phone_number
     }
   end
 
@@ -20,5 +20,16 @@ class UserSerializer
       id: object.court&.id,
       name: object.court&.name
     }
+  end
+
+  attribute :address do |object|
+    object.profile&.addresses&.map do |address|
+      {
+        id: address.id,
+        dzongkhag: address.dzongkhag,
+        gewog: address.gewog,
+        address_type: address.address_type.humanize
+      }
+    end
   end
 end

@@ -7,6 +7,12 @@ module Api
       class UsersController < BaseController
         before_action :user, only: %i[update show]
 
+        def index
+          @users = User.with_role(:User)
+          authorize @users
+          render_json :ok, nil, serialized_users(@users)
+        end
+
         def show
           authorize @user
           render_json :ok, nil, serialized_user(@user)
@@ -24,11 +30,30 @@ module Api
 
         def update
           authorize @user
-          if @user.update(user_params)
+          @user.skip_reconfirmation! if user_params[:email].present? && @user.email != user_params[:email]
+          if @user.update(user_params.except(:password, :password_confirmation))
             render_json :ok, 'User updated successfully', serialized_user(@user)
           else
             render_json :unprocessable_entity, nil, @user.errors.as_json
           end
+        end
+
+        def judge
+          @users = User.with_role(:Judge)
+          authorize @users
+          render_json :ok, nil, serialized_users(@users)
+        end
+
+        def clerk
+          @users = User.with_role(:Clerk)
+          authorize @users
+          render_json :ok, nil, serialized_users(@users)
+        end
+
+        def registrar
+          @users = User.with_role(:Registrar)
+          authorize @users
+          render_json :ok, nil, serialized_users(@users)
         end
 
         private

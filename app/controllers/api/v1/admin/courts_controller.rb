@@ -37,7 +37,27 @@ module Api
           end
         end
 
+        def statistics
+          authorize :court, :statistics?
+          @court_data = CourtStatisticSerializer.new(court_counts_by_type).serializable_hash[:data][:attributes]
+          render_json :ok, nil, @court_data
+        end
+
         private
+
+        def court_counts_by_type
+          {
+            supreme_court: court_type('supreme'),
+            high_court: court_type('high'),
+            dzongkhag_court: court_type('dzongkhag'),
+            dungkhag_court: court_type('dungkhag'),
+            bench: court_type('bench')
+          }
+        end
+
+        def court_type(type)
+          Court.where(court_type: type).count
+        end
 
         def court
           @court ||= Court.find(params[:id])

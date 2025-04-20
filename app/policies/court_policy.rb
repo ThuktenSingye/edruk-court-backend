@@ -22,4 +22,8 @@ class CourtPolicy < ApplicationPolicy
   def update?
     index?
   end
+
+  def statistics?
+    user.admin?
+  end
 end
