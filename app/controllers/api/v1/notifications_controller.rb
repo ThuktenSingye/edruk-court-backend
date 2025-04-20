@@ -12,7 +12,7 @@ module Api
         render_json :ok, nil, serialized_notifications: @notifications
       end
 
-      def mark_as_read
+      def mark_as_reads
         notification = current_user.notifications.find(params[:id])
         authorize notification, :mark_as_read?, policy_class: Noticed::NotificationPolicy
         notification.mark_as_read!
