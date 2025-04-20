@@ -8,7 +8,18 @@ class HearingScheduleNotifier < ApplicationNotifier
   deliver_by :action_cable do |config|
     config.channel = 'NotificationChannel' # Custom channel name
     config.stream = -> { "notifications:#{recipient.id}" }
-    config.message = -> { params }
+    config.message = lambda {
+      {
+        id: record.id,
+        type: self.class.name,
+        message: message,
+        record: record,
+        url: url,
+        case_number: params[:case]&.case_number,
+        hearing_type: params[:hearing]&.hearing_type&.name,
+        scheduled_date: params[:hearing_schedule]&.scheduled_date
+      }
+    }
   end
 
   required_params :case, :message, :hearing, :hearing_schedule
@@ -27,23 +38,10 @@ class HearingScheduleNotifier < ApplicationNotifier
     }
   end
 
-  def to_action_cable
-    {
-      id: record.id,
-      type: self.class.name,
-      message: message,
-      record: record,
-      url: url,
-      case_number: params[:case]&.case_number,
-      hearing_type: params.dig(:hearing, :hearing_type, :name),
-      scheduled_date: params.dig(:hearing_schedule, :scheduled_date)
-    }
-  end
-
   notification_methods do
     def message
       Schedules::ScheduleMessageBuilder.new(
-        message_type: params[:message],
+        message_type: params[:message].to_sym,
         hearing_type: params.dig(:hearing, :hearing_type, :name),
         case_id: params.dig(:case, :id),
         scheduled_date: params.dig(:hearing_schedule, :scheduled_date),

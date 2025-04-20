@@ -9,7 +9,17 @@ class HearingNotifier < ApplicationNotifier
   deliver_by :action_cable do |config|
     config.channel = 'NotificationChannel' # Custom channel name
     config.stream = -> { "notifications:#{recipient.id}" }
-    config.message = -> { params }
+    config.message = lambda {
+      {
+        id: record.id,
+        type: self.class.name,
+        message: message,
+        record: record,
+        url: url,
+        case_number: params[:case]&.case_number,
+        hearing_type: params[:hearing]&.hearing_type&.name
+      }
+    }
   end
 
   required_params :message, :case, :hearing, :hearing_schedule
@@ -28,32 +38,25 @@ class HearingNotifier < ApplicationNotifier
     }
   end
 
-  def to_action_cable
-    {
-      id: record.id,
-      type: self.class.name,
-      message: message,
-      record: record,
-      url: url,
-      case_number: params[:case]&.case_number,
-      hearing_type: params.dig(:hearing, :hearing_type, :name),
-      priority: case_priority
-    }
-  end
-
   notification_methods do
     def message
-      HearingMessageBuilder.new(
-        message_type: params[:message],
-        hearing_type: params.dig(:hearing, :hearing_type, :name),
-        case_id: params.dig(:case, :id),
-        scheduled_date: params.dig(:hearing_schedule, :scheduled_date),
-        hearing_status: params.dig(:hearing, :hearing_status)
+      hearing = params[:hearing]
+      hearing_schedule = params[:hearing_schedule]
+      case_obj = params[:case]
+
+      Hearings::HearingMessageBuilder.new(
+        message_type: params[:message].to_sym,
+        hearing_type: hearing.hearing_type&.name, # Access association directly
+        case_id: case_obj&.id,
+        scheduled_date: hearing_schedule&.scheduled_date,
+        hearing_status: hearing&.hearing_status
       ).build
     end
 
     def url
-      Rails.application.routes.url_helpers.api_v1_case_hearing_path(params[:case].id, params[:hearing].id)
+      hearing = params[:hearing]
+      case_obj = params[:case]
+      Rails.application.routes.url_helpers.api_v1_case_hearing_path(case_obj.id, hearing.id)
     end
   end
 

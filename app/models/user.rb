@@ -17,6 +17,7 @@ class User < ApplicationRecord
   validates :password, presence: true, on: :create
 
   has_one :profile, dependent: :destroy
+  has_many :notifications, class_name: 'Noticed::Notification', as: :recipient, dependent: :destroy
   accepts_nested_attributes_for :profile
 
   acts_as_tenant :court, optional: true
@@ -35,6 +36,26 @@ class User < ApplicationRecord
     define_method(:"#{role.downcase}?") do
       role?(role)
     end
+  end
+
+  def unread_notifications
+    notifications.unread.newest_first
+  end
+
+  def unread_notifications_count
+    notifications.unread.count
+  end
+
+  def mark_all_notifications_as_read
+    notifications.unread.mark_as_read!
+  end
+
+  def judge?
+    role?('Judge')
+  end
+
+  def clerk?
+    role?('Clerk')
   end
 
   def role?(role_name)

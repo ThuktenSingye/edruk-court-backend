@@ -13,7 +13,7 @@ module Hearings
     end
 
     def build
-      case @message_type.to_s
+      case @message_type
       when 'pre_hearing' then pre_hearing_message
       when 'post_hearing' then post_hearing_message
       when 'hearing_update' then status_update_message
