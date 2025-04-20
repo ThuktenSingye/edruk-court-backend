@@ -3,13 +3,22 @@
 # User Json Serializer
 class UserSerializer
   include JSONAPI::Serializer
-  attributes :id, :email, :court_id, :roles
+  attributes :id, :email
 
-  attribute :roles do |user|
-    user.roles.map(&:name)
+  attribute :profile do |object|
+    {
+      id: object.profile.id,
+      first_name: object.profile&.first_name,
+      last_name: object.profile&.last_name,
+      cid_no: object.profile&.cid_no,
+      phone_number: object.profile&.phone_number,
+    }
   end
 
-  attribute :court_id do |object|
-    object&.court&.id
+  attribute :court do |object|
+    {
+      id: object.court&.id,
+      name: object.court&.name
+    }
   end
 end

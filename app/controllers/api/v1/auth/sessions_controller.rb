@@ -49,7 +49,7 @@ module Api
         def respond_with(current_user, opts = {})
           status = opts[:status] || :ok
           message = opts[:message] || I18n.t('login.success')
-          data = current_user ? UserSerializer.new(current_user).serializable_hash[:data][:attributes] : nil
+          data = current_user ? UserSessionSerializer.new(current_user).serializable_hash[:data][:attributes] : nil
 
           render json: { status: status == :ok ? 200 : status, message: message, data: data }, status: status
         end

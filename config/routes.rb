@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       namespace :v1 do
         namespace :admin do
           resources :courts
+          resources :users
         end
         resources :users, only: [] do
           resource :profile, only: %i[show update] do
