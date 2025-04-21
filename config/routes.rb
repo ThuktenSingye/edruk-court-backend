@@ -24,6 +24,8 @@ Rails.application.routes.draw do
 
     namespace :api do
       namespace :v1 do
+        resources :benches, only: [ :index ]
+
         resources :notifications, only: [ :index ] do
           member do
             post :mark_as_read
