@@ -46,7 +46,7 @@ class HearingNotifier < ApplicationNotifier
 
       Hearings::HearingMessageBuilder.new(
         message_type: params[:message].to_sym,
-        hearing_type: hearing.hearing_type&.name, # Access association directly
+        hearing_type: hearing.hearing_type&.name,
         case_id: case_obj&.id,
         scheduled_date: hearing_schedule&.scheduled_date,
         hearing_status: hearing&.hearing_status

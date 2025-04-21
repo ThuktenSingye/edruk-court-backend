@@ -39,47 +39,30 @@ module Hearings
 
     def notify_post_hearing
       judge = current_tenant.users.with_role(:Judge).first
-      notify_judge(judge)
+      notify_user(judge)
     end
 
     def create_miscellaneous_hearing
       if bench_exist?
-        assign_to_bench
+        assign_to_bench('miscellaneous')
       else
         default_assignment
       end
     end
 
     def create_preliminary_hearing
-      assign_to_bench
-      update_case_participant
+      if bench_exist?
+        assign_to_bench('preliminary')
+      else
+        default_assignment
+      end
     end
 
-    def update_case_participant
-      assign_to_judge
-      assign_to_clerk
-    end
-
-    def assign_to_clerk
-      clerk = current_tenant.users.with_role(:Clerk).find_by(id: @hearing_params[:clerk_id])
-
-      return unless clerk&.has_role?(:Clerk)
-
-      @case.case_participants.find_or_create_by!(user: clerk, role: Role.find_by(name: 'Clerk'))
-      # notify
-    end
-
-    def assign_to_bench
+    def assign_to_bench(hearing_type)
       bench = current_tenant.child_courts.find_by(id: @hearing_params[:bench_id])
       @case.bench = bench if bench.present?
-    end
-
-    def assign_to_judge
-      judge = find_judge
-      return unless judge&.has_role?(:Judge)
-
-      assign_judge_to_case(judge)
-      notify_judge(judge)
+      assign_to_bench_judge(bench)
+      assign_to_bench_clerk(bench) if hearing_type == 'preliminary'
     end
 
     def default_assignment
@@ -87,20 +70,54 @@ module Hearings
       assign_to_judge
     end
 
-    def assign_judge_to_case(judge)
-      @case.case_participants.find_or_create_by!(user: judge, role: Role.find_by(name: 'Judge'))
+    def assign_to_bench_clerk(bench)
+      clerk = bench.users.with_role(:Clerk).find_by(id: @hearing_params[:clerk_id])
+
+      assign_clerk_to_case(clerk)
     end
 
-    def notify_judge(judge)
-      Hearings::HearingNotificationService.new(@case, @hearing).notify_user(judge)
+    def assign_to_clerk
+      clerk = current_tenant.users.with_role(:Clerk).find_by(id: @hearing_params[:clerk_id])
+
+      assign_clerk_to_case(clerk)
+
+      notify_user(clerk)
+    end
+
+    def assign_to_judge
+      judge = find_judge
+      assign_judge_to_case(judge)
+    end
+
+    def assign_to_bench_judge(bench)
+      judge = find_bench_judge(bench)
+      assign_judge_to_case(judge)
+    end
+
+    def assign_judge_to_case(judge)
+      return unless judge&.has_role?(:Judge)
+
+      @case.case_participants.find_or_create_by!(user: judge, role: Role.find_by(name: 'Judge'))
+
+      notify_user(judge)
+    end
+
+    def assign_clerk_to_case(clerk)
+      return unless clerk&.has_role?(:Clerk)
+
+      @case.case_participants.find_or_create_by!(user: clerk, role: Role.find_by(name: 'Clerk'))
+    end
+
+    def notify_user(user)
+      Hearings::HearingNotificationService.new(@case, @hearing).notify_user(user)
+    end
+
+    def find_bench_judge(bench)
+      bench.users.with_role(:Judge).find_by(id: @hearing_params[:judge_id])
     end
 
     def find_judge
-      if bench_exist?
-        current_tenant.users.with_role(:Judge).find_by(id: @hearing_params[:judge_id])
-      else
-        current_tenant.users.with_role(:Judge).first
-      end
+      current_tenant.users.with_role(:Judge).first
     end
 
     def bench_exist?

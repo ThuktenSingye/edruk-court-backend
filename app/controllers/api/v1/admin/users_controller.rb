@@ -19,6 +19,8 @@ module Api
         end
 
         def create
+          # you cannot add judge and clerk directly to the court if court has the bench
+          # if court has bench, you can add the judge and clerk to the court
           user = build_user
           authorize user
           if user.save
@@ -50,7 +52,7 @@ module Api
           render_json :ok, nil, serialized_users(@users)
         end
 
-        def registrars
+        def registrar
           @users = User.with_role(:Registrar)
           authorize @users
           render_json :ok, nil, serialized_users(@users)
