@@ -32,7 +32,7 @@ class UserPolicy < ApplicationPolicy
     user.admin?
   end
 
-  def registrar?
+  def registrars?
     user.admin?
   end
 

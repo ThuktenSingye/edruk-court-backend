@@ -40,7 +40,7 @@ Rails.application.routes.draw do
             collection do
               get :judge
               get :clerk
-              get :registrar
+              get :registrars
             end
           end
         end

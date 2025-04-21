@@ -50,7 +50,7 @@ module Api
           render_json :ok, nil, serialized_users(@users)
         end
 
-        def registrar
+        def registrars
           @users = User.with_role(:Registrar)
           authorize @users
           render_json :ok, nil, serialized_users(@users)

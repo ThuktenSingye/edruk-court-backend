@@ -19,6 +19,7 @@ module Api
         def create
           final_params = assign_scheduler(hearing_params)
           @hearing = @case.hearings.build(final_params.except(:bench_id, :judge_id, :clerk_id))
+          binding.pry
           authorize @hearing
           if @hearing.save
             Hearings::HearingService.new(@case, @hearing, hearing_params, current_user).create_and_notify

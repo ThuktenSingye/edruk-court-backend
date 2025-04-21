@@ -12,15 +12,38 @@ module ApplicationCable
     private
 
     def find_verified_user
-      token = request.headers[:HTTP_SEC_WEBSOCKET_PROTOCOL].split.last
-      decoded_token = JsonWebToken.decode(token)
-      if (current_user = User.find(decoded_token['user_id']))
-        current_user
-      else
-        reject_unauthorized_connection
-      end
-    rescue StandardError
+      token = fetch_token
+      decoded = decode_token(token)
+      user_id = extract_user_id(decoded)
+      find_user(user_id)
+    end
+
+    def fetch_token
+      token = request.params[:token] || extract_bearer_token
+      reject_unauthorized_connection unless token
+      token
+    end
+
+    def decode_token(token)
+      JWT.decode(token, ENV.fetch('DEVISE_JWT_SECRET_KEY', nil), true, algorithm: 'HS256').first
+    rescue JWT::DecodeError
       reject_unauthorized_connection
+    end
+
+    def extract_user_id(decoded)
+      user_id = decoded['id'] || decoded['user_id'] || decoded['sub']
+      reject_unauthorized_connection unless user_id
+      user_id
+    end
+
+    def find_user(user_id)
+      User.find_by(id: user_id) || reject_unauthorized_connection
+    end
+
+    def extract_bearer_token
+      return unless request.headers['Authorization']
+
+      request.headers['Authorization'].split[1]
     end
   end
 end

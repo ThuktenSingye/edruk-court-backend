@@ -8,7 +8,7 @@
 class HearingNotifier < ApplicationNotifier
   deliver_by :action_cable do |config|
     config.channel = 'NotificationChannel' # Custom channel name
-    config.stream = -> { "notifications:#{recipient.id}" }
+    config.stream = -> { recipients }
     config.message = lambda {
       {
         id: record.id,
