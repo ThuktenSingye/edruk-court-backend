@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Hearing Type Policy Class
 class HearingTypePolicy < ApplicationPolicy
   # NOTE: Up to Pundit v2.3.1, the inheritance was declared as
   # `Scope < Scope` rather than `Scope < ApplicationPolicy::Scope`.
@@ -7,13 +8,14 @@ class HearingTypePolicy < ApplicationPolicy
   # code, beware of possible changes to the ancestors:
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
+  # Hearing Type Scope
   class Scope < ApplicationPolicy::Scope
     # NOTE: Be explicit about which records you allow access to!
     def resolve
       if user.registrar?
-        scope.where(name: %w[miscellaneous preliminary])
-      elsif user.clerk?
-        scope.where.not(name: %w[miscellaneous preliminary])
+        scope.where(name: %w[Miscellaneous Preliminary])
+      elsif user.clerk? || user.judge?
+        scope.where.not(name: %w[Miscellaneous Preliminary])
       else
         scope.none
       end
