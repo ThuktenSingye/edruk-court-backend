@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_19_165210) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_21_183755) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -61,6 +61,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_19_165210) do
     t.integer "document_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "case_id"
+    t.index ["case_id"], name: "index_case_documents_on_case_id"
     t.index ["hash_value", "hearing_id"], name: "index_case_documents_on_hash_value_and_hearing_id", unique: true
     t.index ["hash_value"], name: "index_case_documents_on_hash_value", unique: true
     t.index ["hearing_id"], name: "index_case_documents_on_hearing_id"
@@ -313,6 +315,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_19_165210) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "profiles"
+  add_foreign_key "case_documents", "cases"
   add_foreign_key "case_documents", "hearings"
   add_foreign_key "case_evidences", "hearings"
   add_foreign_key "case_participants", "cases"

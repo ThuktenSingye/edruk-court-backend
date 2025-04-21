@@ -13,7 +13,7 @@ class CaseDocumentSerializer
   attribute :document do |object|
     if object.document.attached?
       {
-        url: Rails.application.routes.url_helpers.rails_blob_url(object.document, only_path: true),
+        url: Rails.application.routes.url_helpers.url_for(object.document),
         filename: object.document.filename.to_s,
         content_type: object.document.content_type,
         byte_size: object.document.byte_size

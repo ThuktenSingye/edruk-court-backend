@@ -15,7 +15,7 @@ module Api
           @cases = policy_scope(@cases)
           authorize @cases
           @cases = @cases.order(created_at: :desc).includes(:case_participants)
-          render_json :ok, nil, @cases
+          render_json :ok, nil, serialized_cases(@cases)
         end
 
         def show
@@ -77,7 +77,7 @@ module Api
         end
 
         def case_params
-          params.expect(case: %i[case_number registration_number judgement_number title summary case_priority
+          params.expect(case: %i[document case_number registration_number judgement_number title summary case_priority
                                  case_status])
         end
       end
