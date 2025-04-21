@@ -24,6 +24,8 @@ class User < ApplicationRecord
 
   encrypts :private_key
 
+  ROLES = %w[Judge Clerk Registrar Plaintiff Defendant Prosecutor Lawyer Admin].freeze
+
   def after_confirmation
     super
     generate_key_pair
@@ -42,14 +44,11 @@ class User < ApplicationRecord
     notifications.unread.mark_as_read!
   end
 
-  def judge?
-    role?('Judge')
+  ROLES.each do |role|
+    define_method(:"#{role.downcase}?") do
+      role?(role)
+    end
   end
-
-  def clerk?
-    role?('Clerk')
-  end
-
   def role?(role_name)
     cached_roles.include?(role_name)
   end
