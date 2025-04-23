@@ -36,6 +36,7 @@ class CasePolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.admin? || user.registrar?
+        # allow only filed case for registrar
         scope.where(court_id: user.court_id)
       elsif user.clerk? || user.judge?
         cases_assigned_to_user

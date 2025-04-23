@@ -5,7 +5,7 @@ module CaseFile
   extend ActiveSupport::Concern
 
   included do
-    belongs_to :hearing
+    belongs_to :hearing, optional: true
     has_many :document_signatures, as: :signable, dependent: :destroy
 
     validates :hash_value, presence: true

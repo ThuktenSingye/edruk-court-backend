@@ -9,6 +9,7 @@ class Case < ApplicationRecord
   has_many :case_participants, dependent: :destroy
   has_many :hearings, dependent: :destroy
   has_many :case_documents, dependent: :nullify
+  accepts_nested_attributes_for :case_documents
 
   enum :case_status, { filed: 0, pending: 1, active: 2, dismissed: 3, withdrawn: 4, settled: 5, closed: 6 }
   enum :case_priority, { low: 0, medium: 1, high: 2, critical: 3 }

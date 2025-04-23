@@ -76,10 +76,14 @@ module Api
           CaseSerializer.new(court_case).serializable_hash[:data][:attributes]
         end
 
+        # rubocop:disable Rails/StrongParametersExpect
         def case_params
-          params.expect(case: %i[document case_number registration_number judgement_number title summary case_priority
-                                 case_status])
+          params.require(:case).permit(
+            :case_number, :registration_number, :judgement_number, :title, :summary, :case_priority, :case_status,
+            { case_documents_attributes: %i[id document_status document hash_value] }
+          )
         end
+        # rubocop:enable Rails/StrongParametersExpect
       end
     end
   end

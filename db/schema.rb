@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_21_183755) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_21_203723) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,7 +55,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_21_183755) do
 
   create_table "case_documents", force: :cascade do |t|
     t.string "hash_value"
-    t.bigint "hearing_id", null: false
+    t.bigint "hearing_id"
     t.boolean "verified_by_judge", default: true
     t.datetime "verified_at"
     t.integer "document_status"

@@ -4,14 +4,14 @@
 class CaseSerializer
   include JSONAPI::Serializer
 
-  attributes :case_number, :registration_number, :judgement_number, :title, :summary
+  attributes :id, :case_number, :registration_number, :judgement_number, :title, :summary
 
   attribute :case_status do |object|
-    object.case_status.humanize
+    object.case_status&.humanize
   end
 
   attribute :case_priority do |object|
-    object.case_priority.humanize
+    object.case_priority&.humanize
   end
 
   attribute :documents do |object|
