@@ -6,14 +6,15 @@ class CaseQuery
     @case = court_case
   end
 
-  def call
+  def call(current_user)
     hearings = @case.hearings.includes(:hearing_type, :case_documents, :case_evidences)
-    case_file(hearings)
+    case_file(hearings, current_user)
   end
 
   private
 
-  def case_file(hearings)
-    CaseFileSerializer.new(hearings, is_collection: true).serializable_hash[:data].pluck(:attributes)
+  def case_file(hearings, current_user)
+    CaseFileSerializer.new(hearings, params: { current_user: current_user },
+                                     is_collection: true).serializable_hash[:data].pluck(:attributes)
   end
 end

@@ -10,8 +10,14 @@ class CaseFileSerializer
     { name: object.hearing_type&.name }
   end
 
-  attribute :case_documents do |object|
-    object.case_documents.map do |doc|
+  attribute :case_documents do |object, params|
+    current_user = params[:current_user]
+    documents = if current_user&.judge?
+                  object.case_documents.where(document_status: 'verified')
+                else
+                  object.case_documents
+                end
+    documents.map do |doc|
       {
         id: doc.id,
         verified_by_judge: doc.verified_by_judge,

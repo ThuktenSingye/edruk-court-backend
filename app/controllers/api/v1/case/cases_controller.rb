@@ -50,7 +50,7 @@ module Api
 
         def files
           authorize :case, :files?
-          @files = CaseQuery.new(@case).call
+          @files = CaseQuery.new(@case).call(current_user)
           render_json :ok, nil, @files
         end
 
