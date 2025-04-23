@@ -60,6 +60,14 @@ class HearingSchedulePolicy < ApplicationPolicy
     true
   end
 
+  def month?
+    true
+  end
+
+  def list?
+    true
+  end
+
   def update?
     court_user? && authorized_for_update?
   end

@@ -22,5 +22,13 @@ class HearingScheduleSerializer
     object.hearing_type_name.humanize
   end
 
-  attribute :scheduled_by, &:scheduled_by_id
+  attribute :scheduled_by do |object|
+    if object.scheduled_by
+      {
+        id: object.scheduled_by.id,
+        first_name: object.scheduled_by.profile.first_name,
+        last_name: object.scheduled_by.profile.last_name
+      }
+    end
+  end
 end

@@ -19,6 +19,7 @@ Rails.application.routes.draw do
         resources :courts do
           collection do
             get :statistics
+            get :court_types
           end
         end
         resources :users do
@@ -54,6 +55,8 @@ Rails.application.routes.draw do
         end
 
 
+
+
         resources :users, only: [] do
           resource :profile, only: %i[show update] do
             resources :addresses, only: %i[create]
@@ -66,6 +69,8 @@ Rails.application.routes.draw do
             get :pending
             get :reminders
             get :overdue
+            get :month
+            get :list
           end
         end
 

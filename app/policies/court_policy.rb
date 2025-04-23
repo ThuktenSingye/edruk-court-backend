@@ -26,4 +26,8 @@ class CourtPolicy < ApplicationPolicy
   def statistics?
     user.admin?
   end
+
+  def court_types?
+    user.admin?
+  end
 end

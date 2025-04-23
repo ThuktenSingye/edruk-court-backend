@@ -43,6 +43,13 @@ module Api
           render_json :ok, nil, @court_data
         end
 
+        def court_types
+          court_types = Court.court_types.transform_keys { |k| k.to_s.camelize(:lower) }
+          authorize court_types, :court_types?, policy_class: CourtPolicy
+
+          render_json :ok, nil, court_types
+        end
+
         private
 
         def court_counts_by_type
