@@ -31,14 +31,15 @@ class ApplicationController < ActionController::API
   end
 
   def set_bench_as_subtenant
-    court_subdomain = request.subdomains.last
-    bench_subdomain = request.subdomains.first
+    court_subdomain = request.subdomains.first
+    bench_subdomain = request.subdomains.last
 
     @court = Court.find_by(subdomain: court_subdomain)
     @bench = @court.child_courts.find_by(subdomain: bench_subdomain)
 
     if @bench
-      set_current_tenant(@bench)
+      ActsAsTenant.current_tenant = @bench
+      # set_current_tenant(@bench)
     else
       render json: { status: 404, message: 'Bench not found.' }, status: :not_found
     end

@@ -60,7 +60,8 @@ module Hearings
 
     def assign_to_bench(hearing_type)
       bench = current_tenant.child_courts.find_by(id: @hearing_params[:bench_id])
-      @case.bench = bench if bench.present?
+      @case.bench_id = bench.id if bench.present?
+      @case.save
       assign_to_bench_judge(bench)
       assign_to_bench_clerk(bench) if hearing_type == 'preliminary'
     end

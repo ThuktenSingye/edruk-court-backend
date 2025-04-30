@@ -3,6 +3,7 @@
 # Case Model
 class Case < ApplicationRecord
   acts_as_tenant :court, optional: false
+  acts_as_tenant :bench, optional: false
   belongs_to :bench, class_name: 'Court', optional: true
   belongs_to :case_type, optional: true
   belongs_to :case_subtype, optional: true

@@ -21,4 +21,8 @@ class Court < ApplicationRecord
            :overdue,
            :reminder,
            to: :hearing_schedules, prefix: true
+
+  def bench?
+    court_type == 'bench'
+  end
 end

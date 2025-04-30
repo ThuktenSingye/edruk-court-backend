@@ -47,8 +47,25 @@ module Api
         end
 
         def pending
-          @hearing_schedules = policy_scope(current_tenant.hearing_schedules_pending)
+          if current_tenant.bench?
+            hearing_scope = HearingSchedule.where(
+              schedule_status: 'pending',
+              hearings: {
+                cases: {
+                  court_id: current_tenant.parent_court_id,
+                  bench_id: current_tenant.id
+                }
+              }
+            )
+            @hearing_schedules = policy_scope(hearing_scope)
+          else
+            @hearing_schedules = policy_scope(
+              current_tenant.hearing_schedules_pending
+            )
+          end
+          # @hearing_schedules = policy_scope(current_tenant.hearing_schedules_pending)
           authorize @hearing_schedules
+          # binding.pry
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
 
@@ -80,7 +97,9 @@ module Api
         private
 
         def case
-          @case ||= current_tenant.cases.find(params[:case_id])
+          ActsAsTenant.without_tenant do
+            @case ||= ::Case.find_by(id: params[:case_id])
+          end
         end
 
         def hearing

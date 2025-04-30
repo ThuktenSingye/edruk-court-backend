@@ -32,4 +32,14 @@ class CaseSerializer
       }
     end
   end
+
+  attribute :hearings do |object|
+    object.hearings.map do |hearing|
+      {
+        id: hearing.id,
+        hearing_type: hearing.hearing_type.name,
+        hearing_status: hearing.hearing_status
+      }
+    end
+  end
 end

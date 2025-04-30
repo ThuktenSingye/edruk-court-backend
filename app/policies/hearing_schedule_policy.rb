@@ -22,9 +22,22 @@ class HearingSchedulePolicy < ApplicationPolicy
     end
 
     def scope_for_court_staff
-      scope.joins(hearing: :case)
-           .where(cases: { court_id: user.court_id })
-           .merge(participant_scope_if_needed)
+      # for court having bench
+      if user.judge? || user.clerk?
+        # binding.pry
+        scope
+          .joins('INNER JOIN hearings ON hearings.id = hearing_schedules.hearing_id')
+          .joins('INNER JOIN cases ON cases.id = hearings.case_id')
+          .joins('INNER JOIN case_participants ON case_participants.case_id = cases.id')
+          .where(case_participants: { user_id: user.id })
+      else
+        scope.joins(hearing: :case)
+             .where(cases: { court_id: user.court_id })
+      end
+
+      # scope.joins(hearing: :case)
+      #      .where(cases: { court_id: user.court_id })
+      #      .merge(participant_scope_if_needed)
     end
 
     def scope_for_case_participants
@@ -69,7 +82,8 @@ class HearingSchedulePolicy < ApplicationPolicy
   end
 
   def update?
-    court_user? && authorized_for_update?
+    # court_user? && authorized_for_update?
+    authorized_for_update?
   end
 
   def destroy?
@@ -84,7 +98,7 @@ class HearingSchedulePolicy < ApplicationPolicy
   end
 
   def authorized_for_update?
-    first_hearing? ? user.registrar? : assigned_to_judge? || assigned_to_clerk?
+    first_hearing? ? user.registrar? || assigned_to_judge? : assigned_to_clerk?
   end
 
   def authorized_for_destroy?

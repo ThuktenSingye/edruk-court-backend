@@ -39,14 +39,31 @@ module Hearings
       @hearing.hearing_type.name.downcase == 'preliminary'
     end
 
-    def notifications_params(message)
+    def notifications_params(message_type)
       {
         record: @hearing,
-        message: message,
+        message: build_message(message_type),
         hearing: @hearing,
+        url: build_url,
         hearing_schedule: @hearing.hearing_schedules.last,
         case: @case
       }
+    end
+
+    def build_message(message_type)
+      hearing_schedule = @hearing.hearing_schedules.last
+
+      Hearings::HearingMessageBuilder.new(
+        message_type: message_type.to_sym,
+        hearing_type: @hearing.hearing_type&.name,
+        case_id: @case&.id,
+        scheduled_date: hearing_schedule&.scheduled_date,
+        hearing_status: @hearing&.hearing_status
+      ).build
+    end
+
+    def build_url
+      Rails.application.routes.url_helpers.api_v1_case_hearing_path(@case.id, @hearing.id)
     end
   end
 end
