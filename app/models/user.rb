@@ -20,17 +20,13 @@ class User < ApplicationRecord
   has_many :notifications, class_name: 'Noticed::Notification', as: :recipient, dependent: :destroy
   accepts_nested_attributes_for :profile
 
+  after_create :generate_key_pair
+
   acts_as_tenant :court, optional: true
 
   encrypts :private_key
 
   ROLES = %w[Judge Clerk Registrar Plaintiff Defendant Prosecutor Lawyer Admin].freeze
-
-  def after_confirmation
-    super
-    generate_key_pair
-    save!(validate: false)
-  end
 
   def unread_notifications
     notifications.unread.newest_first.limit(20)
@@ -71,5 +67,6 @@ class User < ApplicationRecord
     key_pair = EccKeyGenerator.generate
     self.public_key = key_pair[:public_key]
     self.private_key = key_pair[:private_key]
+    save!(validate: false)
   end
 end

@@ -8,6 +8,7 @@ class UserSerializer
   attribute :profile do |object|
     {
       id: object.profile.id,
+      avatar: Rails.application.routes.url_helpers.url_for(object.profile&.avatar),
       first_name: object.profile&.first_name,
       last_name: object.profile&.last_name,
       cid_no: object.profile&.cid_no,

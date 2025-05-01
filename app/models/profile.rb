@@ -4,6 +4,7 @@
 class Profile < ApplicationRecord
   belongs_to :user
   has_many :addresses, dependent: :destroy
+  has_one_attached :avatar
   accepts_nested_attributes_for :addresses
 
   enum :gender, { male: 0, female: 1, other: 2 }

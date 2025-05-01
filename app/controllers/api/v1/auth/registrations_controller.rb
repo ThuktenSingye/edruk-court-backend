@@ -11,19 +11,22 @@ module Api
 
         def create
           super do |resource|
-            if resource.persisted?
-              default_role = Role.find_or_create_by!(name: 'User')
-              resource.add_role(default_role.name)
-            end
+            assign_default_role(resource) if resource.persisted?
           end
         end
 
         private
 
+        def assign_default_role(user)
+          default_role = Role.find_or_create_by!(name: 'User')
+          user.add_role(default_role.name)
+        end
+
         def respond_with(resource, _opts = {})
           if resource.persisted?
             render json: {
-              status: 201, message: 'Signed up successfully.'
+              status: 201, message: 'Signed up successfully.',
+              data: UserSessionSerializer.new(resource).serializable_hash[:data][:attributes]
             }, status: :created
           else
             render json: {

@@ -54,9 +54,6 @@ Rails.application.routes.draw do
           end
         end
 
-
-
-
         resources :users, only: [] do
           resource :profile, only: %i[show update] do
             resources :addresses, only: %i[create]

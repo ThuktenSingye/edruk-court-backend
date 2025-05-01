@@ -30,7 +30,8 @@ module Api
       end
 
       def profile_params
-        params.expect(profile: [:first_name, :last_name, :cid_no, :phone_number, :house_no, :thram_no, :age, :gender,
+        params.expect(profile: [:avatar, :first_name, :last_name, :cid_no, :phone_number, :house_no,
+                                :thram_no, :age, :gender,
                                 { addresses_attributes: %i[id dzongkhag gewog street_address address_type] }])
       end
     end
