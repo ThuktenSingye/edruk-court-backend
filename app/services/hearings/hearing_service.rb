@@ -114,7 +114,9 @@ module Hearings
     end
 
     def find_bench_judge(bench)
-      bench.users.with_role(:Judge).find_by(id: @hearing_params[:judge_id])
+      return unless bench
+
+      bench.users&.with_role(:Judge)&.find_by(id: @hearing_params[:judge_id])
     end
 
     def find_judge

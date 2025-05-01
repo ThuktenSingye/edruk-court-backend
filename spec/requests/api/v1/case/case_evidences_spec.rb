@@ -2,19 +2,18 @@
 
 require 'rails_helper'
 require 'swagger_helper'
-# rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
+# rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup, Style/GlobalVars
 RSpec.describe 'Api::V1::Case::CaseEvidences', type: :request do
-  let(:court) { create(:court) }
   let(:general_user) { create(:user, confirmed_at: Time.zone.now) }
   let(:case_type) { create(:case_type, :civil) }
   let(:case_subtype) { create(:case_subtype, case_type: case_type) }
-  let!(:court_case) { create(:case, case_subtype: case_subtype, case_type: case_type, court: court) }
+  let!(:court_case) { create(:case, case_subtype: case_subtype, case_type: case_type, court: $default_account) }
   let!(:hearing_type) { create(:hearing_type) }
   let!(:hearing) { create(:hearing, case: court_case, hearing_type: hearing_type) }
   let!(:case_evidence) { create(:case_evidence, :with_image, hearing: hearing) }
-  let(:registrar_user) { create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
-  let(:judge_user) { create(:user, :judge, court: court, confirmed_at: Time.zone.now) }
-  let(:clerk_user) { create(:user, :clerk, court: court, confirmed_at: Time.zone.now) }
+  let(:registrar_user) { create(:user, :registrar, confirmed_at: Time.zone.now) }
+  let(:judge_user) { create(:user, :judge, confirmed_at: Time.zone.now) }
+  let(:clerk_user) { create(:user, :clerk, confirmed_at: Time.zone.now) }
 
   path '/api/v1/cases/:case_id/hearings/:hearing_id/evidences' do
     get 'List all case evidences for a given hearing' do
@@ -204,5 +203,5 @@ RSpec.describe 'Api::V1::Case::CaseEvidences', type: :request do
     end
   end
 
-  # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
+  # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup, Style/GlobalVars
 end

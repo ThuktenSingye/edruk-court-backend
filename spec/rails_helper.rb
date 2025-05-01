@@ -110,7 +110,7 @@ RSpec.configure do |config|
     )
 
     # # Create a bench court as child of default account
-    Court.find_or_create_by!(
+    $default_bench = Court.find_or_create_by!(
       name: 'Default Bench',
       court_type: 4,
       parent_court: $default_account,

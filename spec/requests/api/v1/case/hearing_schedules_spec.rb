@@ -3,19 +3,20 @@
 require 'rails_helper'
 require 'swagger_helper'
 
-# rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
+# rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup, Style/GlobalVars
 RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
-  let(:court) { FactoryBot.create(:court) }
   let(:general_user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
   let(:case_type) { FactoryBot.create(:case_type, :civil) }
   let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
-  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, case_type: case_type, court: court) }
+  let!(:court_case) do
+    FactoryBot.create(:case, case_subtype: case_subtype, case_type: case_type, court: $default_account)
+  end
   let!(:hearing_type) { FactoryBot.create(:hearing_type) }
   let!(:hearing) { FactoryBot.create(:hearing, case: court_case, hearing_type: hearing_type) }
 
-  let(:registrar_user) { FactoryBot.create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
-  let(:judge_user) { FactoryBot.create(:user, :judge, court: court, confirmed_at: Time.zone.now) }
-  let(:clerk_user) { FactoryBot.create(:user, :clerk, court: court, confirmed_at: Time.zone.now) }
+  let(:registrar_user) { FactoryBot.create(:user, :registrar, confirmed_at: Time.zone.now) }
+  let(:judge_user) { FactoryBot.create(:user, :judge, confirmed_at: Time.zone.now) }
+  let(:clerk_user) { FactoryBot.create(:user, :clerk, confirmed_at: Time.zone.now) }
 
   path '/api/v1/cases/{case_id}/hearings/{hearing_id}/hearing_schedules' do
     get 'List all hearing schedules for a hearing' do
@@ -222,7 +223,7 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
       consumes 'application/json'
       produces 'application/json'
 
-      parameter name: :hearing_schedule_params, in: :body, schema: {
+      parameter name: :hearing_schedules_params, in: :body, schema: {
         type: :object,
         properties: {
           scheduled_date: { type: :string, format: 'date' },
@@ -262,7 +263,7 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
           FactoryBot.create(:hearing_schedule, hearing: preliminary_hearing, scheduled_by: clerk_user)
         end
 
-        before { sign_in judge_user }
+        before { sign_in clerk_user }
 
         response '200', 'Hearing schedule updated' do
           schema type: :object,
@@ -280,10 +281,10 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
           it 'send notification' do
             update_hearing_schedule
             notification = Noticed::Notification.last
-            expect(notification.recipient).to eq(clerk_participant.user)
+            expect(notification.recipient).to eq(judge_participant.user)
             expect(notification.params[:message]).to eq('schedule_update')
-            # rubocop:enable RSpec/MultipleExpectations
           end
+          # rubocop:enable RSpec/MultipleExpectations
         end
       end
 
@@ -297,7 +298,7 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
         let(:valid_params) do
           {
             scheduled_date: Faker::Date.forward(days: 2),
-            schedule_status: 'changes_requested',
+            schedule_status: :changes_requested,
             reschedule_reason: Faker::Lorem.paragraph
           }
         end
@@ -388,8 +389,8 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
             notification = Noticed::Notification.last
             expect(notification.recipient).to eq(judge_participant.user)
             expect(notification.params[:message]).to eq('schedule_update')
-            # rubocop:enable RSpec/MultipleExpectations
           end
+          # rubocop:enable RSpec/MultipleExpectations
         end
 
         context 'when unauthorized' do
@@ -471,5 +472,5 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
       end
     end
   end
-  # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
+  # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup, Style/GlobalVars
 end

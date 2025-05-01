@@ -4,8 +4,10 @@ module Api
   module V1
     module Case
       # Hearing Schedule Controller
+      # rubocop:disable Metrics/ClassLength
       class HearingSchedulesController < ApplicationController
         before_action :authenticate_user!
+        before_action :court_cases
         before_action :case, only: %i[index update destroy]
         before_action :hearing, only: %i[index update destroy]
         before_action :hearing_schedule, only: %i[update destroy]
@@ -17,6 +19,7 @@ module Api
         end
 
         def update
+          authorize @hearing_schedule
           if @hearing_schedule.update(hearing_schedules_params)
             Schedules::HearingScheduleService.new(@case, @hearing, @hearing_schedule, current_user).notify
             render_json :ok, 'Schedule Updated Successfully', serialized_hearing_schedule(@hearing_schedule)
@@ -26,6 +29,7 @@ module Api
         end
 
         def destroy
+          authorize @hearing_schedule
           if @hearing_schedule.destroy
             Schedules::HearingScheduleService.new(@case, @hearing, @hearing_schedule, current_user).notify
             render_json :ok, 'Schedule Deleted Successfully', serialized_hearing_schedule(@hearing_schedule)
@@ -35,71 +39,68 @@ module Api
         end
 
         def today
-          @hearing_schedules = policy_scope(current_tenant.hearing_schedules_today_approved)
+          @hearing_schedules = policy_scope(
+            HearingSchedule.today_approved.for_accessible_courts(current_user.accessible_court_ids)
+          )
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
 
         def reminders
+          @hearing_schedules = policy_scope(
+            HearingSchedule.reminder.for_accessible_courts(current_user.accessible_court_ids)
+          )
           @hearing_schedules = policy_scope(current_tenant.hearing_schedules_reminder)
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
 
         def pending
-          if current_tenant.bench?
-            hearing_scope = HearingSchedule.where(
-              schedule_status: 'pending',
-              hearings: {
-                cases: {
-                  court_id: current_tenant.parent_court_id,
-                  bench_id: current_tenant.id
-                }
-              }
-            )
-            @hearing_schedules = policy_scope(hearing_scope)
-          else
-            @hearing_schedules = policy_scope(
-              current_tenant.hearing_schedules_pending
-            )
-          end
-          # @hearing_schedules = policy_scope(current_tenant.hearing_schedules_pending)
+          @hearing_schedules = policy_scope(
+            HearingSchedule.pending.for_accessible_courts(current_user.accessible_court_ids)
+          )
           authorize @hearing_schedules
-          # binding.pry
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
 
         def overdue
-          @hearing_schedules = policy_scope(current_tenant.hearing_schedules_overdue)
+          @hearing_schedules = policy_scope(
+            HearingSchedule.reminder.for_accessible_courts(current_user.accessible_court_ids)
+          )
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
 
-        # fetch all hearing that has been approved with schedules
-        # fetch all hearing that has been approved and based on month
         def month
           date_range = parse_month_range(params[:month])
-          @hearing_schedules = policy_scope(current_tenant.hearing_schedules
-                                                          .where(scheduled_date: date_range)
-                                                          .where(schedule_status: 'approved')
-                                                          .order(scheduled_date: :asc))
+          @hearing_schedules = policy_scope(
+            HearingSchedule.for_accessible_courts(current_user.accessible_court_ids)
+                           .where(scheduled_date: date_range).where(schedule_status: 'approved')
+                           .order(scheduled_date: :asc)
+          )
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
 
         def list
-          @hearing_schedules = policy_scope(current_tenant.hearing_schedules
-                                                          .order(scheduled_date: :asc))
+          @hearing_schedules = policy_scope(
+            HearingSchedule
+              .for_accessible_courts(current_user.accessible_court_ids)
+              .order(scheduled_date: :asc)
+          )
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
 
         private
 
+        def court_cases
+          @court_cases ||= ::Case.where(court_id: current_user.accessible_court_ids)
+                                 .or(::Case.where(bench_id: current_user.accessible_court_ids))
+        end
+
         def case
-          ActsAsTenant.without_tenant do
-            @case ||= ::Case.find_by(id: params[:case_id])
-          end
+          @case ||= @court_cases.find_by(id: params[:case_id])
         end
 
         def hearing
@@ -108,7 +109,6 @@ module Api
 
         def hearing_schedule
           @hearing_schedule ||= @hearing.hearing_schedules.find(params[:id])
-          authorize @hearing_schedule
         end
 
         def hearing_schedule_query
@@ -144,6 +144,7 @@ module Api
           params.expect(hearing_schedule: %i[scheduled_date schedule_status reschedule_reason])
         end
       end
+      # rubocop:enable Metrics/ClassLength
     end
   end
 end

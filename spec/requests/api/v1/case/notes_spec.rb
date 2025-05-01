@@ -3,14 +3,13 @@
 require 'rails_helper'
 require 'swagger_helper'
 
-# rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
+# rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup, Style/GlobalVars
 RSpec.describe 'Api::V1::Case::Notes', type: :request do
-  let(:court) { FactoryBot.create(:court) }
   let!(:bench) { Court.find_by(court_type: 'bench') }
   let(:user) { FactoryBot.create(:user, confirmed_at: Time.zone.now) }
   let(:case_type) { FactoryBot.create(:case_type) }
   let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
-  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: court) }
+  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: $default_account) }
   let!(:hearing_type) { FactoryBot.create(:hearing_type) }
   let!(:miscellaneous_hearing_type) { FactoryBot.create(:hearing_type, :miscellaneous) }
   let!(:hearing) { FactoryBot.create(:hearing, case: court_case, hearing_type: hearing_type) }
@@ -22,9 +21,9 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
     FactoryBot.create(:hearing, case: court_case, hearing_type: preliminary_hearing_type)
   end
 
-  let(:registrar_user) { FactoryBot.create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
-  let!(:judge_user) { FactoryBot.create(:user, :judge, court: court, confirmed_at: Time.zone.now) }
-  let!(:clerk_user) { FactoryBot.create(:user, :clerk, court: bench, confirmed_at: Time.zone.now) }
+  let(:registrar_user) { FactoryBot.create(:user, :registrar, confirmed_at: Time.zone.now) }
+  let!(:judge_user) { FactoryBot.create(:user, :judge, confirmed_at: Time.zone.now) }
+  let!(:clerk_user) { FactoryBot.create(:user, :clerk, confirmed_at: Time.zone.now) }
 
   # index
   path '/api/v1/case/:case_id/hearings/:hearing_id/notes' do
@@ -443,5 +442,5 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
       end
     end
   end
-  # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
+  # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup, Style/GlobalVars
 end

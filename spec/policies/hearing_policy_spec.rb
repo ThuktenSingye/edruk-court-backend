@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-# rubocop:disable RSpec/MultipleMemoizedHelpers,RSpec/LetSetup
+# rubocop:disable RSpec/MultipleMemoizedHelpers,RSpec/LetSetup, Style/GlobalVars
 RSpec.describe HearingPolicy, type: :policy do
-  let(:court) { FactoryBot.create(:court) }
   let(:case_type) { FactoryBot.create(:case_type) }
   let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
-  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: court) }
+  let!(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: $default_account) }
 
   describe 'permissions' do
     context 'when role is registrar and there is no hearing' do
@@ -95,5 +94,5 @@ RSpec.describe HearingPolicy, type: :policy do
       it { is_expected.to permit_actions(%i[update create]) }
     end
   end
-  # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
+  # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup, Style/GlobalVars
 end

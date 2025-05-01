@@ -3,13 +3,12 @@
 require 'rails_helper'
 require 'swagger_helper'
 
-# rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/ExampleLength
+# rubocop:disable RSpec/MultipleMemoizedHelpers, RSpec/ExampleLength, Style/GlobalVars
 RSpec.describe 'Api::V1::Cases', type: :request do
-  let(:court) { create(:court) }
-  let!(:user) { create(:user, :court_user, court: court, confirmed_at: Time.zone.now) }
+  let!(:user) { create(:user, :court_user, court: $default_account, confirmed_at: Time.zone.now) }
   let(:case_type) { create(:case_type, :civil) }
   let(:case_subtype) { create(:case_subtype, case_type: case_type) }
-  let!(:court_case) { create(:case, case_subtype: case_subtype, case_type: case_type, court: court) }
+  let!(:court_case) { create(:case, case_subtype: case_subtype, case_type: case_type, court: $default_account) }
   let(:case_params) do
     {
       case_number: Faker::Number.number(digits: 2).to_s,
@@ -20,10 +19,10 @@ RSpec.describe 'Api::V1::Cases', type: :request do
       case_priority: :low,
       case_status: :filed,
       case_subtype: case_subtype,
-      court: court
+      court: $default_account
     }
   end
-  let(:registrar_user) { create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
+  # let(:registrar_user) { create(:user, :registrar, confirmed_at: Time.zone.now) }
 
   path '/api/v1/cases' do
     get 'List all cases' do
@@ -32,7 +31,7 @@ RSpec.describe 'Api::V1::Cases', type: :request do
       produces 'application/json'
 
       context 'when role is registrar' do
-        let(:registrar_user) { create(:user, :registrar, court: court, confirmed_at: Time.zone.now) }
+        let(:registrar_user) { create(:user, :registrar, confirmed_at: Time.zone.now) }
 
         before { sign_in registrar_user }
 
@@ -99,6 +98,8 @@ RSpec.describe 'Api::V1::Cases', type: :request do
         end
 
         before { sign_in registrar_user }
+
+        let(:registrar_user) { create(:user, :registrar, confirmed_at: Time.zone.now) }
 
         response '200', 'Case files retrieved successfully' do
           schema type: :object,
@@ -347,4 +348,4 @@ RSpec.describe 'Api::V1::Cases', type: :request do
     end
   end
 end
-# rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/ExampleLength
+# rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/ExampleLength, Style/GlobalVars

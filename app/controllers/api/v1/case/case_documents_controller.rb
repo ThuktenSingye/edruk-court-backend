@@ -6,6 +6,7 @@ module Api
       # Case Document Controller Class
       class CaseDocumentsController < ApplicationController
         before_action :authenticate_user!
+        before_action :court_cases
         before_action :case
         before_action :hearing
         before_action :case_document, only: [:update]
@@ -37,8 +38,14 @@ module Api
 
         private
 
+        def court_cases
+          @court_cases ||= ::Case
+                           .where(court_id: current_user.accessible_court_ids)
+                           .or(::Case.where(bench_id: current_user.accessible_court_ids))
+        end
+
         def case
-          @case ||= current_tenant.cases.find(params[:case_id])
+          @case ||= @court_cases.find_by(id: params[:case_id])
         end
 
         def hearing

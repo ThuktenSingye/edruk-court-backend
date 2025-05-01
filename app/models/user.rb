@@ -53,6 +53,14 @@ class User < ApplicationRecord
     cached_roles.include?(role_name)
   end
 
+  def accessible_court_ids
+    if court.present?
+      [court.id] + court.child_courts.where(court_type: :bench).pluck(:id)
+    else
+      []
+    end
+  end
+
   private
 
   def cached_roles

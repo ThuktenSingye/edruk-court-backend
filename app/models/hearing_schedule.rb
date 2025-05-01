@@ -15,6 +15,14 @@ class HearingSchedule < ApplicationRecord
   delegate :hearing_status, to: :hearing, prefix: true, allow_nil: true
   delegate :name, to: :hearing_type, prefix: true, allow_nil: true
 
+  scope :for_accessible_courts, lambda { |court_ids|
+    joins(hearing: :case)
+      .where(
+        'cases.court_id IN (:court_ids) OR cases.bench_id IN (:court_ids)',
+        court_ids: court_ids
+      )
+  }
+
   scope :today_approved, lambda {
     where(scheduled_date: Time.zone.today.all_day, schedule_status: 'approved')
       .order(scheduled_date: :asc)

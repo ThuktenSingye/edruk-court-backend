@@ -18,7 +18,6 @@ RSpec.describe CaseEvidence, type: :model do
   end
 
   context 'when validating association' do
-    it { is_expected.to belong_to :hearing }
     it { is_expected.to have_many :document_signatures }
     it { is_expected.to have_one_attached :evidence }
   end

@@ -6,15 +6,14 @@ module Api
       # Case Controller
       class CasesController < ApplicationController
         before_action :authenticate_user!
+        before_action :court_cases
         before_action :case, only: %i[show update files]
-        before_action :court_case
         before_action :case_service, only: :statistics
 
         def index
-          @cases = current_tenant.cases.all
-          @cases = policy_scope(@cases)
-          authorize @cases
-          @cases = @cases.order(created_at: :desc).includes(:case_participants)
+          @court_cases = policy_scope(@court_cases)
+          authorize @court_cases
+          @cases = @court_cases.order(created_at: :desc).includes(:case_participants)
           render_json :ok, nil, serialized_cases(@cases)
         end
 
@@ -56,16 +55,18 @@ module Api
 
         private
 
-        def case
-          @case ||= current_tenant.cases.find(params[:id])
+        def court_cases
+          @court_cases ||= ::Case
+                           .where(court_id: current_user.accessible_court_ids)
+                           .or(::Case.where(bench_id: current_user.accessible_court_ids))
         end
 
-        def court_case
-          @court_case = current_tenant.cases
+        def case
+          @case ||= @court_cases.find_by(id: params[:id])
         end
 
         def case_service
-          @case_service ||= Cases::CaseService.new(@court_case)
+          @case_service ||= Cases::CaseService.new(@court_cases)
         end
 
         def serialized_cases(court_cases)

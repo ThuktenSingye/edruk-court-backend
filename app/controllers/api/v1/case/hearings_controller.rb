@@ -6,11 +6,11 @@ module Api
       # Hearing Controller
       class HearingsController < ApplicationController
         before_action :authenticate_user!
+        before_action :court_cases
         before_action :case
         before_action :hearing, only: [:update]
 
         def index
-          # binding.pry
           @hearings = policy_scope(@case.hearings.includes(:hearing_type, :hearing_schedules))
           authorize @hearings
           render_json :ok, nil, serialized_hearings(@hearings)
@@ -41,8 +41,14 @@ module Api
 
         private
 
+        def court_cases
+          @court_cases ||= ::Case
+                           .where(court_id: current_user.accessible_court_ids)
+                           .or(::Case.where(bench_id: current_user.accessible_court_ids))
+        end
+
         def case
-          @case ||= current_tenant.cases.find(params[:case_id])
+          @case ||= @court_cases.find_by(id: params[:case_id])
         end
 
         def hearing

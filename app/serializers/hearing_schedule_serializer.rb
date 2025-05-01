@@ -26,8 +26,8 @@ class HearingScheduleSerializer
     if object.scheduled_by
       {
         id: object.scheduled_by.id,
-        first_name: object.scheduled_by.profile.first_name,
-        last_name: object.scheduled_by.profile.last_name
+        first_name: object.scheduled_by.profile&.first_name,
+        last_name: object.scheduled_by.profile&.last_name
       }
     end
   end

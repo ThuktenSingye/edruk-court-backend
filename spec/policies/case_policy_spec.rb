@@ -2,12 +2,11 @@
 
 require 'rails_helper'
 
-# rubocop:disable RSpec/MultipleMemoizedHelpers,RSpec/LetSetup
+# rubocop:disable RSpec/LetSetup, Style/GlobalVars
 RSpec.describe CasePolicy, type: :policy do
-  let(:court) { FactoryBot.create(:court) }
   let(:case_type) { FactoryBot.create(:case_type) }
   let(:case_subtype) { FactoryBot.create(:case_subtype, case_type: case_type) }
-  let(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: court) }
+  let(:court_case) { FactoryBot.create(:case, case_subtype: case_subtype, court: $default_account) }
 
   describe 'permissions' do
     context 'when role is registrar' do
@@ -44,5 +43,5 @@ RSpec.describe CasePolicy, type: :policy do
       it { is_expected.to permit_actions(%i[index]) }
     end
   end
-  # rubocop:enable RSpec/MultipleMemoizedHelpers, RSpec/LetSetup
+  # rubocop:enable RSpec/LetSetup, Style/GlobalVars
 end
