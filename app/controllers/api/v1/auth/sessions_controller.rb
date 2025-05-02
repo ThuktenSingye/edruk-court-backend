@@ -25,7 +25,7 @@ module Api
         end
 
         def authenticate_user
-          @user = User.find_by(email: params[:user][:email])
+          @user = ::User.find_by(email: params[:user][:email])
           login_user(@user)
         end
 

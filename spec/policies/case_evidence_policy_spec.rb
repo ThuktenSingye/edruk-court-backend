@@ -36,11 +36,11 @@ RSpec.describe CaseEvidencePolicy, type: :policy do
   #     FactoryBot.create(:hearing, case: court_case, hearing_type: preliminary_hearing_type)
   #   end
   #   let!(:clerk_participant) do
-  #     FactoryBot.create(:case_participant, case: court_case, user: clerk_user, role: Role.find_by(name: 'Clerk'))
+  #     FactoryBot.create(:case_participant, case: court_case, users: clerk_user, role: Role.find_by(name: 'Clerk'))
   #   end
   #
   #   let!(:judge_participant) do
-  #     FactoryBot.create(:case_participant, case: court_case, user: judge_user, role: Role.find_by(name: 'Judge'))
+  #     FactoryBot.create(:case_participant, case: court_case, users: judge_user, role: Role.find_by(name: 'Judge'))
   #   end
   #
   #   let!(:hearing_schedule) do
@@ -65,7 +65,7 @@ RSpec.describe CaseEvidencePolicy, type: :policy do
   #     it 'send notification' do
   #       update_hearing_schedule
   #       notification = Noticed::Notification.last
-  #       expect(notification.recipient).to eq(judge_participant.user)
+  #       expect(notification.recipient).to eq(judge_participant.users)
   #       expect(notification.params[:message]).to eq('schedule_update')
   #             #     end
   #   end

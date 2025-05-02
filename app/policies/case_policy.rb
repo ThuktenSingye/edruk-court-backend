@@ -9,11 +9,11 @@ class CasePolicy < ApplicationPolicy
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
   def index?
-    user.admin? || user.registrar? || user.judge? || user.clerk?
+    true
   end
 
   def show?
-    user.present? && court_user?
+    (user.present? && court_user?) || plaintiff_cases? || defendant_cases?
   end
 
   def update?
@@ -21,7 +21,7 @@ class CasePolicy < ApplicationPolicy
   end
 
   def create?
-    court_user? && user.registrar?
+    (court_user? && user.registrar?) || (user.plaintiff? || user.lawyer? || user.user?)
   end
 
   def statistics?
@@ -32,16 +32,19 @@ class CasePolicy < ApplicationPolicy
     index?
   end
 
+  def active?
+    index?
+  end
+
   # Case Scope
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.admin? || user.registrar?
-        # allow only filed case for registrar
         scope.where(court_id: user.court_id)
       elsif user.clerk? || user.judge?
-        cases_assigned_to_user
+        cases_assigned_to_court
       else
-        scope.none
+        user_cases
       end
     end
 
@@ -51,7 +54,19 @@ class CasePolicy < ApplicationPolicy
       Role.where(name: %w[Judge Clerk]).pluck(:id)
     end
 
-    def cases_assigned_to_user
+    def user_roles_ids
+      Role.where(name: %w[Defendant Plaintiff Lawyer]).pluck(:id)
+    end
+
+    def user_cases
+      scope.joins(:case_participants)
+           .where(case_participants: {
+                    user: user,
+                    role_id: user_roles_ids
+                  })
+    end
+
+    def cases_assigned_to_court
       scope.joins(:case_participants)
            .where(case_participants: {
                     user: user,
@@ -64,6 +79,21 @@ class CasePolicy < ApplicationPolicy
 
   def assigned_to_clerk?
     user.clerk? && record.case_participants.exists?(user: user, role: Role.where(name: 'Clerk'))
+  end
+
+  def involved_in_case?(roles)
+    return false if user.blank?
+
+    participant_role_ids = Role.where(name: roles).pluck(:id)
+    record.case_participants.where(user: user, role_id: participant_role_ids).any?
+  end
+
+  def plaintiff_cases?
+    involved_in_case?(%w[Plaintiff Lawyer])
+  end
+
+  def defendant_cases?
+    involved_in_case?('Defendant')
   end
 
   def court_user?

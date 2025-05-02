@@ -9,7 +9,7 @@ RSpec.describe ProfilePolicy, type: :policy do
   let(:profile) { FactoryBot.create(:profile, user: user) }
 
   describe 'permissions' do
-    context 'when role is user' do
+    context 'when role is users' do
       it { is_expected.to permit_actions(%i[show update]) }
     end
 

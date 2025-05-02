@@ -5,12 +5,12 @@ require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Auth::Confirmation', type: :request do
   path '/api/v1/auth/confirmation' do
-    get 'Confirm user account' do
+    get 'Confirm users account' do
       tags 'Authentication'
       produces 'application/json'
 
       parameter name: :confirmation_token, in: :query, type: :string, required: true,
-                description: 'Confirmation token sent to user email'
+                description: 'Confirmation token sent to users email'
 
       let!(:user) { FactoryBot.create(:user, confirmed_at: nil) }
 
@@ -23,7 +23,7 @@ RSpec.describe 'Api::V1::Auth::Confirmation', type: :request do
             expect(response).to have_http_status(:ok)
           end
 
-          it 'confirms the user' do
+          it 'confirms the users' do
             get user_confirmation_path, params: { confirmation_token: confirmation_token }
             expect(user.reload).to be_confirmed
           end

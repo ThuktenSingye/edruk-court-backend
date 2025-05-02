@@ -35,7 +35,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
       parameter name: :case_id, in: :path, type: :string, required: true, description: 'ID of the case'
       parameter name: :hearing_id, in: :path, type: :string, required: true, description: 'ID of the hearing'
 
-      context 'when the user role is judge' do
+      context 'when the users role is judge' do
         subject(:get_all_notes) do
           get api_v1_case_hearing_notes_path(court_case, hearing)
           response
@@ -92,7 +92,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         required: [:note]
       }
 
-      context 'when user is registrar and pre_hearing' do
+      context 'when users is registrar and pre_hearing' do
         subject(:create_note) do
           post api_v1_case_hearing_notes_path(court_case, miscellaneous_hearing), params: { note: valid_note_params }
           response
@@ -122,7 +122,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         end
       end
 
-      context 'when user is registrar and post_hearing' do
+      context 'when users is registrar and post_hearing' do
         subject(:create_note) do
           post api_v1_case_hearing_notes_path(court_case, preliminary_hearing), params: { note: valid_note_params }
           response
@@ -138,7 +138,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         end
       end
 
-      context 'when user is judge and post_hearing' do
+      context 'when users is judge and post_hearing' do
         subject(:create_note) do
           post api_v1_case_hearing_notes_path(court_case, hearing), params: { note: valid_note_params }
           response
@@ -172,7 +172,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         end
       end
 
-      context 'when user is judge and pre_hearing' do
+      context 'when users is judge and pre_hearing' do
         subject(:create_note) do
           post api_v1_case_hearing_notes_path(court_case, miscellaneous_hearing), params: { note: valid_note_params }
           response
@@ -208,7 +208,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         required: [:content]
       }
 
-      context 'when user is registrar and pre_hearing' do
+      context 'when users is registrar and pre_hearing' do
         subject(:update_note) do
           put api_v1_case_hearing_note_path(court_case, miscellaneous_hearing, note),
               params: { note: valid_note_params }
@@ -240,7 +240,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         end
       end
 
-      context 'when user is registrar and pre_hearing but with invalid params' do
+      context 'when users is registrar and pre_hearing but with invalid params' do
         subject(:update_note) do
           put api_v1_case_hearing_note_path(court_case, miscellaneous_hearing, note),
               params: { note: valid_note_params }
@@ -266,7 +266,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         end
       end
 
-      context 'when user is registrar and post_hearing' do
+      context 'when users is registrar and post_hearing' do
         subject(:update_note) do
           put api_v1_case_hearing_note_path(court_case, hearing, note), params: { note: valid_note_params }
           response
@@ -288,7 +288,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         end
       end
 
-      context 'when user is judge and post_hearing' do
+      context 'when users is judge and post_hearing' do
         subject(:update_note) do
           put api_v1_case_hearing_note_path(court_case, hearing, note), params: { note: valid_note_params }
           response
@@ -324,7 +324,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         end
       end
 
-      context 'when user is judge and pre_hearing' do
+      context 'when users is judge and pre_hearing' do
         subject(:update_note) do
           put api_v1_case_hearing_note_path(court_case, miscellaneous_hearing, note),
               params: { note: valid_note_params }
@@ -354,7 +354,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
       parameter name: :hearing_id, in: :path, type: :string, required: true, description: 'ID of the hearing'
       parameter name: :id, in: :path, type: :string, required: true, description: 'ID of the note'
 
-      context 'when user is registrar and pre_hearing' do
+      context 'when users is registrar and pre_hearing' do
         subject(:delete_note) do
           delete api_v1_case_hearing_note_path(court_case, miscellaneous_hearing, note),
                  params: { note: valid_note_params }
@@ -377,7 +377,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         end
       end
 
-      context 'when user is registrar and post_hearing' do
+      context 'when users is registrar and post_hearing' do
         subject(:delete_note) do
           delete api_v1_case_hearing_note_path(court_case, hearing, note),
                  params: { note: valid_note_params }
@@ -395,7 +395,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         end
       end
 
-      context 'when user is judge and post_hearing' do
+      context 'when users is judge and post_hearing' do
         subject(:delete_note) do
           delete api_v1_case_hearing_note_path(court_case, hearing, note),
                  params: { note: valid_note_params }
@@ -423,7 +423,7 @@ RSpec.describe 'Api::V1::Case::Notes', type: :request do
         end
       end
 
-      context 'when user is judge and pre_hearing' do
+      context 'when users is judge and pre_hearing' do
         subject(:delete_note) do
           delete api_v1_case_hearing_note_path(court_case, miscellaneous_hearing, note),
                  params: { note: valid_note_params }

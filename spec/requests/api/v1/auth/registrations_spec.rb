@@ -35,7 +35,7 @@ RSpec.describe 'Api::V1::Auth::Registrations', type: :request do
       }
 
       produces 'application/json'
-      context 'with valid user attributes' do
+      context 'with valid users attributes' do
         subject(:register_user) do
           post user_registration_path, params: user_params, as: :json
           response
@@ -55,7 +55,7 @@ RSpec.describe 'Api::V1::Auth::Registrations', type: :request do
 
         let(:user_params) { { user: valid_user_attributes } }
 
-        response '201', 'user created' do
+        response '201', 'users created' do
           schema type: :object,
                  properties: {
                    email: { type: :string, format: :email },
@@ -82,7 +82,7 @@ RSpec.describe 'Api::V1::Auth::Registrations', type: :request do
           end
 
           # rubocop:disable RSpec/ExampleLength
-          it 'creates user with correct profile' do
+          it 'creates users with correct profile' do
             register_user
             created_user = User.last
             expect(created_user.profile).to have_attributes(
@@ -97,7 +97,7 @@ RSpec.describe 'Api::V1::Auth::Registrations', type: :request do
         end
       end
 
-      context 'with invalid user attributes' do
+      context 'with invalid users attributes' do
         subject(:register_user) do
           post user_registration_path, params: user_params, as: :json
           response

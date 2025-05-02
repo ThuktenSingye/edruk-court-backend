@@ -2,7 +2,7 @@
 service: edruk_court
 
 # Name of the container image.
-image: your-user/edruk_court
+image: your-users/edruk_court
 
 # Deploy to these servers.
 servers:
@@ -25,7 +25,7 @@ proxy:
 registry:
   # Specify the registry server, if you're not using Docker Hub
   # server: registry.digitalocean.com / ghcr.io / ...
-  username: your-user
+  username: your-users
 
   # Always use an access token rather than real password when possible.
   password:
@@ -87,9 +87,9 @@ builder:
   #   - GITHUB_TOKEN
   #   - RAILS_MASTER_KEY
 
-# Use a different ssh user than root
+# Use a different ssh users than root
 # ssh:
-#   user: app
+#   users: app
 
 # Use accessory services (secrets come from .kamal/secrets).
 # accessories:

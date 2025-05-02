@@ -16,7 +16,7 @@ RSpec.describe 'Api::V1::Auth::Passwords', type: :request do
   end
 
   path '/api/v1/auth/password' do
-    put 'Reset user password' do
+    put 'Reset users password' do
       tags 'Authentication'
       consumes 'application/json'
 
@@ -57,7 +57,7 @@ RSpec.describe 'Api::V1::Auth::Passwords', type: :request do
           it { is_expected.to have_http_status :ok }
           it { expect { password_reset }.not_to change(User, :count) }
 
-          it 'changes the user password' do
+          it 'changes the users password' do
             password_reset
             user.reload
             expect(user).to be_valid_password('new_password')
@@ -84,7 +84,7 @@ RSpec.describe 'Api::V1::Auth::Passwords', type: :request do
         response '422', 'unprocessable entity' do
           it { is_expected.to have_http_status :unprocessable_entity }
 
-          it 'does not change the user password' do
+          it 'does not change the users password' do
             password_reset
             user.reload
             expect(user).not_to be_valid_password('new_password')

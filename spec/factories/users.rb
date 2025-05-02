@@ -16,7 +16,7 @@ FactoryBot.define do
     password_confirmation { nil }
   end
 
-  # Associate user with roles
+  # Associate users with roles
   trait :admin do
     after(:create) do |user|
       user.add_role('Admin')
@@ -29,7 +29,7 @@ FactoryBot.define do
     end
   end
 
-  # Associate user with roles
+  # Associate users with roles
   trait :registrar do
     after(:create) do |user|
       user.add_role('Registrar')

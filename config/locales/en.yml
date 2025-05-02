@@ -32,7 +32,7 @@ en:
   login:
     success: "Log In Successfully."
     error:
-      credentials: "Invalid credentials or user does not belong to this court."
+      credentials: "Invalid credentials or users does not belong to this court."
       court_not_found: "Court Not found."
   logout:
     success: "Log Out Successfully"

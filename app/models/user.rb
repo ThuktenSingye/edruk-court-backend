@@ -26,7 +26,7 @@ class User < ApplicationRecord
 
   encrypts :private_key
 
-  ROLES = %w[Judge Clerk Registrar Plaintiff Defendant Prosecutor Lawyer Admin].freeze
+  ROLES = %w[Judge Clerk Registrar Plaintiff Defendant Prosecutor Lawyer Admin User].freeze
 
   def unread_notifications
     notifications.unread.newest_first.limit(20)

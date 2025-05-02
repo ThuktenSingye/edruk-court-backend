@@ -13,7 +13,7 @@ module Hearings
     end
 
     def build
-      Rails.logger.info "✅ Authenticated user #{@message_type}"
+      Rails.logger.info "✅ Authenticated users #{@message_type}"
       case @message_type
 
       when :pre_hearing then pre_hearing_message

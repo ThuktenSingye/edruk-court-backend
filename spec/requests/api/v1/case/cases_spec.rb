@@ -22,7 +22,7 @@ RSpec.describe 'Api::V1::Cases', type: :request do
       court: $default_account
     }
   end
-  # let(:registrar_user) { create(:user, :registrar, confirmed_at: Time.zone.now) }
+  # let(:registrar_user) { create(:users, :registrar, confirmed_at: Time.zone.now) }
 
   path '/api/v1/cases' do
     get 'List all cases' do
@@ -309,7 +309,7 @@ RSpec.describe 'Api::V1::Cases', type: :request do
       security [Bearer: []]
       produces 'application/json'
 
-      context 'when user is not court official' do
+      context 'when users is not court official' do
         let(:general_user) { create(:user, confirmed_at: Time.zone.now) }
 
         before { sign_in general_user }
@@ -322,7 +322,7 @@ RSpec.describe 'Api::V1::Cases', type: :request do
         end
       end
 
-      context 'when user is court official' do
+      context 'when users is court official' do
         let(:registrar_user) { create(:user, :registrar, confirmed_at: Time.zone.now) }
 
         before { sign_in registrar_user }

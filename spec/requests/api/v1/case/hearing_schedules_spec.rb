@@ -189,12 +189,12 @@ RSpec.describe 'Api::V1::Case::HearingSchedules', type: :request do
       end
     end
 
-    get 'List reminders on hearing schedules if user is not court official' do
+    get 'List reminders on hearing schedules if users is not court official' do
       tags 'Hearing Schedules'
       security [Bearer: []]
       produces 'application/json'
 
-      context 'when role is general user, it return empty array' do
+      context 'when role is general users, it return empty array' do
         before { sign_in general_user }
 
         response '200', 'Hearing schedules found' do

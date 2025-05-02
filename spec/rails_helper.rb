@@ -140,7 +140,7 @@ RSpec.configure do |config|
 end
 
 Pundit::Matchers.configure do |config|
-  # Change the default user alias
+  # Change the default users alias
   config.default_user_alias = :user
 end
 

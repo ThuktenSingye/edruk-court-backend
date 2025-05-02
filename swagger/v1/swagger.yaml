@@ -258,14 +258,14 @@ paths:
                   type: integer
   "/api/v1/auth/confirmation":
     get:
-      summary: Confirm user account
+      summary: Confirm users account
       tags:
       - Authentication
       parameters:
       - name: confirmation_token
         in: query
         required: true
-        description: Confirmation token sent to user email
+        description: Confirmation token sent to users email
         schema:
           type: string
       responses:
@@ -275,7 +275,7 @@ paths:
           description: unprocessable entity
   "/api/v1/auth/password":
     put:
-      summary: Reset user password
+      summary: Reset users password
       tags:
       - Authentication
       parameters: []
@@ -315,7 +315,7 @@ paths:
       parameters: []
       responses:
         '201':
-          description: user created
+          description: users created
           content:
             application/json:
               schema:
@@ -1188,7 +1188,7 @@ paths:
                       type: string
   "/api/v1/hearing_schedules/reminders":
     get:
-      summary: List reminders on hearing schedules if user is not court official
+      summary: List reminders on hearing schedules if users is not court official
       tags:
       - Hearing Schedules
       security:

@@ -11,7 +11,7 @@ RSpec.describe AddressPolicy, type: :policy do
   let(:admin) { FactoryBot.create(:user, :admin) }
 
   describe 'permissions' do
-    context 'when role is user' do
+    context 'when role is users' do
       let(:user) { profile.user }
 
       it { is_expected.to permit_action(:create) }

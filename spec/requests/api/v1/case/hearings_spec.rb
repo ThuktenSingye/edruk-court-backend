@@ -139,7 +139,7 @@ RSpec.describe 'Api::V1::Case::Hearings', type: :request do
         end
       end
 
-      context 'when role is general user' do
+      context 'when role is general users' do
         let(:valid_hearing_params) do
           {
             hearing_status: :completed
