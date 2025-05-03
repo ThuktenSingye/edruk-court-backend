@@ -18,7 +18,7 @@ class HearingSchedulePolicy < ApplicationPolicy
     end
 
     def case_participant_user?
-      user.plaintiff? || user.defendant?
+      user.plaintiff? || user.defendant? || user.user? || user.lawyer?
     end
 
     def scope_for_court_staff
@@ -32,7 +32,7 @@ class HearingSchedulePolicy < ApplicationPolicy
 
     def scope_for_case_participants
       scope.joins(hearing: { case: :case_participants })
-           .where(case_participants: { user_id: user.id })
+           .where(case_participants: { user_id: user.id, role_id: user_roles_ids })
     end
 
     def participant_scope_if_needed
@@ -40,6 +40,10 @@ class HearingSchedulePolicy < ApplicationPolicy
 
       scope.joins(hearing: { case: :case_participants })
            .where(case_participants: { user_id: user.id })
+    end
+
+    def user_roles_ids
+      Role.where(name: %w[Defendant Plaintiff Lawyer]).pluck(:id)
     end
   end
 

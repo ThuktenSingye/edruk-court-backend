@@ -43,7 +43,18 @@ Rails.application.routes.draw do
           collection do
             get :active
           end
+          resources :hearings, only: [ :index ] do
+            resources :hearing_schedules, only: [ :index ]
+          end
         end
+
+        resources :hearing_schedules, controller: '/api/v1/user/hearing_schedules' do
+          collection do
+            get :reminders
+            get :list
+          end
+        end
+
       end
     end
   end

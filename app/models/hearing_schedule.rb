@@ -23,6 +23,12 @@ class HearingSchedule < ApplicationRecord
       )
   }
 
+  scope :for_accessible_cases, lambda { |current_user|
+    joins(hearing: { case: :case_participants })
+      .where(case_participants: { user_id: current_user.id,
+                                  role_id: Role.where(name: %w[Defendant Plaintiff Lawyer]).select(:id) })
+  }
+
   scope :today_approved, lambda {
     where(scheduled_date: Time.zone.today.all_day, schedule_status: 'approved')
       .order(scheduled_date: :asc)

@@ -56,11 +56,15 @@ module Api
         end
 
         def serialized_hearings(hearings)
-          hearings.map { |hearing| HearingSerializer.new(hearing).serializable_hash[:data][:attributes] }
+          hearings.map do |hearing|
+            HearingSerializer.new(hearing, params: { current_user: current_user },
+                                           is_collection: true).serializable_hash[:data][:attributes]
+          end
         end
 
         def serialized_hearing(hearing)
-          HearingSerializer.new(hearing).serializable_hash[:data][:attributes]
+          HearingSerializer.new(hearing, params: { current_user: current_user },
+                                         is_collection: true).serializable_hash[:data][:attributes]
         end
 
         def assign_scheduler(params)

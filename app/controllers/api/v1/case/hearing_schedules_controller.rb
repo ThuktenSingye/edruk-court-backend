@@ -50,7 +50,6 @@ module Api
           @hearing_schedules = policy_scope(
             HearingSchedule.reminder.for_accessible_courts(current_user.accessible_court_ids)
           )
-          @hearing_schedules = policy_scope(current_tenant.hearing_schedules_reminder)
           authorize @hearing_schedules
           render_json :ok, nil, serialized_hearing_schedules(@hearing_schedules)
         end
