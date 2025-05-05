@@ -2,13 +2,14 @@
 
 # Base Controller
 class ApplicationController < ActionController::API
-  set_current_tenant_by_subdomain_or_domain(:court, :subdomain, :domain)
+  set_current_tenant_through_filter
 
   include Pundit::Authorization
   include JsonResponse
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
+  before_action :set_tenant
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :set_bench_as_subtenant, if: :bench_present?
   after_action :verify_authorized, unless: :devise_controller?
@@ -26,6 +27,16 @@ class ApplicationController < ActionController::API
                                           profile_attributes: %i[avatar first_name last_name cid_no phone_number gender]
                                         }
                                       ])
+  end
+
+  def set_tenant
+    host = request.host
+    if /\A\d{1,3}(\.\d{1,3}){3}\z/.match?(host) # matches IP addresses
+      ActsAsTenant.current_tenant = nil
+    else
+      tenant = Court.find_by(domain: host.split('.').first)
+      ActsAsTenant.current_tenant = tenant
+    end
   end
 
   def bench_present?
