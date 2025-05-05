@@ -125,7 +125,7 @@ module Hearings
     end
 
     def bench_exist?
-      current_tenant.child_courts.exists?(court_type: 'bench')
+      current_tenant.child_courts&.exists?(court_type: 'bench')
     end
   end
 end

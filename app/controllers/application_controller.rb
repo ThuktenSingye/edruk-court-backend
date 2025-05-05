@@ -34,7 +34,7 @@ class ApplicationController < ActionController::API
     if /\A\d{1,3}(\.\d{1,3}){3}\z/.match?(host) # matches IP addresses
       ActsAsTenant.current_tenant = nil
     else
-      tenant = Court.find_by(domain: host.split('.').first)
+      tenant = Court.find_by(subdomain: host.split('.').first)
       ActsAsTenant.current_tenant = tenant
     end
   end
