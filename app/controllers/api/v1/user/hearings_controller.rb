@@ -10,6 +10,7 @@ module Api
         before_action :case
 
         def index
+          #  allow only approved hearing to be shown
           @hearings = policy_scope(@case.hearings.includes(:hearing_type, :hearing_schedules))
           authorize @hearings
           render_json :ok, nil, serialized_hearings(@hearings)

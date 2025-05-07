@@ -37,24 +37,51 @@ module Api
           end
         end
 
+        # def sign
+        #   authorize @case_document, :sign?, policy_class: CaseDocumentPolicy
+        #   @signable_service = SignableSigningService.new(@case, @case_document, current_user)
+        #   if @signable_service.sign_all
+        #     render_json :ok, 'Signature added Successfully', nil
+        #   else
+        #     render_json :unprocessable_entity, 'Failed to sign document', @signable_service.errors
+        #   end
+        # end
+        #
+        # def sign_all
+        #   authorize @case_documents, :sign_all?, policy_class: CaseDocumentPolicy
+        #   @signable_service = SignableSigningService.new(@case, @case_documents, current_user)
+        #   if @signable_service.sign_all
+        #     render_json :ok, 'Signature added Successfully', nil
+        #   else
+        #     render_json :unprocessable_entity, 'Failed to sign document', @signable_service.errors
+        #   end
+        # end
+
         def sign
           authorize @case_document, :sign?, policy_class: CaseDocumentPolicy
-          @signable_service = SignableSigningService.new(@case, @case_document, current_user)
-          if @signable_service.sign_all
-            render_json :ok, 'Signature added Successfully', nil
-          else
-            render_json :unprocessable_entity, 'Failed to sign document', @signable_service.errors.to_json
+          unless verify_signable
+            return render_json :unprocessable_entity, 'The attachment is not valid', @verification_service.errors
           end
+
+          unless sign_signable
+            return render_json :unprocessable_entity, 'Failed to sign document', @signable_service.errors
+          end
+
+          render_json :ok, 'Signature added Successfully', nil
         end
 
+        # for miscellaneous signing by judge below api will be called so need to update the policy to allow judge
         def sign_all
           authorize @case_documents, :sign_all?, policy_class: CaseDocumentPolicy
-          @signable_service = SignableSigningService.new(@case, @case_documents, current_user)
-          if @signable_service.sign_all
-            render_json :ok, 'Signature added Successfully', nil
-          else
-            render_json :unprocessable_entity, 'Failed to sign document', @signable_service.errors.json
+          unless verify_all_signables
+            return render_json :unprocessable_entity, 'The attachment is not valid', @verification_service.errors
           end
+
+          unless sign_all_signables
+            return render_json :unprocessable_entity, 'Failed to sign document', @signable_service.errors
+          end
+
+          render_json :ok, 'Signature added Successfully', nil
         end
 
         private
@@ -79,6 +106,26 @@ module Api
 
         def case_documents
           @case_documents ||= policy_scope(@hearing.case_documents)
+        end
+
+        def verify_all_signables
+          @verification_service = SignableVerificationService.new(@case, @case_documents, current_user)
+          @verification_service.verify_all
+        end
+
+        def verify_signable
+          @verification_service = SignableVerificationService.new(@case, @case_document, current_user)
+          @verification_service.verify_all
+        end
+
+        def sign_signable
+          @signable_service = SignableSigningService.new(@case, @case_document, current_user)
+          @signable_service.sign_all
+        end
+
+        def sign_all_signables
+          @signable_service = SignableSigningService.new(@case, @case_documents, current_user)
+          @signable_service.sign_all
         end
 
         def serialized_case_documents(case_documents)

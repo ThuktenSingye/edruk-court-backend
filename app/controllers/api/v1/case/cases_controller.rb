@@ -4,6 +4,7 @@ module Api
   module V1
     module Case
       # Case Controller
+      # rubocop:disable Metrics/ClassLength
       class CasesController < ApplicationController
         before_action :authenticate_user!
         before_action :court_cases
@@ -143,6 +144,7 @@ module Api
         end
         # rubocop:enable Rails/StrongParametersExpect
       end
+      # rubocop:enable Metrics/ClassLength
     end
   end
 end

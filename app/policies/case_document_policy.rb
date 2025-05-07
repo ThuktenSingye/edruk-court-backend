@@ -26,7 +26,7 @@ class CaseDocumentPolicy < ApplicationPolicy
       elsif user.clerk?
         docs_assigned_to_clerk.post_hearing
       else
-        scope.none
+        user_cases
       end
     end
 
@@ -46,14 +46,27 @@ class CaseDocumentPolicy < ApplicationPolicy
       scope.joins(hearing: { case: :case_participants })
            .where(case_participants: { user_id: user.id, role: Role.find_by(name: 'Clerk') })
     end
+
+    def user_cases
+      scope.joins(hearing: { case: :case_participants })
+           .where(case_participants: {
+                    user: user,
+                    role_id: user_roles_ids
+                  })
+    end
+
+    def user_roles_ids
+      Role.where(name: %w[Defendant Plaintiff Lawyer Prosecutor]).pluck(:id)
+    end
   end
 
   def index?
-    user.judge? || user.clerk? || user.registrar?
+    true
   end
 
   def create?
-    court_user? && (registrar_creates_documents? || judge_or_clerk_creates_documents?)
+    (court_user? && registrar_creates_documents?) || judge_or_clerk_creates_documents? ||
+      plaintiff_cases? || defendant_cases?
   end
 
   def update?
@@ -87,10 +100,11 @@ class CaseDocumentPolicy < ApplicationPolicy
   end
 
   def assigned_to_judge?
-    user.judge? && participant_exists_as?('Judge')
+    user.judge? && involved_in_case?('Judge')
   end
 
   def assigned_to_clerk?
+    # user.clerk? && involved_in_case?('Clerk')
     user.clerk? && participant_exists_as?('Clerk')
   end
 
@@ -99,6 +113,21 @@ class CaseDocumentPolicy < ApplicationPolicy
       user: user,
       role: Role.where(name: role_name)
     )
+  end
+
+  def involved_in_case?(roles)
+    return false if user.blank?
+
+    participant_role_ids = Role.where(name: roles).pluck(:id)
+    case_case_participants.where(user: user, role_id: participant_role_ids).any?
+  end
+
+  def plaintiff_cases?
+    involved_in_case?(%w[Plaintiff Lawyer Prosecutor])
+  end
+
+  def defendant_cases?
+    involved_in_case?('Defendant')
   end
 
   def court_user?

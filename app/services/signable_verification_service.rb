@@ -70,7 +70,7 @@ class SignableVerificationService
 
   def clerk_participant
     participant = CaseParticipant.find_by(case_id: @court_case.id, role_id: Role.find_by(name: 'Clerk'))
-    User.unscoped.find_by(id: participant.user_id).first
+    User.unscoped.find_by(id: participant.user_id)
   end
 
   def registrar_participant
@@ -79,7 +79,7 @@ class SignableVerificationService
 
   def defendant_participant
     participant = CaseParticipant.find_by(case_id: @court_case.id, role_id: Role.find_by(name: 'Defendant'))
-    User.unscoped.find_by(id: participant.user_id).first
+    User.unscoped.find_by(id: participant.user_id)
   end
 
   def plaintiff_roles_ids

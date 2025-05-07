@@ -44,6 +44,14 @@ Rails.application.routes.draw do
             get :active
           end
           resources :hearings, only: [ :index ] do
+            resources :case_documents, path: :documents do
+              member do
+                post :sign
+              end
+              collection do
+                post :sign_all
+              end
+            end
             resources :hearing_schedules, only: [ :index ]
           end
         end

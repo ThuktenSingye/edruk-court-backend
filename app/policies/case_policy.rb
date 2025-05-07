@@ -97,7 +97,7 @@ class CasePolicy < ApplicationPolicy
   end
 
   def plaintiff_cases?
-    involved_in_case?(%w[Plaintiff Lawyer])
+    involved_in_case?(%w[Plaintiff Lawyer Prosecutor])
   end
 
   def defendant_cases?
