@@ -18,6 +18,16 @@ class User < ApplicationRecord
 
   has_one :profile, dependent: :destroy
   has_many :notifications, class_name: 'Noticed::Notification', as: :recipient, dependent: :destroy
+
+  # Court orders issued by this user
+  # rubocop:disable Rails/InverseOf
+  has_many :issued_court_orders, class_name: 'CourtOrder', foreign_key: 'issuing_user_id', dependent: :destroy
+  # rubocop:enable Rails/InverseOf
+
+  # Court orders received by this user
+  has_many :order_recipient_users, dependent: :destroy
+  has_many :received_court_orders, through: :order_recipient_users, source: :court_order
+
   accepts_nested_attributes_for :profile
 
   after_create :generate_key_pair

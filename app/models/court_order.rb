@@ -7,11 +7,14 @@ class CourtOrder < ApplicationRecord
   belongs_to :issuing_user, class_name: 'User', optional: true
 
   has_many_attached :documents
-  has_many :order_recipient_courts, dependent: :nullify, inverse_of: :court_order
-  has_many :order_recipient_users, dependent: :nullify, inverse_of: :court_order
+  has_many :order_recipient_courts, dependent: :destroy, inverse_of: :court_order
+  has_many :order_recipient_users, dependent: :destroy, inverse_of: :court_order
 
   has_many :recipient_courts, through: :order_recipient_courts, source: :court
   has_many :recipient_users, through: :order_recipient_users, source: :user
+
+  accepts_nested_attributes_for :order_recipient_courts, allow_destroy: true
+  accepts_nested_attributes_for :order_recipient_users, allow_destroy: true
 
   validates :message, presence: true
 end

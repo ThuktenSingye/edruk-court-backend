@@ -16,6 +16,12 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       namespace :admin do
+        resources :court_orders do
+          collection do
+            get :sent
+          end
+        end
+
         resources :courts do
           collection do
             get :statistics
@@ -36,6 +42,12 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       namespace :user do
+        resources :court_orders do
+          collection do
+            get :received
+          end
+        end
+
         resources :cases do
           member do
             get :files
@@ -78,6 +90,12 @@ Rails.application.routes.draw do
 
     namespace :api do
       namespace :v1 do
+        resources :court_orders do
+          collection do
+            get :sent
+            get :received
+          end
+        end
         resources :hearing_types, only: [ :index ]
 
         resources :benches, only: [ :index ]

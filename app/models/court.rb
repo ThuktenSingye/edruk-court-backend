@@ -11,6 +11,15 @@ class Court < ApplicationRecord
   has_many :hearings, through: :cases
   has_many :hearing_schedules, through: :hearings
 
+  # Court orders issued by this court
+  # rubocop:disable Rails/InverseOf
+  has_many :issued_court_orders, class_name: 'CourtOrder', foreign_key: 'issuance_court_id', dependent: :destroy
+  # rubocop:enable Rails/InverseOf
+
+  # Court orders received by this court
+  has_many :order_recipient_courts, dependent: :destroy
+  has_many :received_court_orders, through: :order_recipient_courts, source: :court_order
+
   enum :court_type, { supreme: 0, high: 1, dzongkhag: 2, dungkhag: 3, bench: 4 }
 
   validates :name, :court_type, :email, :contact_no, presence: true
