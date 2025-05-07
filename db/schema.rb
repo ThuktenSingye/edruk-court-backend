@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_07_153355) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_07_202130) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -150,6 +150,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_153355) do
     t.index ["registration_number"], name: "index_cases_on_registration_number", unique: true
   end
 
+  create_table "court_orders", force: :cascade do |t|
+    t.text "message"
+    t.bigint "case_id"
+    t.string "order_type"
+    t.integer "issuance_court_id"
+    t.integer "issuing_user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["case_id"], name: "index_court_orders_on_case_id"
+  end
+
   create_table "courts", force: :cascade do |t|
     t.string "name"
     t.integer "court_type"
@@ -260,6 +271,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_153355) do
     t.index ["recipient_type", "recipient_id"], name: "index_noticed_notifications_on_recipient"
   end
 
+  create_table "order_recipient_courts", force: :cascade do |t|
+    t.bigint "court_order_id", null: false
+    t.bigint "court_id", null: false
+    t.datetime "read_at"
+    t.integer "read_status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["court_id"], name: "index_order_recipient_courts_on_court_id"
+    t.index ["court_order_id"], name: "index_order_recipient_courts_on_court_order_id"
+  end
+
+  create_table "order_recipient_users", force: :cascade do |t|
+    t.bigint "court_order_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "read_at"
+    t.integer "read_status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["court_order_id"], name: "index_order_recipient_users_on_court_order_id"
+    t.index ["user_id"], name: "index_order_recipient_users_on_user_id"
+  end
+
   create_table "profiles", force: :cascade do |t|
     t.string "first_name"
     t.string "last_name"
@@ -331,6 +364,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_153355) do
   add_foreign_key "cases", "case_types"
   add_foreign_key "cases", "courts"
   add_foreign_key "cases", "courts", column: "bench_id"
+  add_foreign_key "court_orders", "cases"
+  add_foreign_key "court_orders", "courts", column: "issuance_court_id"
+  add_foreign_key "court_orders", "users", column: "issuing_user_id"
   add_foreign_key "courts", "courts", column: "parent_court_id"
   add_foreign_key "document_signatures", "users", column: "signer_id"
   add_foreign_key "hearing_notes", "hearings"
@@ -342,6 +378,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_153355) do
   add_foreign_key "jurisdictions", "courts"
   add_foreign_key "notes", "hearings"
   add_foreign_key "notes", "users"
+  add_foreign_key "order_recipient_courts", "court_orders"
+  add_foreign_key "order_recipient_courts", "courts"
+  add_foreign_key "order_recipient_users", "court_orders"
+  add_foreign_key "order_recipient_users", "users"
   add_foreign_key "profiles", "users"
   add_foreign_key "users", "courts"
   add_foreign_key "users_roles", "roles"
