@@ -25,11 +25,27 @@ module Api
           authorize @case
           if @case.save
             Users::Cases::CaseNotificationService.new(@case).notify_registrar(case_params[:court_id])
-            render_json :created, 'New Cases Added Successfully', serialized_case(@case)
+            sign_documents(@case) ? render_success : render_signing_failure
           else
             render_json :unprocessable_entity, 'Failed to Add Case', @case.errors
           end
         end
+
+        # def create
+        #   @case = Users::Cases::CaseService.new(case_params, current_user).build_case
+        #   authorize @case
+        #   if @case.save
+        #     Users::Cases::CaseNotificationService.new(@case).notify_registrar(case_params[:court_id])
+        #     @signable_service = SignableSigningService.new(@case, @case.case_documents, current_user)
+        #     if @signable_service.sign_all
+        #       render_json :created, 'New Case Added Successfully', serialized_case(@case)
+        #     else
+        #       render_json :unprocessable_entity, 'Failed to sign all documents', @signable_service.errors
+        #     end
+        #   else
+        #     render_json :unprocessable_entity, 'Failed to Add Case', @case.errors
+        #   end
+        # end
 
         def update
           authorize @case
@@ -54,6 +70,11 @@ module Api
 
         private
 
+        def sign_documents(court_case)
+          @signable_service = SignableSigningService.new(court_case, court_case.case_documents, current_user)
+          @signable_service.sign_all
+        end
+
         def cases
           role_ids = Role.where(name: %w[Plaintiff Defendant]).pluck(:id)
           @cases ||= ::Case.joins(:case_participants).where(
@@ -74,6 +95,14 @@ module Api
 
         def serialized_case(court_case)
           CaseSerializer.new(court_case).serializable_hash[:data][:attributes]
+        end
+
+        def render_success
+          render_json :created, 'New Case Added Successfully', serialized_case(@case)
+        end
+
+        def render_signing_failure
+          render_json :unprocessable_entity, 'Failed to sign all documents', @signable_service.errors
         end
 
         # rubocop:disable Rails/StrongParametersExpect, Metrics/MethodLength

@@ -104,11 +104,20 @@ Rails.application.routes.draw do
             end
             member do
               get :files
+              post :sign_all
             end
+            post 'documents/:doc_id/sign', to: 'cases#sign', as: :sign_case_documents
             resources :hearings, except: %i[destroy] do
               resources :notes
               resources :hearing_schedules
-              resources :case_documents, path: :documents
+              resources :case_documents, path: :documents do
+                member do
+                  post :sign
+                end
+                collection do
+                  post :sign_all
+                end
+              end
               resources :case_evidences, path: :evidences
             end
           end

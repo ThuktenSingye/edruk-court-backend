@@ -9,21 +9,22 @@ module Api
         before_action :court_cases
         before_action :case
         before_action :hearing
-        before_action :case_document, only: [:update]
+        before_action :case_document, except: %i[index create sign_all]
+        before_action :case_documents, except: %i[index]
 
         def index
-          @case_documents = policy_scope(@hearing.case_documents.order(created_at: :asc))
-          authorize @case_documents
-          render_json :ok, nil, serialized_case_documents(@case_documents)
+          @documents = policy_scope(@hearing.case_documents.order(created_at: :asc))
+          authorize @documents
+          render_json :ok, nil, serialized_case_documents(@documents)
         end
 
         def create
-          @case_document = @hearing.case_documents.build(case_document_params)
-          authorize @case_document
-          if @case_document.save
-            render_json :created, 'Document added Successfully', serialized_case_document(@case_document)
+          @documents = @hearing.case_documents.build(case_document_params)
+          authorize @documents
+          if @documents.save
+            render_json :created, 'Document added Successfully', serialized_case_document(@documents)
           else
-            render_json :unprocessable_entity, 'Failed to add document', @case_document.errors
+            render_json :unprocessable_entity, 'Failed to add document', @documents.errors
           end
         end
 
@@ -33,6 +34,26 @@ module Api
             render_json :ok, 'Document updated Successfully', serialized_case_document(@case_document)
           else
             render_json :unprocessable_entity, 'Failed to add document', @case_document.errors
+          end
+        end
+
+        def sign
+          authorize @case_document, :sign?, policy_class: CaseDocumentPolicy
+          @signable_service = SignableSigningService.new(@case, @case_document, current_user)
+          if @signable_service.sign_all
+            render_json :ok, 'Signature added Successfully', nil
+          else
+            render_json :unprocessable_entity, 'Failed to sign document', @signable_service.errors.to_json
+          end
+        end
+
+        def sign_all
+          authorize @case_documents, :sign_all?, policy_class: CaseDocumentPolicy
+          @signable_service = SignableSigningService.new(@case, @case_documents, current_user)
+          if @signable_service.sign_all
+            render_json :ok, 'Signature added Successfully', nil
+          else
+            render_json :unprocessable_entity, 'Failed to sign document', @signable_service.errors.json
           end
         end
 
@@ -56,6 +77,10 @@ module Api
           @case_document ||= @hearing.case_documents.find(params[:id])
         end
 
+        def case_documents
+          @case_documents ||= policy_scope(@hearing.case_documents)
+        end
+
         def serialized_case_documents(case_documents)
           case_documents.map do |document|
             CaseDocumentSerializer.new(document).serializable_hash[:data][:attributes]
@@ -67,7 +92,7 @@ module Api
         end
 
         def case_document_params
-          params.expect(document: %i[document hash_value document_status verified_by_judge verified_at])
+          params.expect(document: %i[document])
         end
       end
     end

@@ -45,6 +45,7 @@ class User < ApplicationRecord
       role?(role)
     end
   end
+
   def role?(role_name)
     cached_roles.include?(role_name)
   end

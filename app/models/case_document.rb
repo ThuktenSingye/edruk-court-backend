@@ -7,6 +7,7 @@ class CaseDocument < ApplicationRecord
   after_commit :set_initial_status, on: :create
 
   enum :document_status, { pending: 0, verified: 1, denied: 2 }
+  validates :document_status, presence: true
 
   def document_url
     document.attached? ? Rails.application.routes.url_helpers.url_for(document) : nil

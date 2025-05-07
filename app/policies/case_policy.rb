@@ -8,34 +8,6 @@ class CasePolicy < ApplicationPolicy
   # code, beware of possible changes to the ancestors:
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
-  def index?
-    true
-  end
-
-  def show?
-    (user.present? && court_user?) || plaintiff_cases? || defendant_cases?
-  end
-
-  def update?
-    court_user? && (user.registrar? || assigned_to_clerk?)
-  end
-
-  def create?
-    (court_user? && user.registrar?) || (user.plaintiff? || user.lawyer? || user.user?)
-  end
-
-  def statistics?
-    index?
-  end
-
-  def files?
-    index?
-  end
-
-  def active?
-    index?
-  end
-
   # Case Scope
   class Scope < ApplicationPolicy::Scope
     def resolve
@@ -73,6 +45,42 @@ class CasePolicy < ApplicationPolicy
                     role_id: judge_and_clerk_role_ids
                   })
     end
+  end
+
+  def index?
+    true
+  end
+
+  def show?
+    (user.present? && court_user?) || plaintiff_cases? || defendant_cases?
+  end
+
+  def update?
+    court_user? && (user.registrar? || assigned_to_clerk?)
+  end
+
+  def create?
+    (court_user? && user.registrar?) || (user.plaintiff? || user.lawyer? || user.user?)
+  end
+
+  def statistics?
+    index?
+  end
+
+  def files?
+    index?
+  end
+
+  def active?
+    index?
+  end
+
+  def sign?
+    (court_user? && user.registrar?) || involved_in_case?(['Judge'])
+  end
+
+  def sign_all?
+    (court_user? && user.registrar?) || involved_in_case?(['Judge'])
   end
 
   private

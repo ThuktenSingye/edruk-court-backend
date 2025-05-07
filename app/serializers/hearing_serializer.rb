@@ -11,7 +11,7 @@ class HearingSerializer
   end
 
   attribute :schedules do |hearing|
-    hearing.hearing_schedules.map do |schedule|
+    hearing.hearing_schedules&.map do |schedule|
       {
         id: schedule.id,
         scheduled_date: schedule.scheduled_date.iso8601,
@@ -31,11 +31,25 @@ class HearingSerializer
 
   attribute :documents do |object, params|
     current_user = params[:current_user]
-    documents = if current_user&.judge?
-                  object.case_documents.where(document_status: 'verified')
-                else
-                  object.case_documents
-                end
+    # documents = if object.hearing_type.name.downcase == 'miscellaneous'
+    #               if current_user&.judge?
+    #                 object.case.case_documents.where(document_status: 'verified')
+    #               else
+    #                 object.case.case_documents
+    #               end
+    #             elsif current_user&.judge?
+    #               object.case_documents.where(document_status: 'verified')
+    #             else
+    #               object.case_documents
+    #             end
+    documents =
+      if object.hearing_type.name.downcase == 'miscellaneous'
+        # rubocop:disable Layout/LineLength
+        current_user&.judge? ? object.case.case_documents.where(document_status: 'verified') : object.case.case_documents
+        # rubocop:enable Layout/LineLength
+      else
+        current_user&.judge? ? object.case_documents.where(document_status: 'verified') : object.case_documents
+      end
     documents.map do |document|
       {
         id: document.id,

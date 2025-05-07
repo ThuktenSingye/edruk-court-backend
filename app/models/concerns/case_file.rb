@@ -8,9 +8,6 @@ module CaseFile
     belongs_to :hearing, optional: true
     has_many :document_signatures, as: :signable, dependent: :destroy
 
-    validates :hash_value, presence: true
-    validates :hash_value, uniqueness: { case_sensitive: false }
-
     scope :pre_hearing, lambda {
       joins(hearing: :hearing_type)
         .where(hearing_types: { name: 'miscellaneous' })

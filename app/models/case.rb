@@ -21,6 +21,6 @@ class Case < ApplicationRecord
   private
 
   def set_initial_status
-    update(case_status: :filed)
+    update!(case_status: :filed)
   end
 end

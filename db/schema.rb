@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_02_130707) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_07_153355) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -58,13 +58,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_02_130707) do
     t.bigint "hearing_id"
     t.boolean "verified_by_judge", default: true
     t.datetime "verified_at"
-    t.integer "document_status"
+    t.integer "document_status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "case_id"
     t.index ["case_id"], name: "index_case_documents_on_case_id"
     t.index ["hash_value", "hearing_id"], name: "index_case_documents_on_hash_value_and_hearing_id", unique: true
-    t.index ["hash_value"], name: "index_case_documents_on_hash_value", unique: true
     t.index ["hearing_id"], name: "index_case_documents_on_hearing_id"
   end
 
@@ -73,7 +72,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_02_130707) do
     t.bigint "hearing_id", null: false
     t.boolean "verified_by_judge"
     t.datetime "verified_at"
-    t.integer "evidence_status"
+    t.integer "evidence_status", default: 0
     t.string "file_type"
     t.boolean "is_encrypted"
     t.string "iv"
@@ -125,12 +124,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_02_130707) do
     t.string "judgement_number"
     t.string "title"
     t.text "summary"
-    t.integer "case_priority"
+    t.integer "case_priority", default: 0
     t.boolean "is_appeal", default: false
     t.boolean "is_enforced", default: false
     t.boolean "is_remanded", default: false
     t.boolean "is_reopened", default: false
-    t.integer "case_status"
+    t.integer "case_status", default: 0
     t.bigint "court_id", null: false
     t.bigint "case_subtype_id"
     t.datetime "created_at", null: false
@@ -190,7 +189,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_02_130707) do
 
   create_table "hearing_schedules", force: :cascade do |t|
     t.datetime "scheduled_date"
-    t.integer "schedule_status"
+    t.integer "schedule_status", default: 0
     t.text "reschedule_reason"
     t.bigint "hearing_id", null: false
     t.bigint "scheduled_by_id", null: false
@@ -208,7 +207,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_02_130707) do
   end
 
   create_table "hearings", force: :cascade do |t|
-    t.integer "hearing_status"
+    t.integer "hearing_status", default: 0
     t.bigint "case_id", null: false
     t.bigint "hearing_type_id", null: false
     t.datetime "created_at", null: false
@@ -333,7 +332,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_02_130707) do
   add_foreign_key "cases", "courts"
   add_foreign_key "cases", "courts", column: "bench_id"
   add_foreign_key "courts", "courts", column: "parent_court_id"
-  add_foreign_key "document_signatures", "case_participants", column: "signer_id"
+  add_foreign_key "document_signatures", "users", column: "signer_id"
   add_foreign_key "hearing_notes", "hearings"
   add_foreign_key "hearing_notes", "users", column: "author_id"
   add_foreign_key "hearing_schedules", "hearings"

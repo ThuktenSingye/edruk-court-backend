@@ -64,6 +64,14 @@ class CaseDocumentPolicy < ApplicationPolicy
     create?
   end
 
+  def sign?
+    create?
+  end
+
+  def sign_all?
+    index?
+  end
+
   private
 
   def registrar_creates_documents?
