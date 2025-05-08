@@ -31,7 +31,19 @@ class Court < ApplicationRecord
            :reminder,
            to: :hearing_schedules, prefix: true
 
+  scope :supreme_courts, -> { where(court_type: :supreme) }
+  scope :high_courts, -> { where(court_type: :high) }
+  scope :dzongkhag_courts, -> { where(court_type: :dzongkhag) }
+  scope :dungkhag_courts, -> { where(court_type: :dungkhag) }
+  scope :benches, -> { where(court_type: :bench) }
+
   def bench?
     court_type == 'bench'
   end
+
+  def bench_exist?
+    child_courts.exists?(court_type: :bench)
+  end
+
+
 end
