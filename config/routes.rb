@@ -96,6 +96,8 @@ Rails.application.routes.draw do
             get :received
           end
         end
+        resources :courts, only: [ :index ]
+
         resources :hearing_types, only: [ :index ]
 
         resources :benches, only: [ :index ]
