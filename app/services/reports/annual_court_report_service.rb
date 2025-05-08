@@ -2,7 +2,7 @@
 
 module Reports
   # Service class for annual report generation
-  # rubocop:disable Metrics/ClassLength, Metrics/MethodLength
+  # rubocop:disable Metrics/ClassLength, Metrics/MethodLength, Metrics/AbcSize
   class AnnualCourtReportService
     def initialize(year:, court:)
       @year = year
@@ -27,7 +27,13 @@ module Reports
       }
     end
 
-    def generate_annual_court_report; end
+    def generate_annual_court_report
+      {
+        cases: court_case_type_counts,
+        cases_overview: case_overview,
+        court_case_statistic: generate_court_report
+      }
+    end
 
     def national_case_type_counts
       {
@@ -152,8 +158,123 @@ module Reports
       result
     end
 
+    # court report for current court
+    def court_case_type_counts
+      {
+        criminal: court_count_by_case_type('Criminal'),
+        civil: court_count_by_case_type('Civil'),
+        other: court_count_by_case_type('Other')
+      }
+    end
+
     def count_by_case_type(type)
       Case.joins(:case_type).where(case_types: { title: type }).count
+    end
+
+    def court_count_by_case_type(type)
+      @court.cases.joins(:case_type).where(case_types: { title: type }).count
+    end
+
+    def bench_courts
+      result_courts = []
+      if @court.bench_exist?
+        benches = @court.child_courts
+        result_courts.concat(benches)
+      else
+        result_courts << court
+      end
+      result_courts
+    end
+
+    def case_overview
+      result_courts = bench_courts
+      total_cases = total_decided = total_pending = total_appeal = total_enforced = 0
+      result_courts.each do |court|
+        total_cases += total_case(court)
+        total_decided += decided_case(court)
+        total_pending += pending_case(court)
+        total_appeal += appeal_case(court)
+        total_enforced += enforced_case(court)
+      end
+      {
+        total: total_cases,
+        decided: total_decided,
+        pending: total_pending,
+        appeal: total_appeal,
+        enforced: total_enforced
+      }
+    end
+
+    def generate_court_report
+      result_courts = @court.bench_exist? ? @court.child_courts : [@court]
+
+      result_courts.to_h do |court|
+        court_report = (1..12).to_h do |month|
+          start_date = Date.new(@year, month, 1).beginning_of_day
+          end_date = start_date.end_of_month.end_of_day
+          month_name = start_date.strftime('%B')
+
+          month_report = court.users.with_role(:Clerk).to_h do |clerk|
+            clerk_name = "#{clerk.profile.first_name} #{clerk.profile.last_name}"
+            [clerk_name, monthly_clerk_stats(clerk, start_date, end_date)]
+          end
+
+          [month_name, month_report]
+        end
+
+        [court.name, court_report]
+      end
+    end
+
+    def monthly_clerk_stats(clerk, start_date, end_date)
+      @clerk_cases ||= ::Case.joins(:case_participants).where(case_participants: { user_id: clerk.id,
+                                                                                   role_id: clerk_role_id })
+      {
+        opening_balance: clerk_opening_balance(@clerk_cases, start_date),
+        registered: clerk_registered_cases(@clerk_cases, start_date, end_date),
+        decided: clerk_decided_cases(@clerk_cases, start_date, end_date),
+        appeal: clerk_appeal_cases(@clerk_cases, start_date, end_date),
+        pending: clerk_pending_cases(@clerk_cases, start_date, end_date)
+      }
+    end
+
+    def clerk_opening_balance(cases, start_date)
+      cases.where(case_status: :active)
+           .where(cases: { created_at: ...start_date })
+           .distinct
+           .count
+    end
+
+    def clerk_registered_cases(cases, start_date, end_date)
+      cases.where(created_at: start_date..end_date).distinct.count
+    end
+
+    def clerk_decided_cases(cases, start_date, end_date)
+      cases.where(case_status: %i[dismissed withdrawn settled closed])
+           .where(updated_at: start_date..end_date)
+           .distinct
+           .count
+    end
+
+    def clerk_appeal_cases(cases, start_date, end_date)
+      cases.where(is_appeal: true)
+           .where(updated_at: start_date..end_date)
+           .distinct
+           .count
+    end
+
+    def clerk_pending_cases(cases, start_date, end_date)
+      cases.where(case_status: :pending)
+           .where(cases: { created_at: ...start_date })
+           .where.not(id: cases.where(case_status: %i[dismissed withdrawn settled closed])
+                               .where(updated_at: start_date..end_date)
+                               .select(:id))
+           .distinct
+           .count
+    end
+
+    def clerk_role_id
+      Role.where(name: 'Clerk').pluck(:id)
     end
 
     def courts(court_type)
@@ -202,5 +323,5 @@ module Reports
       court.cases.count
     end
   end
-  # rubocop:enable Metrics/ClassLength, Metrics/MethodLength
+  # rubocop:enable Metrics/ClassLength, Metrics/MethodLength, Metrics/AbcSize
 end
