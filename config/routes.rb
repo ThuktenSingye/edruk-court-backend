@@ -90,6 +90,14 @@ Rails.application.routes.draw do
 
     namespace :api do
       namespace :v1 do
+
+        resources :reports do
+          member do
+            get :generate
+          end
+        end
+
+        get '/report/generate', to: 'case/reports#generate'
         resources :court_orders do
           collection do
             get :sent

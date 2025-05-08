@@ -25,6 +25,11 @@ class Court < ApplicationRecord
   validates :name, :court_type, :email, :contact_no, presence: true
   validates :domain, :subdomain, :name, :email, uniqueness: { case_sensitive: false }
 
+  has_many :primary_cases, class_name: 'Case', dependent: :nullify
+
+  # Cases where this court is a bench
+  has_many :bench_cases, class_name: 'Case', foreign_key: 'bench_id', dependent: :nullify, inverse_of: :bench
+
   delegate :today_approved,
            :pending,
            :overdue,
@@ -45,5 +50,7 @@ class Court < ApplicationRecord
     child_courts.exists?(court_type: :bench)
   end
 
-
+  def cases
+    Case.where('court_id = ? OR bench_id = ?', id, id)
+  end
 end

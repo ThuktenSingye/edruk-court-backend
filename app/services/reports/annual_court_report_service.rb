@@ -2,6 +2,7 @@
 
 module Reports
   # Service class for annual report generation
+  # rubocop:disable Metrics/ClassLength, Metrics/MethodLength
   class AnnualCourtReportService
     def initialize(year:, court:)
       @year = year
@@ -18,14 +19,30 @@ module Reports
 
     private
 
-    def generate_supreme_court_annual_report; end
+    def generate_supreme_court_annual_report
+      {
+        cases: national_case_type_counts,
+        case_overview: national_case_overview,
+        case_statistic: national_case_statistics
+      }
+    end
+
     def generate_annual_court_report; end
 
-    def national_case_overview
+    def national_case_type_counts
       {
         criminal: count_by_case_type('Criminal'),
         civil: count_by_case_type('Civil'),
         other: count_by_case_type('Other')
+      }
+    end
+
+    def national_case_overview
+      {
+        supreme: supreme_court_case_overview,
+        high: high_court_case_overview,
+        dzongkhag: dzongkhag_court_case_overview,
+        dungkhag: dungkhag_court_case_overview
       }
     end
 
@@ -39,57 +56,58 @@ module Reports
     end
 
     def supreme_court_case_overview
-      supreme_courts ||= Court.supreme_courts
-
-      total_cases = 0
-      total_decided = 0
-      total_pending = 0
-
-      supreme_courts.each do |supreme_court|
-        total_cases += supreme_court.cases.count
-        total_decided += decided_case(supreme_court)
-        total_pending += pending_case(supreme_court)
-      end
+      court_case_overview(:supreme, metrics: %i[total_case decided_case pending_case])
     end
 
     def high_court_case_overview
-
-      high_courts ||= Court.high_courts
-
-      total_cases = total_decided = total_pending = total_appeal = total_enforced = 0
-
-      high_courts.each do |high_court|
-        total_cases += total_cases(high_court)
-        total_decided += decided_case(high_court)
-        total_pending += pending_case(high_court)
-        total_appeal += appeal_case(high_court)
-        total_enforced += enforced_case(high_court)
-      end
+      court_case_overview(:high, metrics: %i[total_case decided_case pending_case appeal_case enforced_case])
     end
 
     def dzongkhag_court_case_overview
-
+      court_case_overview(:dzongkhag,
+                          metrics: %i[total_case decided_case pending_case appeal_case enforced_case])
     end
 
     def dungkhag_court_case_overview
+      court_case_overview(:dungkhag,
+                          metrics: %i[total_case decided_case pending_case appeal_case enforced_case])
+    end
 
+    def court_case_overview(court_type,
+                            metrics: %i[total_case decided_case pending_case appeal_case enforced_case])
+      legal_courts ||= courts(court_type)
+      result = Hash.new(0)
+
+      legal_courts.each do |court|
+        metrics.each do |metric|
+          result[metric] += send(metric, court)
+        end
+      end
+
+      result
     end
 
     def supreme_court_case_statistics
       supreme_courts ||= courts(:supreme)
+      result = {}
       supreme_courts.map do |supreme_court|
-        {
+        result[supreme_court.name] = {
+          opening_balance: opening_balance(supreme_court),
+          registered: registered_case(supreme_court),
           total: total_case(supreme_court),
           decided: decided_case(supreme_court),
-          pending: pending_case(supreme_court),
+          pending: pending_case(supreme_court)
         }
       end
     end
 
     def high_court_case_statistics
       high_courts ||= courts(:high)
+      result = {}
       high_courts.map do |high_court|
-        {
+        result[high_court.name] = {
+          opening_balance: opening_balance(high_court),
+          registered: registered_case(high_court),
           total: total_case(high_court),
           decided: decided_case(high_court),
           pending: pending_case(high_court),
@@ -97,25 +115,33 @@ module Reports
           enforced: enforced_case(high_court)
         }
       end
+      result
     end
 
     def dzongkhag_court_case_statistics
       dzongkhag_courts ||= courts(:dzongkhag)
+      result = {}
       dzongkhag_courts.map do |dzongkhag_court|
-        {
+        result[dzongkhag_court.name] = {
+          opening_balance: opening_balance(dzongkhag_court),
+          registered: registered_case(dzongkhag_court),
           total: total_case(dzongkhag_court),
           decided: decided_case(dzongkhag_court),
           pending: pending_case(dzongkhag_court),
-          appeal: appeal_case(dzongkhag_courts),
+          appeal: appeal_case(dzongkhag_court), # Fixed: was dzongkhag_courts (plural)
           enforced: enforced_case(dzongkhag_court)
         }
       end
+      result
     end
 
     def dungkhag_court_case_statistics
       dungkhag_courts ||= courts(:dungkhag)
+      result = {}
       dungkhag_courts.map do |dungkhag_court|
-        {
+        result[dungkhag_court.name] = {
+          opening_balance: opening_balance(dungkhag_court),
+          registered: registered_case(dungkhag_court),
           total: total_case(dungkhag_court),
           decided: decided_case(dungkhag_court),
           pending: pending_case(dungkhag_court),
@@ -123,6 +149,7 @@ module Reports
           enforced: enforced_case(dungkhag_court)
         }
       end
+      result
     end
 
     def count_by_case_type(type)
@@ -135,15 +162,28 @@ module Reports
       courts.map do |court|
         if court.bench_exist?
           benches = court.child_courts
-          result_courts.concat(Array(benches))
+          result_courts.concat(benches)
         else
           result_courts << court
         end
       end
+
+      result_courts
+    end
+
+    def registered_case(court)
+      start_date = Date.new(@year, 1, 1).beginning_of_day
+      end_date = Date.new(@year, 12, 31).end_of_day
+      court.cases.where(created_at: start_date..end_date).count
+    end
+
+    def opening_balance(court)
+      start_of_year = Date.new(@year.to_i, 1, 1)
+      court.cases.where(case_status: 'active').where(created_at: ...start_of_year).count
     end
 
     def decided_case(court)
-      court.cases.where(case_status: :closed).count
+      court.cases.where(case_status: %i[dismissed withdrawn settled closed]).count
     end
 
     def pending_case(court)
@@ -155,11 +195,12 @@ module Reports
     end
 
     def enforced_case(court)
-      court.cases.where(is_enfored: true).count
+      court.cases.where(is_enforced: true).count
     end
 
     def total_case(court)
       court.cases.count
     end
   end
+  # rubocop:enable Metrics/ClassLength, Metrics/MethodLength
 end

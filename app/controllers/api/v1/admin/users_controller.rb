@@ -41,19 +41,19 @@ module Api
         end
 
         def judge
-          @users = User.with_role(:Judge)
+          @users = ::User.with_role(:Judge)
           authorize @users
           render_json :ok, nil, serialized_users(@users)
         end
 
         def clerk
-          @users = User.with_role(:Clerk)
+          @users = ::User.with_role(:Clerk)
           authorize @users
           render_json :ok, nil, serialized_users(@users)
         end
 
         def registrar
-          @users = User.with_role(:Registrar)
+          @users = ::User.with_role(:Registrar)
           authorize @users
           render_json :ok, nil, serialized_users(@users)
         end
@@ -61,11 +61,11 @@ module Api
         private
 
         def user
-          @user ||= User.find(params[:id])
+          @user ||= ::User.find(params[:id])
         end
 
         def build_user
-          user = User.build(user_params.except(:role))
+          user = ::User.build(user_params.except(:role))
           user.add_role(user_params[:role]) if user_params[:role]
           user.confirmed_at = Time.zone.now
           user
