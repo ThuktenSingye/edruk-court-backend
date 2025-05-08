@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_07_202130) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_08_052955) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -223,6 +223,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_07_202130) do
     t.bigint "hearing_type_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "sequence_number", default: 1
     t.index ["case_id"], name: "index_hearings_on_case_id"
     t.index ["hearing_type_id"], name: "index_hearings_on_hearing_type_id"
   end

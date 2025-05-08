@@ -9,6 +9,7 @@ module Api
         before_action :court_cases
         before_action :case
         before_action :hearing, only: [:update]
+        before_action :assign_sequence_number, only: [:create]
 
         def index
           @hearings = policy_scope(@case.hearings.includes(:hearing_type, :hearing_schedules))
@@ -64,6 +65,20 @@ module Api
 
         def serialized_hearing(hearing)
           HearingSerializer.new(hearing, params: { current_user: current_user }).serializable_hash[:data][:attributes]
+        end
+
+        def assign_sequence_number
+          return unless rebuttal_hearing?
+
+          rebuttal_type_id = params[:hearing][:hearing_type_id]
+          last_seq = @case.hearings.where(hearing_type_id: rebuttal_type_id)
+                          .maximum(:sequence_number) || 0
+          params[:hearing][:sequence_number] = last_seq + 1
+        end
+
+        def rebuttal_hearing?
+          rebuttal_type = HearingType.find_by(name: 'Rebuttal')
+          params[:hearing][:hearing_type_id].to_i == rebuttal_type.id
         end
 
         def assign_scheduler(params)
