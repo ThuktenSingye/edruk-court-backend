@@ -7,7 +7,7 @@
 # Case Notifier Class
 class CaseNotifier < ApplicationNotifier
   deliver_by :action_cable do |config|
-    config.channel = 'NotificationChannel' # Custom channel name
+    config.channel = 'NotificationChannel'
     config.stream = -> { recipient }
     config.message = lambda {
       {

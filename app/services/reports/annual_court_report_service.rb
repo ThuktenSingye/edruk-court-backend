@@ -168,11 +168,19 @@ module Reports
     end
 
     def count_by_case_type(type)
-      Case.joins(:case_type).where(case_types: { title: type }).count
+      Case.joins(:case_type)
+          .where(case_types: { title: type })
+          .where('cases.created_at BETWEEN ? AND ?', start_of_year, end_of_year)
+          .distinct
+          .count
     end
 
     def court_count_by_case_type(type)
-      @court.cases.joins(:case_type).where(case_types: { title: type }).count
+      @court.cases.joins(:case_type)
+            .where(case_types: { title: type })
+            .where('cases.created_at BETWEEN ? AND ?', start_of_year, end_of_year)
+            .distinct
+            .count
     end
 
     def bench_courts
@@ -293,34 +301,54 @@ module Reports
     end
 
     def registered_case(court)
-      start_date = Date.new(@year, 1, 1).beginning_of_day
-      end_date = Date.new(@year, 12, 31).end_of_day
-      court.cases.where(created_at: start_date..end_date).count
+      court.cases.where(created_at: start_of_year..end_of_year).count
     end
 
     def opening_balance(court)
-      start_of_year = Date.new(@year.to_i, 1, 1)
       court.cases.where(case_status: 'active').where(created_at: ...start_of_year).count
     end
 
     def decided_case(court)
-      court.cases.where(case_status: %i[dismissed withdrawn settled closed]).count
+      court.cases.where(case_status: %i[dismissed withdrawn settled closed])
+           .where(updated_at: start_of_year..end_of_year)
+           .distinct
+           .count
     end
 
     def pending_case(court)
-      court.cases.where(case_status: :pending).count
+      court.cases.where(case_status: :pending)
+           .where(created_at: ...start_of_year)
+           .where.not(id: court.cases.where(case_status: %i[dismissed withdrawn settled closed])
+                               .where(updated_at: start_of_year..end_of_year)
+                               .select(:id))
+           .distinct
+           .count
     end
 
     def appeal_case(court)
-      court.cases.where(is_appeal: true).count
+      court.cases.where(is_appeal: true)
+           .where(updated_at: start_of_year..end_of_year)
+           .distinct
+           .count
     end
 
     def enforced_case(court)
-      court.cases.where(is_enforced: true).count
+      court.cases.where(is_enforced: true)
+           .where(updated_at: start_of_year..end_of_year)
+           .distinct
+           .count
     end
 
     def total_case(court)
-      court.cases.count
+      court.cases.where('cases.created_at BETWEEN ? AND ?', start_of_year, end_of_year).distinct.count
+    end
+
+    def start_of_year
+      Date.new(@year, 1, 1).beginning_of_day
+    end
+
+    def end_of_year
+      Date.new(@year, 12, 31).end_of_day
     end
   end
   # rubocop:enable Metrics/ClassLength, Metrics/MethodLength, Metrics/AbcSize
