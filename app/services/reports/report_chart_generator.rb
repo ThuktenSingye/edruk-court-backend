@@ -94,7 +94,7 @@ module Reports
 
     def save_chart(chart, filename_prefix)
       filename = "#{filename_prefix}_#{Time.current.to_i}.png"
-      charts_dir = Rails.root.join('public', 'charts')
+      charts_dir = Rails.public_path.join('charts')
       FileUtils.mkdir_p(charts_dir) unless File.directory?(charts_dir)
       path = File.join(charts_dir, filename)
       chart.write(path)
