@@ -90,6 +90,8 @@
     <orderEntry type="library" scope="PROVIDED" name="flog (v4.8.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="fugit (v1.11.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="globalid (v1.2.1, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="gruff (v0.26.0, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="histogram (v0.2.4.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v1.14.7, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ice_nine (v0.11.2, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="image_processing (v1.13.0, RVM: ruby-3.3.6) [gem]" level="application" />
@@ -123,6 +125,7 @@
     <orderEntry type="library" scope="PROVIDED" name="nio4r (v2.7.4, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="nokogiri (v1.18.3, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="noticed (v2.6.0, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="observer (v0.1.2, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="openssl (v3.2.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="orm_adapter (v0.5.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ostruct (v0.6.1, RVM: ruby-3.3.6) [gem]" level="application" />
@@ -130,6 +133,7 @@
     <orderEntry type="library" scope="PROVIDED" name="parser (v3.3.7.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="path_expander (v1.1.3, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="pg (v1.5.9, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="pkg-config (v1.6.2, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="pp (v0.6.2, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="prettyprint (v0.2.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="pry (v0.15.2, RVM: ruby-3.3.6) [gem]" level="application" />
@@ -159,6 +163,7 @@
     <orderEntry type="library" scope="PROVIDED" name="reline (v0.6.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="responders (v3.1.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rexml (v3.4.1, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rmagick (v6.1.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rolify (v6.0.1, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-core (v3.13.2, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-expectations (v3.13.3, RVM: ruby-3.3.6) [gem]" level="application" />
@@ -206,6 +211,7 @@
     <orderEntry type="library" scope="PROVIDED" name="warden-jwt_auth (v0.11.0, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="websocket-driver (v0.7.7, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="websocket-extensions (v0.1.5, RVM: ruby-3.3.6) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="wicked_pdf (v2.8.2, RVM: ruby-3.3.6) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="zeitwerk (v2.7.2, RVM: ruby-3.3.6) [gem]" level="application" />
   </component>
   <component name="RModuleSettingsStorage">
@@ -220,6 +226,7 @@
         <option value="active_record:migration" />
         <option value="active_record:model" />
         <option value="active_record:multi_db" />
+        <option value="active_record:rolify" />
         <option value="application_record" />
         <option value="authentication" />
         <option value="benchmark" />
@@ -230,6 +237,7 @@
         <option value="devise:install" />
         <option value="devise:views" />
         <option value="erb:authentication" />
+        <option value="erd:install" />
         <option value="factory_bot:model" />
         <option value="generator" />
         <option value="integration_test" />
@@ -239,11 +247,16 @@
         <option value="migration" />
         <option value="model" />
         <option value="mongoid:devise" />
+        <option value="noticed:delivery_method" />
+        <option value="noticed:model" />
+        <option value="noticed:notifier" />
         <option value="pundit:install" />
         <option value="pundit:policy" />
         <option value="resource" />
         <option value="responders:install" />
         <option value="responders_controller" />
+        <option value="rolify" />
+        <option value="rolify:user" />
         <option value="rspec:channel" />
         <option value="rspec:controller" />
         <option value="rspec:feature" />
@@ -257,8 +270,14 @@
         <option value="rspec:policy" />
         <option value="rspec:request" />
         <option value="rspec:scaffold" />
+        <option value="rspec:swagger" />
         <option value="rspec:system" />
         <option value="rspec:view" />
+        <option value="rswag:api:install" />
+        <option value="rswag:install" />
+        <option value="rswag:specs:install" />
+        <option value="rswag:ui:custom" />
+        <option value="rswag:ui:install" />
         <option value="scaffold" />
         <option value="scaffold_controller" />
         <option value="script" />
@@ -284,6 +303,7 @@
         <option value="test_unit:policy" />
         <option value="test_unit:scaffold" />
         <option value="test_unit:system" />
+        <option value="wicked_pdf" />
       </list>
     </option>
     <option name="myGenerators">
@@ -293,6 +313,7 @@
         <option value="active_record:migration" />
         <option value="active_record:model" />
         <option value="active_record:multi_db" />
+        <option value="active_record:rolify" />
         <option value="application_record" />
         <option value="authentication" />
         <option value="benchmark" />
@@ -303,6 +324,7 @@
         <option value="devise:install" />
         <option value="devise:views" />
         <option value="erb:authentication" />
+        <option value="erd:install" />
         <option value="factory_bot:model" />
         <option value="generator" />
         <option value="integration_test" />
@@ -312,11 +334,16 @@
         <option value="migration" />
         <option value="model" />
         <option value="mongoid:devise" />
+        <option value="noticed:delivery_method" />
+        <option value="noticed:model" />
+        <option value="noticed:notifier" />
         <option value="pundit:install" />
         <option value="pundit:policy" />
         <option value="resource" />
         <option value="responders:install" />
         <option value="responders_controller" />
+        <option value="rolify" />
+        <option value="rolify:user" />
         <option value="rspec:channel" />
         <option value="rspec:controller" />
         <option value="rspec:feature" />
@@ -330,8 +357,14 @@
         <option value="rspec:policy" />
         <option value="rspec:request" />
         <option value="rspec:scaffold" />
+        <option value="rspec:swagger" />
         <option value="rspec:system" />
         <option value="rspec:view" />
+        <option value="rswag:api:install" />
+        <option value="rswag:install" />
+        <option value="rswag:specs:install" />
+        <option value="rswag:ui:custom" />
+        <option value="rswag:ui:install" />
         <option value="scaffold" />
         <option value="scaffold_controller" />
         <option value="script" />
@@ -357,6 +390,7 @@
         <option value="test_unit:policy" />
         <option value="test_unit:scaffold" />
         <option value="test_unit:system" />
+        <option value="wicked_pdf" />
       </list>
     </option>
   </component>
@@ -668,6 +702,7 @@
           <RakeTaskImpl id="spec">
             <subtasks>
               <RakeTaskImpl description="Run the code examples in spec/channels" fullCommand="spec:channels" id="channels" />
+              <RakeTaskImpl description="Run the code examples in spec/jobs" fullCommand="spec:jobs" id="jobs" />
               <RakeTaskImpl description="Run the code examples in spec/models" fullCommand="spec:models" id="models" />
               <RakeTaskImpl description="Run the code examples in spec/policies" fullCommand="spec:policies" id="policies" />
               <RakeTaskImpl description="Run the code examples in spec/requests" fullCommand="spec:requests" id="requests" />

@@ -20,15 +20,14 @@ class Court < ApplicationRecord
   has_many :order_recipient_courts, dependent: :destroy
   has_many :received_court_orders, through: :order_recipient_courts, source: :court_order
 
+  has_many :primary_cases, class_name: 'Case', dependent: :nullify
+  has_many :bench_cases, class_name: 'Case', foreign_key: 'bench_id', dependent: :nullify, inverse_of: :bench
+  has_many :reports, dependent: :nullify
+
   enum :court_type, { supreme: 0, high: 1, dzongkhag: 2, dungkhag: 3, bench: 4 }
 
   validates :name, :court_type, :email, :contact_no, presence: true
   validates :domain, :subdomain, :name, :email, uniqueness: { case_sensitive: false }
-
-  has_many :primary_cases, class_name: 'Case', dependent: :nullify
-
-  # Cases where this court is a bench
-  has_many :bench_cases, class_name: 'Case', foreign_key: 'bench_id', dependent: :nullify, inverse_of: :bench
 
   delegate :today_approved,
            :pending,

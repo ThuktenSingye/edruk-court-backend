@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Annual Court Report <%= year %></title>
+  <%# app/views/reports/show.html.erb %>
+  <% content_for :title do %>Annual Court Report <%= year %><% end %>
+  <% content_for :header do %>Annual Court Report - <%= year %><% end %>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          color: #333;
+          display: flex;
+          flex-direction: column;
+          justify-items: center;
+          align-items: center;
+      }
+      h1, h2 {
+          color: #2c3e50;
+          margin-bottom: 10px;
+      }
+      table {
+          border-collapse: collapse;
+          width: 100%;
+          margin-bottom: 30px;
+      }
+      th, td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+      }
+      th {
+          background-color: #f4f6f7;
+          font-weight: bold;
+      }
+      img {
+          max-width: 100%;
+          height: auto;
+          margin-bottom: 30px;
+          border: 1px solid #ccc;
+          padding: 5px;
+          background: #fff;
+      }
+  </style>
+</head>
+<body>
+<h1>Annual Court Report - <%= year %></h1>
+
+<section>
+  <h2>Cases Distribution</h2>
+  <%# Use wicked_pdf_image_tag helper to correctly resolve image paths %>
+  <% if pie_chart_path.present? %>
+    <%= wicked_pdf_image_tag(pie_chart_path, alt: "Cases Pie Chart") %>
+  <% else %>
+    <p><em>Pie chart not available.</em></p>
+  <% end %>
+</section>
+
+<section>
+  <h2>Cases Overview</h2>
+  <% if bar_chart_path.present? %>
+    <%= wicked_pdf_image_tag(bar_chart_path, alt: "Cases Bar Chart") %>
+  <% else %>
+    <p><em>Bar chart not available.</em></p>
+  <% end %>
+</section>
+
+<div class="case-statistics">
+  <h2>Detailed Case Statistics</h2>
+  <% if reports_data.present? %>
+    <% if court_type == 'supreme' %>
+      <% binding.pry %>
+      <% court_types = ['supreme', 'high', 'dzonkhag', 'dungkhag'] %>
+      <% court_types.each do |court_type| %>
+        <% court_data = reports_data[court_type.to_sym] %>
+        <% if court_data.is_a?(Array) && court_data.any? %>
+          <%= render partial: 'supreme_court_statistics',
+                     locals: {
+                       court_data: court_data.map { |d| [nil, d] },
+                       show_appeal: false,
+                       show_enforced: false
+                     } %>
+        <% elsif court_data.is_a?(Hash) && court_data.any? %>
+          <% court_data.each do |bench_data| %>
+            <%= render partial: 'supreme_court_statistics',
+                       locals: {
+                         court_data: bench_data.map { |d| [nil, d] },
+                         show_appeal: true,
+                         show_enforced: true
+                       } %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <%else %>
+    <% end %>
+  <% else %>
+    <p class="no-data">No case statistics data available for this year.</p>
+  <% end %>
+</div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<div class="case-statistics-section">
+  <h3><%= court_type.capitalize %> Court Case Statistics</h3>
+
+  <% if stats.any? %>
+    <% stats.each do |subcourt_name, stat| %>
+      <h4><%= subcourt_name.capitalize %> Court</h4>
+      <table class="statistics-table">
+        <thead>
+        <tr>
+          <th>Opening Balance</th>
+          <th>Registered</th>
+          <th>Total</th>
+          <th>Decided</th>
+          <th>Pending</th>
+          <th>Appeal</th>
+          <th>Enforced</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td><%= stat['opening_balance'] %></td>
+          <td><%= stat['registered'] %></td>
+          <td><%= stat['total'] %></td>
+          <td><%= stat['decided'] %></td>
+          <td><%= stat['pending'] %></td>
+          <td><%= stat['appeal'] %></td>
+          <td><%= stat['enforced'] %></td>
+        </tr>
+        </tbody>
+      </table>
+    <% end %>
+  <% else %>
+    <p>No data available for <%= court_type.capitalize %> courts.</p>
+  <% end %>
+</div>

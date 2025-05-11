@@ -1,0 +1,32 @@
+<div class="case-statistics-section">
+  <h3><%= court_type.capitalize %> Court Case Statistics</h3>
+
+  <table class="statistics-table">
+    <thead>
+    <tr>
+      <th>Bench</th>
+      <th>Opening Balance</th>
+      <th>Registered</th>
+      <th>Total</th>
+      <th>Decided</th>
+      <th>Pending</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% if stats.any? %>
+      <% stats.each_with_index do |stat, index| %>
+        <tr>
+          <td>Bench <%= index + 1 %></td>
+          <td><%= stat['opening_balance'] %></td>
+          <td><%= stat['registered'] %></td>
+          <td><%= stat['total'] %></td>
+          <td><%= stat['decided'] %></td>
+          <td><%= stat['pending'] %></td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr><td colspan="6">No data available</td></tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>

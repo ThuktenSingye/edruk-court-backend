@@ -4,10 +4,18 @@
 class HearingScheduleSerializer
   include JSONAPI::Serializer
   attributes :id, :scheduled_date, :schedule_status, :reschedule_reason, :scheduled_by, :case_title,
-             :case_number, :hearing_status, :hearing_type_name
+             :case_number, :hearing_status, :hearing_type_name,:case_id, :hearing_id
 
   attribute :schedule_status do |object|
     object.schedule_status.humanize
+  end
+
+  attribute :case_id do |object|
+    object.hearing.case.id
+  end
+
+  attribute :hearing_id do |object|
+    object.hearing.id
   end
 
   attribute :case_title, &:case_title

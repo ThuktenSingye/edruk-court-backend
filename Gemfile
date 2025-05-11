@@ -95,3 +95,7 @@ gem 'noticed'
 gem 'rolify'
 
 gem 'rswag'
+
+gem 'gruff'
+
+gem 'wicked_pdf'

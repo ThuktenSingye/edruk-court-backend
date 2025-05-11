@@ -52,7 +52,7 @@ class CasePolicy < ApplicationPolicy
   end
 
   def show?
-    (user.present? && court_user?) || plaintiff_cases? || defendant_cases?
+    (user.present? && court_user?) || plaintiff_cases? || defendant_cases? || assigned_to_judge? || assigned_to_clerk?
   end
 
   def update?
@@ -87,6 +87,10 @@ class CasePolicy < ApplicationPolicy
 
   def assigned_to_clerk?
     user.clerk? && record.case_participants.exists?(user: user, role: Role.where(name: 'Clerk'))
+  end
+
+  def assigned_to_judge?
+    user.judge? && record.case_participants.exists?(user: user, role: Role.where(name: 'Judge'))
   end
 
   def involved_in_case?(roles)

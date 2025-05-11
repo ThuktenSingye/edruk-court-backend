@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_09_075735) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_09_131230) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -310,6 +310,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_09_075735) do
     t.index ["user_id"], name: "index_profiles_on_user_id"
   end
 
+  create_table "reports", force: :cascade do |t|
+    t.bigint "court_id", null: false
+    t.bigint "generated_by_id"
+    t.integer "report_status"
+    t.datetime "generated_at"
+    t.jsonb "metadata"
+    t.string "year"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["court_id"], name: "index_reports_on_court_id"
+    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
+  end
+
   create_table "roles", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -505,6 +518,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_09_075735) do
   add_foreign_key "order_recipient_users", "court_orders"
   add_foreign_key "order_recipient_users", "users"
   add_foreign_key "profiles", "users"
+  add_foreign_key "reports", "courts"
+  add_foreign_key "reports", "users", column: "generated_by_id"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

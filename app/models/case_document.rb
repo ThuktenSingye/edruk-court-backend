@@ -6,7 +6,7 @@ class CaseDocument < ApplicationRecord
   has_one_attached :document
   after_commit :set_initial_status, on: :create
 
-  enum :document_status, { pending: 0, verified: 1, denied: 2 }
+  enum :document_status, { pending: 0, verified: 1, denied: 2, signed: 3 }
   validates :document_status, presence: true
 
   def document_url

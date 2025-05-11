@@ -22,7 +22,7 @@ module Reports
     def generate_supreme_court_annual_report
       {
         cases: national_case_type_counts,
-        case_overview: national_case_overview,
+        cases_overview: national_case_overview,
         case_statistic: national_case_statistics
       }
     end
@@ -31,7 +31,7 @@ module Reports
       {
         cases: court_case_type_counts,
         cases_overview: case_overview,
-        court_case_statistic: generate_court_report
+        case_statistic: generate_court_report
       }
     end
 
@@ -105,6 +105,7 @@ module Reports
           pending: pending_case(supreme_court)
         }
       end
+      result
     end
 
     def high_court_case_statistics
@@ -134,7 +135,7 @@ module Reports
           total: total_case(dzongkhag_court),
           decided: decided_case(dzongkhag_court),
           pending: pending_case(dzongkhag_court),
-          appeal: appeal_case(dzongkhag_court), # Fixed: was dzongkhag_courts (plural)
+          appeal: appeal_case(dzongkhag_court),
           enforced: enforced_case(dzongkhag_court)
         }
       end
@@ -335,8 +336,7 @@ module Reports
     def enforced_case(court)
       court.cases.where(is_enforced: true)
            .where(updated_at: start_of_year..end_of_year)
-           .distinct
-           .count
+           .distinct.count
     end
 
     def total_case(court)
