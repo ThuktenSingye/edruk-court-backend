@@ -12,8 +12,8 @@ services:
       RAILS_ENV: development
       DEVISE_JWT_SECRET_KEY: ${DEVISE_JWT_SECRET_KEY}
     volumes:
-      - .:/app
-    command: ./bin/rails server -b 0.0.0.0 -p 3000
+      - .:/rails
+    command: [ "./bin/rails", "server", "-b", "0.0.0.0", "-p", "3000" ]
 
   worker:
     build: .
@@ -26,5 +26,5 @@ services:
       RAILS_ENV: development
       DEVISE_JWT_SECRET_KEY: ${DEVISE_JWT_SECRET_KEY}
     volumes:
-      - .:/app
-    command: ./bin/jobs
+      - .:/rails
+    command: ["./bin/jobs"]
