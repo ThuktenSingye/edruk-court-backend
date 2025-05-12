@@ -46,11 +46,11 @@ class HearingPolicy < ApplicationPolicy
   end
 
   def create?
-    court_user? && (registrar_creates_hearing? || judge_or_clerk_creates_hearing?)
+    registrar_creates_hearing? || judge_or_clerk_creates_hearing?
   end
 
   def update?
-    court_user? && (first_hearing? ? user.registrar? : assigned_to_judge? || assigned_to_clerk?)
+    first_hearing? ? user.registrar? : assigned_to_judge? || assigned_to_clerk?
   end
 
   private

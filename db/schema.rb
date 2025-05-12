@@ -129,6 +129,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_09_131230) do
     t.boolean "is_enforced", default: false
     t.boolean "is_remanded", default: false
     t.boolean "is_reopened", default: false
+    t.boolean "can_appeal", default: false
     t.integer "case_status", default: 0
     t.bigint "court_id", null: false
     t.bigint "case_subtype_id"

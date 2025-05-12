@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
-class PdfRenderingsController < ApplicationController
+class PdfRenderingsController < ActionController::Base
 end

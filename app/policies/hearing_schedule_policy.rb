@@ -92,7 +92,7 @@ class HearingSchedulePolicy < ApplicationPolicy
   end
 
   def authorized_for_update?
-    first_hearing? ? user.registrar? : assigned_to_judge? || assigned_to_clerk?
+    (first_hearing? ? user.registrar? : assigned_to_clerk?) || assigned_to_judge?
   end
 
   def authorized_for_destroy?

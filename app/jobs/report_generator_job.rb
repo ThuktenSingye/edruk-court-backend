@@ -24,8 +24,8 @@ class ReportGeneratorJob < ApplicationJob
       javascript_delay: 1000
     }
 
-    pie_chart_path = charts[:pie_chart].sub(Rails.public_path.to_s, '')
-    bar_chart_path = charts[:bar_chart].sub(Rails.public_path.to_s, '')
+    pie_chart_path = charts[:pie_chart].sub(Rails.root.join('public').to_s, '')
+    bar_chart_path = charts[:bar_chart].sub(Rails.root.join('public').to_s, '')
 
     renderer = ActionController::Renderer.for(PdfRenderingsController)
     html = renderer.render(

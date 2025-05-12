@@ -70,30 +70,15 @@
   <h2>Detailed Case Statistics</h2>
   <% if reports_data.present? %>
     <% if court_type == 'supreme' %>
-      <% binding.pry %>
-      <% court_types = ['supreme', 'high', 'dzonkhag', 'dungkhag'] %>
+      <% court_types = %w[supreme high dzongkhag dungkhag] %>
       <% court_types.each do |court_type| %>
+        <h3><%= court_type.capitalize.to_s %> Court Case Statistics</h3>
         <% court_data = reports_data[court_type.to_sym] %>
-        <% if court_data.is_a?(Array) && court_data.any? %>
-          <%= render partial: 'supreme_court_statistics',
-                     locals: {
-                       court_data: court_data.map { |d| [nil, d] },
-                       show_appeal: false,
-                       show_enforced: false
-                     } %>
-        <% elsif court_data.is_a?(Hash) && court_data.any? %>
-          <% court_data.each do |bench_data| %>
-            <%= render partial: 'supreme_court_statistics',
-                       locals: {
-                         court_data: bench_data.map { |d| [nil, d] },
-                         show_appeal: true,
-                         show_enforced: true
-                       } %>
-          <% end %>
-        <% end %>
+        <%= render partial: 'reports/supreme_court_statistics', locals: { court_type: court_type, court_data: court_data } %>
       <% end %>
-    <%else %>
-    <% end %>
+    <% else %>
+      <%= render partial: 'reports/court_statistics', locals: { reports_data: reports_data } %>
+<% end %>
   <% else %>
     <p class="no-data">No case statistics data available for this year.</p>
   <% end %>

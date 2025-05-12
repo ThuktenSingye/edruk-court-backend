@@ -4,7 +4,7 @@
 class CaseSerializer
   include JSONAPI::Serializer
 
-  attributes :id, :case_number, :registration_number, :judgement_number, :title, :summary
+  attributes :id, :case_number, :registration_number, :judgement_number, :title, :summary, :judge, :clerk, :court
 
   attribute :case_status do |object|
     object.case_status&.humanize
@@ -41,5 +41,22 @@ class CaseSerializer
         hearing_status: hearing.hearing_status
       }
     end
+  end
+
+  attribute :judge do |object|
+    judge = object.case_participants
+                  .find_by(role_id: Role.find_by(name: 'Judge').id)&.user
+    judge&.profile&.then { |p| "#{p.first_name} #{p.last_name}" }
+  end
+
+  attribute :clerk do |object|
+    clerk = object.case_participants
+                  .find_by(role_id: Role.find_by(name: 'Clerk').id)&.user
+    clerk&.profile&.then { |p| "#{p.first_name} #{p.last_name}" }
+  end
+
+
+  attribute :court do |object|
+    object.court.name
   end
 end

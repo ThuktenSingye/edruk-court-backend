@@ -7,10 +7,8 @@
     <th>Total</th>
     <th>Decided</th>
     <th>Pending</th>
-    <% if show_appeal %>
+    <% if court_type != 'supreme' %>
       <th>Appeal</th>
-    <% end %>
-    <% if show_enforced %>
       <th>Enforced</th>
     <% end %>
   </tr>
@@ -20,16 +18,14 @@
     <% # for array, pass court_name as nil %>
     <tr>
       <td><%= court_name.present? ? court_name.capitalize : court_type.capitalize %></td>
-      <td><%= data["opening_balance"] %></td>
-      <td><%= data["registered"] %></td>
-      <td><%= data["total"] %></td>
-      <td><%= data["decided"] %></td>
-      <td><%= data["pending"] %></td>
-      <% if show_appeal %>
-        <td><%= data["appeal"] %></td>
-      <% end %>
-      <% if show_enforced %>
-        <td><%= data["enforced"] %></td>
+      <td><%= data[:opening_balance].to_s %></td>
+      <td><%= data[:registered] %></td>
+      <td><%= data[:total] %></td>
+      <td><%= data[:decided] %></td>
+      <td><%= data[:pending] %></td>
+      <% if court_type != 'supreme' %>
+       <td><%= data[:appeal] %></td>
+        <td><%= data[:enforced] %></td>
       <% end %>
     </tr>
   <% end %>

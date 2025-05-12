@@ -17,7 +17,6 @@ module Api
         authorize Report, :generate?, policy_class: ReportPolicy
         ReportGeneratorJob.perform_later(year.to_i, current_tenant.id)
         # reports_data = Reports::AnnualCourtReportService.new(year: year, court: court).generate
-
         render_json :ok, 'Report generation started', nil
       end
 

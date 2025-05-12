@@ -1,107 +1,69 @@
-<%# Partial for High Court, Dzongkhag Court, and Dungkhag Court statistics %>
-<%# Usage: render 'other_court_statistics', court_type: 'high', stats: case_statistics['high'] %>
+<%# reports_data.each do |court_name, months| %>
+<!--  <h2><%#= court_name.capitalize %></h2>-->
 
-<div class="case-statistics-section">
-  <h3><%= court_type.capitalize %> Court Case Statistics</h3>
+  <%# months.each do |month_name, clerks| %>
+<!--    <h3><%#= month_name %></h3>-->
 
-  <% if stats.is_a?(Hash) && stats.any? %>
-    <% stats.each do |bench_name, bench_data| %>
-      <div class="bench-section">
-        <h4><%= bench_name.capitalize %> Bench/Court</h4>
+<!--    <table>-->
+<!--      <thead>-->
+<!--      <tr>-->
+<!--        <th>Clerk</th>-->
+<!--        <th>Opening Balance</th>-->
+<!--        <th>Registered</th>-->
+<!--        <th>Decided</th>-->
+<!--        <th>Appeal</th>-->
+<!--        <th>Pending</th>-->
+<!--      </tr>-->
+<!--      </thead>-->
+<!--      <tbody>-->
+      <%# clerks.each do |clerk_name, stats| %>
+<!--        <tr>-->
+<!--          <td><%#= clerk_name %></td>-->
+<!--          <td><%#= stats[:opening_balance] %></td>-->
+<!--          <td><%#= stats[:registered] %></td>-->
+<!--          <td><%#= stats[:decided] %></td>-->
+<!--          <td><%#= stats[:appeal] %></td>-->
+<!--          <td><%#= stats[:pending] %></td>-->
+<!--        </tr>-->
+      <%# end %>
+<!--      </tbody>-->
+<!--    </table>-->
+  <%# end %>
+<%# end %>
 
-        <% if bench_data.is_a?(Hash) && bench_data.keys.first =~ /January|February|March|April|May|June|July|August|September|October|November|December/ %>
-          <!-- Monthly data with clerk information -->
-          <%
-            # Sort months chronologically
-            month_order = %w[January February March April May June July August September October November December]
-            months = bench_data.keys.sort_by { |m| month_order.index(m) || 999 }
-          %>
 
-          <% months.each do |month| %>
-            <div class="month-section">
-              <h5><%= month %></h5>
+<% reports_data.each do |court_name, months| %>
+  <h2><%= court_name.capitalize %></h2>
 
-              <% if bench_data[month].is_a?(Hash) && bench_data[month].any? %>
-                <table class="statistics-table">
-                  <thead>
-                  <tr>
-                    <th>Clerk Name</th>
-                    <th>Opening Balance</th>
-                    <th>Registered</th>
-                    <th>Decided</th>
-                    <th>Appeal</th>
-                    <th>Pending</th>
-                    <% if bench_data[month].values.first['enforced'].present? %>
-                      <th>Enforced</th>
-                    <% end %>
-                    <% if bench_data[month].values.first['total'].present? %>
-                      <th>Total</th>
-                    <% end %>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <% bench_data[month].each do |clerk_name, stats| %>
-                    <tr>
-                      <td><%= clerk_name %></td>
-                      <td><%= stats['opening_balance'] %></td>
-                      <td><%= stats['registered'] %></td>
-                      <td><%= stats['decided'] %></td>
-                      <td><%= stats['appeal'] %></td>
-                      <td><%= stats['pending'] %></td>
-                      <% if bench_data[month].values.first['enforced'].present? %>
-                        <td><%= stats['enforced'] %></td>
-                      <% end %>
-                      <% if bench_data[month].values.first['total'].present? %>
-                        <td><%= stats['total'] %></td>
-                      <% end %>
-                    </tr>
-                  <% end %>
-                  </tbody>
-                </table>
-              <% else %>
-                <p class="no-data">No data available for <%= month %></p>
-              <% end %>
-            </div>
+  <table border="1">
+    <thead>
+    <tr>
+      <th>Month</th>
+      <th>Judge</th>
+      <th>Opening Balance</th>
+      <th>Registered</th>
+      <th>Decided</th>
+      <th>Appeal</th>
+      <th>Pending</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% months.each do |month_name, judges| %>
+      <% rowspan = judges.keys.size %>
+      <% judges.each_with_index do |(judge_name, stats), index| %>
+        <tr>
+          <% if index == 0 %>
+            <td rowspan="<%= rowspan %>"><%= month_name %></td>
           <% end %>
-
-        <% else %>
-          <!-- Simple bench data format (no monthly breakdown) -->
-          <table class="statistics-table">
-            <thead>
-            <tr>
-              <th>Opening Balance</th>
-              <th>Registered</th>
-              <th>Total</th>
-              <th>Decided</th>
-              <th>Pending</th>
-              <% if bench_data['appeal'].present? %>
-                <th>Appeal</th>
-              <% end %>
-              <% if bench_data['enforced'].present? %>
-                <th>Enforced</th>
-              <% end %>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-              <td><%= bench_data['opening_balance'] %></td>
-              <td><%= bench_data['registered'] %></td>
-              <td><%= bench_data['total'] || (bench_data['opening_balance'].to_i + bench_data['registered'].to_i) %></td>
-              <td><%= bench_data['decided'] %></td>
-              <td><%= bench_data['pending'] %></td>
-              <% if bench_data['appeal'].present? %>
-                <td><%= bench_data['appeal'] %></td>
-              <% end %>
-              <% if bench_data['enforced'].present? %>
-                <td><%= bench_data['enforced'] %></td>
-              <% end %>
-            </tr>
-            </tbody>
-          </table>
-        <% end %>
-      </div>
+          <td><%= judge_name %></td>
+          <td><%= stats[:opening_balance] %></td>
+          <td><%= stats[:registered] %></td>
+          <td><%= stats[:decided] %></td>
+          <td><%= stats[:appeal] %></td>
+          <td><%= stats[:pending] %></td>
+        </tr>
+      <% end %>
     <% end %>
-  <% else %>
-    <p class="no-data">No data available for <%= court_type.capitalize %> Court</p>
-  <% end %>
-</div>
+    </tbody>
+  </table>
+<% end %>

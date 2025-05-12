@@ -16,7 +16,8 @@ module Schedules
     end
 
     def notify_case_participant(message_type, current_user)
-      users = @case.case_participants.map(&:user).reject { |user| user.id == current_user.id }
+      users = @case.case_participants.reject { |cp| cp.user&.id == current_user.id }
+      # users = @case.case_participants.map(&:user).reject { |user| user.id == current_user.id }
       HearingScheduleNotifier.with(notifications_params(message_type)).deliver(users)
     end
 

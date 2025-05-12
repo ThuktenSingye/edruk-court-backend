@@ -8,19 +8,19 @@ class CourtPolicy < ApplicationPolicy
   # code, beware of possible changes to the ancestors:
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
   def index?
-    user.admin? || user.judge? || user.clerk? || user.registrar?
+    user.admin? || user.user?
   end
 
   def show?
-    index?
+    user.admin?
   end
 
   def create?
-    index?
+    user.admin?
   end
 
   def update?
-    index?
+    user.admin?
   end
 
   def statistics?

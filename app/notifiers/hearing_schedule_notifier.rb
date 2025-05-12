@@ -40,17 +40,24 @@ class HearingScheduleNotifier < ApplicationNotifier
 
   notification_methods do
     def message
+      # Schedules::ScheduleMessageBuilder.new(
+      #   message_type: params[:message].to_sym,
+      #   hearing_type: params.dig(:hearing, :hearing_type, :name),
+      #   case_id: params.dig(:case, :id),
+      #   scheduled_date: params.dig(:hearing_schedule, :scheduled_date),
+      #   schedule_status: params.dig(:hearing_schedule, :schedule_status)
+      # ).build
       Schedules::ScheduleMessageBuilder.new(
         message_type: params[:message].to_sym,
-        hearing_type: params.dig(:hearing, :hearing_type, :name),
-        case_id: params.dig(:case, :id),
-        scheduled_date: params.dig(:hearing_schedule, :scheduled_date),
-        schedule_status: params.dig(:hearing_schedule, :schedule_status)
+        hearing_type: params[:hearing]&.hearing_type&.name,
+        case_id: params[:case]&.id,
+        scheduled_date: params[:hearing_schedule]&.scheduled_date,
+        schedule_status: params[:hearing_schedule]&.schedule_status
       ).build
     end
 
     def url
-      Rails.application.routes.url_helpers.api_v1_case_hearing_hearing_schedule(params[:case].id, params[:hearing].id,
+      Rails.application.routes.url_helpers.api_v1_case_hearing_hearing_schedule_path(params[:case].id, params[:hearing].id,
                                                                                 params[:hearing_schedule].id)
     end
   end
