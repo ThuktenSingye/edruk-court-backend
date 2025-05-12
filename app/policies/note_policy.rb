@@ -66,7 +66,7 @@ class NotePolicy < ApplicationPolicy
   end
 
   def judge_or_clerk_creates_notes?
-    (assigned_to_judge? || assigned_to_clerk?) && !pre_hearing?
+    assigned_to_judge? || (assigned_to_clerk? && !pre_hearing?)
   end
 
   def pre_hearing?
