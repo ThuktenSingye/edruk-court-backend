@@ -22,11 +22,18 @@ module Api
           @hearing = @case.hearings.build(final_params.except(:bench_id, :judge_id, :clerk_id))
           # update the schedule and hearing status to complete
           authorize @hearing
-          if @hearing.save
-            Hearings::HearingService.new(@case, @hearing, hearing_params, current_user).create_and_notify
-            render_json :created, 'Hearing created Successfully', serialized_hearing(@hearing)
-          else
-            render_json :unprocessable_entity, nil, @hearing.errors
+          ActiveRecord::Base.transaction do
+            last_hearing = @case.hearings.last
+            last_hearing.update!(hearing_status: 'completed') if last_hearing.present?
+
+            @hearing.save!
+          end
+
+          Hearings::HearingService.new(@case, @hearing, hearing_params, current_user).create_and_notify
+          render_json :created, 'Hearing created Successfully', serialized_hearing(@hearing)
+
+          rescue ActiveRecord::RecordInvalid => e
+            render_json :unprocessable_entity, nil, e.record.errors
           end
         end
 
