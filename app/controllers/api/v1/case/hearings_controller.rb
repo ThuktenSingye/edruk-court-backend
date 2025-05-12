@@ -34,7 +34,6 @@ module Api
 
           rescue ActiveRecord::RecordInvalid => e
             render_json :unprocessable_entity, nil, e.record.errors
-          end
         end
 
         def update
