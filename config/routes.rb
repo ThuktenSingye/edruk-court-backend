@@ -135,6 +135,8 @@ Rails.application.routes.draw do
         end
 
         scope module: :case do
+          resources :case_types, only: [ :index ]
+
           resources :cases, except: %i[destroy] do
             collection do
               get :statistics
