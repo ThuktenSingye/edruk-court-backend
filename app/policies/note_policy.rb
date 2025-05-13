@@ -48,7 +48,8 @@ class NotePolicy < ApplicationPolicy
   end
 
   def create?
-    court_user? && (registrar_creates_notes? || judge_or_clerk_creates_notes?)
+    # court_user? && (registrar_creates_notes? || judge_or_clerk_creates_notes?)
+    registrar_creates_notes? || judge_or_clerk_creates_notes?
   end
 
   def update?

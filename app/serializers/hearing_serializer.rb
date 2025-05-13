@@ -4,7 +4,7 @@
 class HearingSerializer
   include JSONAPI::Serializer
 
-  attributes :id, :hearing_status, :case_number, :summary
+  attributes :id, :hearing_status, :case_number, :summary, :sequence_number
 
   attribute :hearing_type do |hearing|
     hearing.hearing_type.name

@@ -3,7 +3,7 @@
 # Serializer class for session api
 class UserSessionSerializer
   include JSONAPI::Serializer
-  attributes :id, :email, :court_id, :roles, :profile
+  attributes :id, :email, :court_id, :roles, :profile, :court_name
 
   attribute :roles do |user|
     user.roles.map(&:name)
@@ -11,6 +11,10 @@ class UserSessionSerializer
 
   attribute :court_id do |object|
     object&.court&.id
+  end
+
+  attribute :court_name do |object|
+    object&.court&.name
   end
 
   attribute :profile do |object|

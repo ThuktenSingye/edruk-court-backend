@@ -23,7 +23,7 @@ module Api
           # update the schedule and hearing status to complete
           authorize @hearing
           ActiveRecord::Base.transaction do
-            last_hearing = @case.hearings.last
+            last_hearing = @case.hearings.where.not(id: nil).order(created_at: :desc).first
             last_hearing.update!(hearing_status: 'completed') if last_hearing.present?
 
             @hearing.save!

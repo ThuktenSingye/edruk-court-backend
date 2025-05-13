@@ -56,7 +56,7 @@ class CasePolicy < ApplicationPolicy
   end
 
   def update?
-    court_user? && (user.registrar? || assigned_to_clerk?)
+    user.registrar? || assigned_to_clerk?
   end
 
   def create?
