@@ -37,26 +37,6 @@ module Api
           end
         end
 
-        # def sign
-        #   authorize @case_document, :sign?, policy_class: CaseDocumentPolicy
-        #   @signable_service = SignableSigningService.new(@case, @case_document, current_user)
-        #   if @signable_service.sign_all
-        #     render_json :ok, 'Signature added Successfully', nil
-        #   else
-        #     render_json :unprocessable_entity, 'Failed to sign document', @signable_service.errors
-        #   end
-        # end
-        #
-        # def sign_all
-        #   authorize @case_documents, :sign_all?, policy_class: CaseDocumentPolicy
-        #   @signable_service = SignableSigningService.new(@case, @case_documents, current_user)
-        #   if @signable_service.sign_all
-        #     render_json :ok, 'Signature added Successfully', nil
-        #   else
-        #     render_json :unprocessable_entity, 'Failed to sign document', @signable_service.errors
-        #   end
-        # end
-
         def sign
           authorize @case_document, :sign?, policy_class: CaseDocumentPolicy
           unless verify_signable
