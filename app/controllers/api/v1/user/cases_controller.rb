@@ -24,28 +24,13 @@ module Api
           @case = Users::Cases::CaseService.new(case_params, current_user).build_case
           authorize @case
           if @case.save
+            notify_defendant(@case)
             Users::Cases::CaseNotificationService.new(@case).notify_registrar(case_params[:court_id])
             sign_documents(@case) ? render_success : render_signing_failure
           else
             render_json :unprocessable_entity, 'Failed to Add Case', @case.errors
           end
         end
-
-        # def create
-        #   @case = Users::Cases::CaseService.new(case_params, current_user).build_case
-        #   authorize @case
-        #   if @case.save
-        #     Users::Cases::CaseNotificationService.new(@case).notify_registrar(case_params[:court_id])
-        #     @signable_service = SignableSigningService.new(@case, @case.case_documents, current_user)
-        #     if @signable_service.sign_all
-        #       render_json :created, 'New Case Added Successfully', serialized_case(@case)
-        #     else
-        #       render_json :unprocessable_entity, 'Failed to sign all documents', @signable_service.errors
-        #     end
-        #   else
-        #     render_json :unprocessable_entity, 'Failed to Add Case', @case.errors
-        #   end
-        # end
 
         def update
           authorize @case
@@ -69,6 +54,49 @@ module Api
         end
 
         private
+
+        def notify_defendant(court_case)
+          defendant_attrs = case_params[:defendants_attributes]
+          defendant = find_defendant(defendant_attrs[:cid_no])
+          defendant_email = defendant_attrs[:email]
+
+          if defendant
+            assign_defendant_to_case(court_case, defendant)
+            send_notification(defendant, court_case)
+          else
+            send_email_to_defendant(court_case.id, defendant_email, current_user.id)
+          end
+        end
+
+        def find_defendant(cid_no)
+          ::User.find_by(cid: cid_no)
+        end
+
+        def assign_defendant_to_case(court_case, defendant)
+          defendant_role = Role.find_by(name: 'Defendant')
+          return if court_case.case_participants.exists?(user_id: defendant.id, role_id: defendant_role.id)
+
+          court_case.case_participants.create!(
+            user_id: defendant.id,
+            role_id: defendant_role.id
+          )
+        end
+
+        def send_notification(defendant, court_case)
+          CaseNotifier.new(notifications_params(court_case)).deliver(defendant)
+        end
+
+        def send_email_to_defendant(case_id, email, user_id)
+          CaseMailer.new_case_email(case_id, email, user_id).deliver_later
+        end
+
+        def notifications_params(court_case)
+          {
+            record: court_case,
+            message: 'New Case Notification',
+            case: court_case
+          }
+        end
 
         def sign_documents(court_case)
           @signable_service = SignableSigningService.new(court_case, court_case.case_documents, current_user)

@@ -80,4 +80,15 @@ Rails.application.configure do
   config.action_cable.allowed_request_origins = [ "http://nganglam.lvh.me:3001", "http://nganglam.nganglam_bench_one.lvh.me:3001" ]
 
   Rails.application.routes.default_url_options[:host] = 'nganglam.lvh.me:3001'
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.gmail.com',
+    port: 587,
+    domain: 'gmail.com',
+    user_name: ENV.fetch('COURT_USERNAME', nil),
+    password: ENV.fetch('COURT_PASSWORD', nil),
+    authentication: 'plain',
+    enable_starttls_auto: true
+  }
 end
