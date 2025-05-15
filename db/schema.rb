@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_09_131230) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_14_112503) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -270,6 +270,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_09_131230) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_noticed_notifications_on_event_id"
+    t.index ["id"], name: "index_noticed_notifications_on_id", unique: true
     t.index ["recipient_type", "recipient_id"], name: "index_noticed_notifications_on_recipient"
   end
 
@@ -374,6 +375,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_09_131230) do
     t.index ["active_job_id"], name: "index_solid_queue_jobs_on_active_job_id"
     t.index ["class_name"], name: "index_solid_queue_jobs_on_class_name"
     t.index ["finished_at"], name: "index_solid_queue_jobs_on_finished_at"
+    t.index ["id"], name: "index_solid_queue_jobs_on_id", unique: true
     t.index ["queue_name", "finished_at"], name: "index_solid_queue_jobs_for_filtering"
     t.index ["scheduled_at", "finished_at"], name: "index_solid_queue_jobs_for_alerting"
   end

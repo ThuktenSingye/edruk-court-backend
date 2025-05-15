@@ -53,8 +53,9 @@ module Reports
       }
 
       g.font_color = 'black'
+      g.maximum_value = 10
 
-      metrics = %w[total_case decided_case pending_case appeal_case enforced_case]
+      metrics = %w[total decided_case pending_case appeal_case enforced_case]
 
       court_levels = data.keys
       labels = {}

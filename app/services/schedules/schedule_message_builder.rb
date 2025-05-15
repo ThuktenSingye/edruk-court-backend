@@ -4,7 +4,7 @@ module Schedules
   # Schedule Message Builder
   class ScheduleMessageBuilder
     def initialize(params)
-      @message_type = params[:message_type]
+      @message_type = params[:message_type].to_sym
       @hearing_type = params[:hearing_type] || 'Hearing'
       @case_id = params[:case_id] || 'N/A'
       @scheduled_date = params[:scheduled_date]
@@ -13,7 +13,7 @@ module Schedules
 
     def build
       case @message_type
-      when 'schedule_update' then schedule_update_message
+      when :schedule_update then schedule_update_message
       else default_message
       end
     end

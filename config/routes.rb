@@ -147,6 +147,9 @@ Rails.application.routes.draw do
             end
             post 'documents/:doc_id/sign', to: 'cases#sign', as: :sign_case_documents
             resources :hearings, except: %i[destroy] do
+              member do
+                put :judgement
+              end
               resources :notes
               resources :hearing_schedules
               resources :case_documents, path: :documents do

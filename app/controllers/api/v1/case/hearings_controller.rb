@@ -8,7 +8,7 @@ module Api
         before_action :authenticate_user!
         before_action :court_cases
         before_action :case
-        before_action :hearing, only: [:update]
+        before_action :hearing, only: [:update, :judgement]
         before_action :assign_sequence_number, only: [:create]
 
         def index
@@ -18,6 +18,8 @@ module Api
         end
 
         def create
+          assign_sequence_number
+          # binding.pry
           final_params = assign_scheduler(hearing_params)
           @hearing = @case.hearings.build(final_params.except(:bench_id, :judge_id, :clerk_id))
           # update the schedule and hearing status to complete
@@ -47,6 +49,19 @@ module Api
           end
         end
 
+        def judgement
+          authorize @hearing, :judgement?, policy_class: HearingPolicy
+          @hearing.update!(hearing_status: 'completed')
+          @case.update!(case_status: 'closed')
+          @case.update!(judgement_number: generate_judgement_number)
+          @case.save!
+          render_json :ok, 'Case Closed Successfully', nil
+        end
+        # generate judgement number
+        # update the hearing status to complete
+        # update the case status to closed
+        #
+
         private
 
         def court_cases
@@ -71,6 +86,18 @@ module Api
 
         def serialized_hearing(hearing)
           HearingSerializer.new(hearing, params: { current_user: current_user }).serializable_hash[:data][:attributes]
+        end
+
+        def generate_judgement_number
+          court_id = @case.court_id
+          case_id = @case.id
+          year = Time.current.year
+
+          last_judgement_count = ::Case.where("judgement_number LIKE ?", "C#{court_id}Case%-#{year}-%").count
+
+          judgement_no = last_judgement_count + 1
+
+          "C#{court_id}Case#{case_id}-#{year}-#{judgement_no}"
         end
 
         def assign_sequence_number
@@ -101,7 +128,7 @@ module Api
         def hearing_params
           params.require(:hearing).permit(
             :hearing_type_id,
-            :hearing_status, :case_id, :bench_id, :clerk_id, :judge_id,
+            :hearing_status, :case_id, :bench_id, :clerk_id, :judge_id, :sequence_number,
             { hearing_schedules_attributes: %i[
               id scheduled_date schedule_status
               reschedule_reason _destroy

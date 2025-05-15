@@ -16,6 +16,7 @@ module Noticed
     end
 
     def mark_as_read?
+      # user.user? || user.registrar? || user.judge? || user.clerk?
       record.recipient == user
     end
   end

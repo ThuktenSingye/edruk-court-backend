@@ -51,6 +51,10 @@ class HearingPolicy < ApplicationPolicy
 
   def update?
     first_hearing? ? user.registrar? : assigned_to_judge? || assigned_to_clerk?
+  end 
+
+  def judgement?
+    user.clerk?
   end
 
   private

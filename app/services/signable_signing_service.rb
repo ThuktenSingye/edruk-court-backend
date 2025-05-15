@@ -117,8 +117,14 @@ class SignableSigningService
         update_document_status(signable)
       when 'judge'
         update_verified_document(signable)
+      else
+        update_signed_document(signable)
       end
     end
+  end
+
+  def update_signed_document(signable)
+    signable.update!(document_status: :signed)
   end
 
   def update_document_status(signable)

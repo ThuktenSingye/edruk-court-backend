@@ -5,6 +5,8 @@
 # HearingScheduleNotifier.with(record: @post, message: "New post").deliver(User.all)
 # Schedule Notifier
 class HearingScheduleNotifier < ApplicationNotifier
+  deliver_by :database
+
   deliver_by :action_cable do |config|
     config.channel = 'NotificationChannel' # Custom channel name
     config.stream = -> { recipient }
@@ -30,10 +32,12 @@ class HearingScheduleNotifier < ApplicationNotifier
     {
       type: self.class.name,
       params: params,
+      read_at: nil,
       metadata: {
         created_at: Time.zone.now.iso8601,
         court_id: params[:case]&.court_id,
-        priority: case_priority
+        message: message,
+        url: url
       }
     }
   end
@@ -57,14 +61,11 @@ class HearingScheduleNotifier < ApplicationNotifier
     end
 
     def url
-      Rails.application.routes.url_helpers.api_v1_case_hearing_hearing_schedule_path(params[:case].id, params[:hearing].id,
-                                                                                params[:hearing_schedule].id)
+      hearing = params[:hearing]
+      case_obj = params[:case]
+      schedule = params[:hearing_schedule]
+      Rails.application.routes.url_helpers.api_v1_case_hearing_hearing_schedule_path(case_obj.id, hearing.id,
+                                                                                     schedule.id)
     end
-  end
-
-  private
-
-  def case_priority
-    params[:case]&.case_priority || 'low'
   end
 end

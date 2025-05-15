@@ -190,7 +190,7 @@ module Reports
         benches = @court.child_courts
         result_courts.concat(benches)
       else
-        result_courts << court
+        result_courts << @court
       end
       result_courts
     end

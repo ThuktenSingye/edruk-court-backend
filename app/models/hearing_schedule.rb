@@ -48,9 +48,18 @@ class HearingSchedule < ApplicationRecord
       .limit(20)
   }
 
+  # scope :reminder, lambda {
+  #   where(scheduled_date: Time.zone.now.beginning_of_day..(Time.zone.now.end_of_day + 1.day))
+  #     .where(schedule_status: 'approved')
+  #     .order(scheduled_date: :asc)
+  #     .limit(10)
+  # }
+
   scope :reminder, lambda {
-    where(scheduled_date: Time.zone.now.beginning_of_day..(Time.zone.now.end_of_day + 1.day))
+    joins(:hearing)
+      .where(scheduled_date: Time.zone.now.beginning_of_day..(Time.zone.now.end_of_day + 1.day))
       .where(schedule_status: 'approved')
+      .where.not(hearings: { hearing_status: 'completed' })
       .order(scheduled_date: :asc)
       .limit(10)
   }

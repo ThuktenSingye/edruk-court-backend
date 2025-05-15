@@ -18,7 +18,7 @@ class User < ApplicationRecord
 
   has_one :profile, dependent: :destroy
   has_many :notifications, class_name: 'Noticed::Notification', as: :recipient, dependent: :destroy
-
+  has_many :case_participants, dependent: :destroy
   # Court orders issued by this user
   # rubocop:disable Rails/InverseOf
   has_many :issued_court_orders, class_name: 'CourtOrder', foreign_key: 'issuing_user_id', dependent: :destroy

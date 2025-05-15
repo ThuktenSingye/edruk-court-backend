@@ -65,7 +65,7 @@ class CaseDocumentPolicy < ApplicationPolicy
   end
 
   def create?
-    (court_user? && registrar_creates_documents?) || judge_or_clerk_creates_documents? ||
+    registrar_creates_documents? || judge_or_clerk_creates_documents? ||
       plaintiff_cases? || defendant_cases?
   end
 
