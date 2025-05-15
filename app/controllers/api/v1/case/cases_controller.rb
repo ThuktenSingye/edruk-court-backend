@@ -139,6 +139,7 @@ module Api
         def case_params
           params.require(:case).permit(
             :case_number, :registration_number, :judgement_number, :title, :summary, :case_priority, :case_status,
+            :case_type_id, :case_subtype_id,
             { case_documents_attributes: %i[id document_status document hash_value] }
           )
         end
