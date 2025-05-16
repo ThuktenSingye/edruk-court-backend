@@ -18,8 +18,13 @@ module Api
         private
 
         def assign_default_role(user)
-          default_role = Role.find_or_create_by!(name: 'User')
-          user.add_role(default_role.name)
+          role_param = params[:user][:role].to_s.downcase
+
+          valid_roles = %w[organization user]
+          role_name = valid_roles.include?(role_param) ? role_param.capitalize : 'User'
+
+          role_record = Role.find_or_create_by!(name: role_name)
+          user.add_role(role_record.name)
         end
 
         def respond_with(resource, _opts = {})

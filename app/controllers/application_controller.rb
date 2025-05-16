@@ -21,12 +21,23 @@ class ApplicationController < ActionController::API
   end
 
   def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: [
-                                        :email, :password, :password_confirmation,
-                                        {
-                                          profile_attributes: %i[avatar first_name last_name cid_no phone_number gender]
-                                        }
-                                      ])
+    if params[:user] && params[:user][:role] == 'Organization'
+      devise_parameter_sanitizer.permit(:sign_up, keys: [
+        :email, :password, :password_confirmation, :role,
+        {
+          profile_attributes: %i[avatar first_name phone_number]
+        }
+      ])
+
+    else
+      devise_parameter_sanitizer.permit(:sign_up, keys: [
+        :email, :password, :password_confirmation, :role,
+        {
+          profile_attributes: %i[avatar first_name last_name cid_no phone_number gender]
+        }
+      ])
+    end
+
   end
 
   def set_tenant
