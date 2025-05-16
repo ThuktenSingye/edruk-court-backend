@@ -28,7 +28,7 @@ module Hearings
     end
 
     def pre_hearing?
-      miscellaneous? || preliminary?
+      miscellaneous?
     end
 
     def miscellaneous?

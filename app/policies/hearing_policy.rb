@@ -57,6 +57,10 @@ class HearingPolicy < ApplicationPolicy
     user.clerk?
   end
 
+  def enforce?
+    user.user?
+  end
+
   private
 
   def registrar_creates_hearing?

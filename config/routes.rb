@@ -51,11 +51,15 @@ Rails.application.routes.draw do
         resources :cases do
           member do
             get :files
+            post :appeal
           end
           collection do
             get :active
           end
           resources :hearings, only: [ :index ] do
+            collection do
+              post :enforce
+            end
             resources :case_documents, path: :documents do
               member do
                 post :sign

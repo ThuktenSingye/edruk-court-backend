@@ -16,6 +16,19 @@ module Api
           render_json :ok, nil, serialized_hearings(@hearings)
         end
 
+        def enforce
+          hearing_type_id = HearingType.find_by(name: 'Enforcement').id
+          @hearing = @case.hearings.build(hearing_params.merge(hearing_type_id: hearing_type_id))
+          authorize @hearing
+          if @hearing.save
+            @case.update!(is_enforced: true)
+            Hearings::HearingService.new(@case, @hearing, hearing_params, current_user).enforcement_notification
+            render_json :ok, 'Case Enforced Successfully', nil
+          else
+            render_json :unprocessable_entity, nil, @hearing.errors
+          end
+        end
+
         private
 
         def cases
@@ -38,6 +51,15 @@ module Api
 
         def serialized_hearing(hearing)
           HearingSerializer.new(hearing).serializable_hash[:data][:attributes]
+        end
+
+        def hearing_params
+          params.require(:hearing).permit(
+            :hearing_type_id,
+            {
+              case_documents_attributes: %i[id document]
+            }
+          )
         end
       end
     end

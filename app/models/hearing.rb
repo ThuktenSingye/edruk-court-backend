@@ -9,6 +9,7 @@ class Hearing < ApplicationRecord
   has_many :case_documents, dependent: :destroy
   has_many :case_evidences, dependent: :destroy
   accepts_nested_attributes_for :hearing_schedules, allow_destroy: true
+  accepts_nested_attributes_for :case_documents
 
   enum :hearing_status, { ongoing: 0, completed: 1, pending: 2, dismissed: 3 }
 

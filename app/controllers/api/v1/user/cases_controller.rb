@@ -7,7 +7,7 @@ module Api
       class CasesController < ApplicationController
         before_action :authenticate_user!
         before_action :cases
-        before_action :case, only: %i[show update files]
+        before_action :case, only: %i[show update files appeal]
 
         def index
           authorize policy_scope(@cases)
@@ -53,7 +53,35 @@ module Api
           render_json :ok, nil, serialized_cases(@active_case)
         end
 
+        def appeal
+          authorize @case, policy_class: CasePolicy
+          @case.update!(is_appeal: true)
+          create_appeal_case(@case)
+          render_json :ok, 'Case Appeal Successfully', nil
+        end
+
+        def withdraw; end
+
         private
+
+        def create_appeal_case(court_case)
+          current_court = court_case.court
+          parent_court =  current_court.parent_court
+          new_case = ::Case.create!(title: court_case.title, summary: court_case.summary, case_priority: court_case.case_priority,
+                         case_status: :filed, original_case_id: court_case.id, court_id: parent_court.id)
+          create_case_participant(new_case, court_case.case_participants)
+          registrar = ::User.where(court_id: parent_court.id).with_role(:Registrar).first
+          send_notification(registrar, new_case)
+        end
+
+        def create_case_participant(new_case, participants)
+          relevants_roles = Role.where(name: %w[Plaintiff Defendant Prosecutor Lawyer]).pluck(:id)
+          participants.each do |participant|
+            if relevants_roles.include?(participant.role_id)
+              new_case.case_participants.create!(user_id: participant.user_id, role_id: participant.role_id)
+            end
+          end
+        end
 
         def notify_defendant(court_case)
           defendant_attrs = case_params[:defendants_attributes]
@@ -83,7 +111,7 @@ module Api
         end
 
         def send_notification(defendant, court_case)
-          CaseNotifier.new(notifications_params(court_case)).deliver(defendant)
+          CaseNotifier.with(notifications_params(court_case)).deliver(defendant)
         end
 
         def send_email_to_defendant(case_id, email, user_id)

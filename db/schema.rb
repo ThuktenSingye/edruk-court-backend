@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_14_112503) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_16_091318) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -137,8 +137,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_14_112503) do
     t.datetime "updated_at", null: false
     t.bigint "case_type_id"
     t.bigint "bench_id"
+    t.bigint "original_case_id"
     t.index ["bench_id"], name: "index_cases_on_bench_id"
-    t.index ["case_number"], name: "index_cases_on_case_number", unique: true
     t.index ["case_status"], name: "index_cases_on_case_status"
     t.index ["case_subtype_id"], name: "index_cases_on_case_subtype_id"
     t.index ["case_type_id"], name: "index_cases_on_case_type_id"
@@ -147,8 +147,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_14_112503) do
     t.index ["is_enforced"], name: "index_cases_on_is_enforced"
     t.index ["is_remanded"], name: "index_cases_on_is_remanded"
     t.index ["is_reopened"], name: "index_cases_on_is_reopened"
-    t.index ["judgement_number"], name: "index_cases_on_judgement_number", unique: true
-    t.index ["registration_number"], name: "index_cases_on_registration_number", unique: true
+    t.index ["original_case_id"], name: "index_cases_on_original_case_id"
   end
 
   create_table "court_orders", force: :cascade do |t|
@@ -500,6 +499,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_14_112503) do
   add_foreign_key "case_subtypes", "case_types"
   add_foreign_key "cases", "case_subtypes"
   add_foreign_key "cases", "case_types"
+  add_foreign_key "cases", "cases", column: "original_case_id"
   add_foreign_key "cases", "courts"
   add_foreign_key "cases", "courts", column: "bench_id"
   add_foreign_key "court_orders", "cases"

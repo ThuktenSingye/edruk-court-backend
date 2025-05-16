@@ -30,8 +30,14 @@ module Hearings
     end
 
     def post_hearing_message
-      "New #{@hearing_type} hearing for Case #{@case_id} scheduled at #{formatted_date(@scheduled_date)}. " \
-        'Please approve or request reschedule.'
+      if @hearing_type.downcase == 'enforcement'
+        "Case Enforcement for Case #{@case_id} has been Requested." \
+          'Please ensure necessary legal actions are initiated.'
+      else
+        "New #{@hearing_type} hearing for Case #{@case_id} scheduled at #{formatted_date(@scheduled_date)}. " \
+          'Please approve or request reschedule.'
+      end
+
     end
 
     def status_update_message

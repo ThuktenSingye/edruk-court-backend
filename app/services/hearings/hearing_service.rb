@@ -22,7 +22,20 @@ module Hearings
       Hearings::HearingNotificationService.new(@case, @hearing).notify_case_participant('hearing_update', @current_user)
     end
 
+    def enforcement_notification
+      clerk = find_clerk
+      notify_user(clerk)
+    end
+
     private
+
+    def find_clerk
+      clerk_role = Role.find_by(name: 'Clerk')
+      return unless clerk_role
+
+      participant = @case.case_participants.find_by(role_id: clerk_role.id)
+      participant&.user
+    end
 
     def hearing_type
       return unless @hearing.hearing_type

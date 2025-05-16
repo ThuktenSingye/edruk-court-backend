@@ -75,6 +75,10 @@ class CasePolicy < ApplicationPolicy
     index?
   end
 
+  def appeal?
+    user.user?
+  end
+
   def sign?
     (court_user? && user.registrar?) || involved_in_case?(['Judge'])
   end

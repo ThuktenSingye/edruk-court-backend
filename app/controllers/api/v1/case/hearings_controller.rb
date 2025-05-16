@@ -57,10 +57,6 @@ module Api
           @case.save!
           render_json :ok, 'Case Closed Successfully', nil
         end
-        # generate judgement number
-        # update the hearing status to complete
-        # update the case status to closed
-        #
 
         private
 

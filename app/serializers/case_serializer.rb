@@ -4,7 +4,8 @@
 class CaseSerializer
   include JSONAPI::Serializer
 
-  attributes :id, :case_number, :registration_number, :judgement_number, :title, :summary, :judge, :clerk, :court
+  attributes :id, :case_number, :registration_number, :judgement_number, :title, :summary, :judge, :clerk,
+             :court, :original_case_id
 
   attribute :case_status do |object|
     object.case_status&.humanize
