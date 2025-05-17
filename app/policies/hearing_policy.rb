@@ -61,6 +61,10 @@ class HearingPolicy < ApplicationPolicy
     user.user?
   end
 
+  def withdraw?
+    user.user?
+  end
+
   private
 
   def registrar_creates_hearing?

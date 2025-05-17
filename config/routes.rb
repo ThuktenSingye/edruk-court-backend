@@ -49,6 +49,8 @@ Rails.application.routes.draw do
         end
 
         resources :cases do
+          resources :withdrawal_requests, only: [:index, :create]
+
           member do
             get :files
             post :appeal
@@ -59,6 +61,7 @@ Rails.application.routes.draw do
           resources :hearings, only: [ :index ] do
             collection do
               post :enforce
+              post :withdraw
             end
             resources :case_documents, path: :documents do
               member do

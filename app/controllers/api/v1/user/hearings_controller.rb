@@ -29,7 +29,36 @@ module Api
           end
         end
 
+        def withdraw
+          hearing_type_id = HearingType.find_by(name: 'Withdraw').id
+          @hearing = @case.hearings.build(hearing_params.merge(hearing_type_id: hearing_type_id))
+          authorize @hearing
+
+          if @hearing.save
+            @case.update!(is_enforced: true)
+            Hearings::HearingService.new(@case, @hearing, hearing_params, current_user).withdraw_notification
+            sign_documents(@case, @hearing) ? render_success : render_signing_failure
+          else
+            render_json :unprocessable_entity, nil, @hearing.errors
+          end
+        end
+
+
         private
+
+        def render_success
+          render_json :created, 'Withdraw request send successfully', nil
+        end
+
+        def render_signing_failure
+          render_json :unprocessable_entity, 'Failed to send withdraw request', nil
+        end
+
+        def sign_documents(court_case, hearing)
+          @signable_service = SignableSigningService.new(court_case, hearing.case_documents, current_user)
+          @signable_service.sign_all
+        end
+
 
         def cases
           role_ids = Role.where(name: %w[Plaintiff Defendant]).pluck(:id)

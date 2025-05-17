@@ -60,8 +60,6 @@ module Api
           render_json :ok, 'Case Appeal Successfully', nil
         end
 
-        def withdraw; end
-
         private
 
         def create_appeal_case(court_case)

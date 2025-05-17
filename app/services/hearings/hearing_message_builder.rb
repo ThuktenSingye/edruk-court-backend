@@ -33,6 +33,9 @@ module Hearings
       if @hearing_type.downcase == 'enforcement'
         "Case Enforcement for Case #{@case_id} has been Requested." \
           'Please ensure necessary legal actions are initiated.'
+      elsif @hearing_type.downcase == 'withdraw'
+        "Case Withdraw for Case #{@case_id} has been Requested." \
+          'Please ensure necessary legal actions are initiated.'
       else
         "New #{@hearing_type} hearing for Case #{@case_id} scheduled at #{formatted_date(@scheduled_date)}. " \
           'Please approve or request reschedule.'

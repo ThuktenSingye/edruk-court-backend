@@ -23,7 +23,7 @@ class ApplicationController < ActionController::API
   def configure_permitted_parameters
     if params[:user] && params[:user][:role] == 'Organization'
       devise_parameter_sanitizer.permit(:sign_up, keys: [
-        :email, :password, :password_confirmation, :role,
+        :email, :password, :password_confirmation,
         {
           profile_attributes: %i[avatar first_name phone_number]
         }
@@ -31,7 +31,7 @@ class ApplicationController < ActionController::API
 
     else
       devise_parameter_sanitizer.permit(:sign_up, keys: [
-        :email, :password, :password_confirmation, :role,
+        :email, :password, :password_confirmation,
         {
           profile_attributes: %i[avatar first_name last_name cid_no phone_number gender]
         }

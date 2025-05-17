@@ -44,11 +44,39 @@ class SignableVerificationService
   end
 
   def signer(signable)
-    if signable.hearing.blank? || signable.hearing.hearing_type&.name&.downcase == 'miscellaneous'
-      pre_hearing_signer
+    if signable.hearing.hearing_type.name&.downcase == 'withdraw'
+      role = user_role
+      if %w[plaintiff prosecutor].include?(role)
+        find_user(defendant_role_id)
+      else
+        find_user(plaintiff_role_id)
+      end
     else
-      post_hearing_signer
+      if signable.hearing.blank? || signable.hearing.hearing_type&.name&.downcase == 'miscellaneous'
+        pre_hearing_signer
+      else
+        post_hearing_signer
+      end
     end
+
+  end
+
+  def plaintiff_role_id
+    Role.find_by(name: 'Plaintiff').id || Role.find_by(name: 'Prosecutor').id
+  end
+
+  def defendant_role_id
+    Role.find_by(name: 'Defendant').id
+  end
+
+  def user_role
+    participant = CaseParticipant.find_by(user_id: @current_user.id, case_id: @court_case.id)
+    participant.role&.name&.downcase
+  end
+
+  def find_user(role_id)
+    participant = @court_case.case_participants.find_by(role_id: role_id)
+    participant&.user
   end
 
   def pre_hearing_signer

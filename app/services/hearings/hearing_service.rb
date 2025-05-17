@@ -27,13 +27,36 @@ module Hearings
       notify_user(clerk)
     end
 
+    def withdraw_notification
+      opposing_party = find_opposing_party
+      notify_user(opposing_party)
+    end
+
     private
+
+    def find_opposing_party
+      roles = %w[Plaintiff Prosecutor]
+      if roles.include?(find_role.name)
+        find_user(defendant_role_id)
+      else
+        find_user(plaintiff_role_id)
+      end
+    end
 
     def find_clerk
       clerk_role = Role.find_by(name: 'Clerk')
       return unless clerk_role
 
-      participant = @case.case_participants.find_by(role_id: clerk_role.id)
+      find_user(clerk_role.id)
+    end
+
+    def find_role
+      participant = @case.case_participants.find_by(user: @current_user)
+      participant&.role
+    end
+
+    def find_user(role_id)
+      participant = @case.case_participants.find_by(role_id: role_id)
       participant&.user
     end
 
@@ -48,6 +71,18 @@ module Hearings
       else
         notify_post_hearing
       end
+    end
+
+    def defendant_role_id
+      Role.find_by(name: 'Defendant').id
+    end
+
+    def prosecutor_role_id
+      Role.find_by(name: 'Prosecutor').id
+    end
+
+    def plaintiff_role_id
+      Role.find_by(name: 'Plaintiff').id || Role.find_by(name: 'Prosecutor').id
     end
 
     def notify_post_hearing

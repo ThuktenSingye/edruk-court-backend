@@ -124,8 +124,28 @@ class SignableSigningService
   end
 
   def update_signed_document(signable)
-    signable.update!(document_status: :signed)
+    if signable.hearing.hearing_type.name&.downcase == 'withdraw'
+      # Previously in the `else` block
+      role = user_role
+      plaintiff = find_user(plaintiff_role_id)
+      defendant = find_user(defendant_role_id)
+
+      if %w[plaintiff prosecutor].include?(role)
+        if signable.document_signatures.exists?(signer: defendant)
+          signable.update!(document_status: :signed)
+        end
+      else
+        if signable.document_signatures.exists?(signer: plaintiff)
+          signable.update!(document_status: :signed)
+        end
+      end
+    else
+      # Previously in the `if` block
+      signable.update!(document_status: :signed)
+    end
+
   end
+
 
   def update_document_status(signable)
     signable.update!(document_status: :verified)
@@ -135,10 +155,24 @@ class SignableSigningService
     signable.update!(verified_at: Time.current, verified_by_judge: true)
   end
 
+  def plaintiff_role_id
+    Role.find_by(name: 'Plaintiff').id || Role.find_by(name: 'Prosecutor').id
+  end
+
+  def defendant_role_id
+    Role.find_by(name: 'Defendant').id
+  end
+
   def user_role
     participant = CaseParticipant.find_by(user_id: @current_user.id, case_id: @court_case.id)
     participant.role&.name&.downcase
   end
+
+  def find_user(role_id)
+    participant = @court_case.case_participants.find_by(role_id: role_id)
+    participant&.user
+  end
+
 
   def find_signer
     if @current_user.registrar?
