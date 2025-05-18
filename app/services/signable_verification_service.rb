@@ -48,6 +48,10 @@ class SignableVerificationService
       role = user_role
       if %w[plaintiff prosecutor].include?(role)
         find_user(defendant_role_id)
+      elsif role == 'registrar'
+        signable.document_signatures.signer&.last
+      elsif role == 'judge'
+        clerk_participant
       else
         find_user(plaintiff_role_id)
       end
@@ -58,7 +62,6 @@ class SignableVerificationService
         post_hearing_signer
       end
     end
-
   end
 
   def plaintiff_role_id
