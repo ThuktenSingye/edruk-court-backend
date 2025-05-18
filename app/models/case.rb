@@ -10,7 +10,6 @@ class Case < ApplicationRecord
   has_many :hearings, dependent: :destroy
   has_many :hearing_schedules, through: :hearings
   has_many :case_documents, dependent: :nullify
-  has_many :withdrawal_requests, dependent: :nullify
   accepts_nested_attributes_for :case_documents
   after_commit :set_initial_status, on: :create
 

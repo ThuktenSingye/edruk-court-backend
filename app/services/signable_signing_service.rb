@@ -37,7 +37,7 @@ class SignableSigningService
       signature = sign_hash(signable_hash)
       success = create_signature_record(signable, signature)
       raise ActiveRecord::Rollback unless success
-
+      binding.pry
       update_document(signable)
       true
     end
@@ -124,28 +124,28 @@ class SignableSigningService
   end
 
   def update_signed_document(signable)
-    if signable.hearing.hearing_type.name&.downcase == 'withdraw'
-      # Previously in the `else` block
-      role = user_role
-      plaintiff = find_user(plaintiff_role_id)
-      defendant = find_user(defendant_role_id)
-
-      if %w[plaintiff prosecutor].include?(role)
-        if signable.document_signatures.exists?(signer: defendant)
-          signable.update!(document_status: :signed)
+    if signable.hearing.present?
+      if signable.hearing.hearing_type&.name&.downcase == 'withdraw'
+        role = user_role
+        plaintiff = find_user(plaintiff_role_id)
+        defendant = find_user(defendant_role_id)
+        if %w[plaintiff prosecutor].include?(role)
+          if signable.document_signatures.exists?(signer: defendant)
+            signable.update!(document_status: :signed)
+          end
+        else
+          if signable.document_signatures.exists?(signer: plaintiff)
+            signable.update!(document_status: :signed)
+          end
         end
       else
-        if signable.document_signatures.exists?(signer: plaintiff)
-          signable.update!(document_status: :signed)
-        end
+        # Previously in the `if` block
+        signable.update!(document_status: :signed)
       end
     else
-      # Previously in the `if` block
       signable.update!(document_status: :signed)
     end
-
   end
-
 
   def update_document_status(signable)
     signable.update!(document_status: :verified)

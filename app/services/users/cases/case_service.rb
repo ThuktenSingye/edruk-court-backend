@@ -11,6 +11,7 @@ module Users
       end
 
       def build_case
+        assign_user_to_case_documents
         @case = ::Case.new(@case_params)
         add_plaintiff
         add_defendants
@@ -18,6 +19,15 @@ module Users
       end
 
       private
+
+      def assign_user_to_case_documents
+        return unless @case_params[:case_documents_attributes]
+
+        @case_params[:case_documents_attributes].each_value do |doc_attrs|
+          doc_attrs[:user_id] = @current_user.id
+        end
+      end
+
 
       def add_plaintiff
         plaintiff_role = Role.find_by!(name: 'Plaintiff')

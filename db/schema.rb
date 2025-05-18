@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_16_091318) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_18_112007) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -62,9 +62,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_16_091318) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "case_id"
+    t.bigint "user_id"
     t.index ["case_id"], name: "index_case_documents_on_case_id"
     t.index ["hash_value", "hearing_id"], name: "index_case_documents_on_hash_value_and_hearing_id", unique: true
     t.index ["hearing_id"], name: "index_case_documents_on_hearing_id"
+    t.index ["user_id"], name: "index_case_documents_on_user_id"
   end
 
   create_table "case_evidences", force: :cascade do |t|
@@ -129,7 +131,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_16_091318) do
     t.boolean "is_enforced", default: false
     t.boolean "is_remanded", default: false
     t.boolean "is_reopened", default: false
-    t.boolean "can_appeal", default: false
     t.integer "case_status", default: 0
     t.bigint "court_id", null: false
     t.bigint "case_subtype_id"
@@ -492,6 +493,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_16_091318) do
   add_foreign_key "addresses", "profiles"
   add_foreign_key "case_documents", "cases"
   add_foreign_key "case_documents", "hearings"
+  add_foreign_key "case_documents", "users"
   add_foreign_key "case_evidences", "hearings"
   add_foreign_key "case_participants", "cases"
   add_foreign_key "case_participants", "roles"

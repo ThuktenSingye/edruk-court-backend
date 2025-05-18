@@ -57,9 +57,9 @@ class SignableVerificationService
       end
     else
       if signable.hearing.blank? || signable.hearing.hearing_type&.name&.downcase == 'miscellaneous'
-        pre_hearing_signer
+        pre_hearing_signer(signable)
       else
-        post_hearing_signer
+        post_hearing_signer(signable)
       end
     end
   end
@@ -82,21 +82,22 @@ class SignableVerificationService
     participant&.user
   end
 
-  def pre_hearing_signer
-    return plaintiff_participant if @current_user.registrar?
+  def pre_hearing_signer(signable)
+    return plaintiff_participant(signable) if @current_user.registrar?
 
     registrar_participant if @current_user.judge?
   end
 
-  def post_hearing_signer
-    return plaintiff_participant if @current_user.clerk?
+  def post_hearing_signer(signable)
+    return plaintiff_participant(signable) if @current_user.clerk?
 
     clerk_participant if @current_user.judge?
   end
 
-  def plaintiff_participant
-    participant = CaseParticipant.find_by(case_id: @court_case.id, role_id: plaintiff_roles_ids)
-    User.unscoped.find_by(id: participant.user_id)
+  def plaintiff_participant(signable)
+    # participant = CaseParticipant.find_by(case_id: @court_case.id, role_id: plaintiff_roles_ids)
+    # User.unscoped.find_by(id: participant.user_id)
+    signable.user
   end
 
   def clerk_participant

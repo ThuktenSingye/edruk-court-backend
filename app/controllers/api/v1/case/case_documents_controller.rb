@@ -9,8 +9,8 @@ module Api
         before_action :court_cases
         before_action :case
         before_action :hearing
-        before_action :case_document, except: %i[index create sign_all]
-        before_action :case_documents, except: %i[index]
+        before_action :case_document, except: %i[index create sign_all plaintiff defendant]
+        before_action :case_documents, except: %i[index plaintiff defendant]
 
         def index
           @documents = policy_scope(@hearing.case_documents.order(created_at: :asc))
@@ -18,8 +18,28 @@ module Api
           render_json :ok, nil, serialized_case_documents(@documents)
         end
 
+        def plaintiff
+          participant = @case.case_participants.find_by(role_id: plaintiff_role_id)
+          user = ::User.unscoped.find_by(id: participant.user_id)
+
+          @documents = @hearing.case_documents.where(user: user).order(created_at: :asc)
+          authorize @documents
+          render_json :ok, nil, serialized_case_documents(@documents)
+        end
+
+        def defendant
+          participant = @case.case_participants.find_by(role_id: defendant_role_id)
+          user = ::User.unscoped.find_by(id: participant.user_id)
+
+          @documents = policy_scope(@hearing.case_documents.where(user: user).order(created_at: :asc))
+          authorize @documents
+          render_json :ok, nil, serialized_case_documents(@documents)
+        end
+
+
         def create
           @documents = @hearing.case_documents.build(case_document_params)
+          @documents.user = current_user
           authorize @documents
           if @documents.save
             render_json :created, 'Document added Successfully', serialized_case_document(@documents)
@@ -65,6 +85,15 @@ module Api
         end
 
         private
+
+        def plaintiff_role_id
+          Role.find_by(name: 'Plaintiff').id || Role.find_by(name: 'Prosecutor').id
+        end
+
+        def defendant_role_id
+          Role.find_by(name: 'Defendant').id
+        end
+
 
         def court_cases
           @court_cases ||= ::Case
@@ -119,7 +148,7 @@ module Api
         end
 
         def case_document_params
-          params.expect(document: %i[document])
+          params.expect(document: %i[document user_id])
         end
       end
     end

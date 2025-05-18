@@ -95,7 +95,7 @@ module Api
         end
 
         def find_defendant(cid_no)
-          ::User.find_by(cid: cid_no)
+          ::User.joins(:profile).find_by(profiles: { cid_no: cid_no })
         end
 
         def assign_defendant_to_case(court_case, defendant)
@@ -165,7 +165,7 @@ module Api
             :case_number, :registration_number, :judgement_number, :title, :summary, :case_priority, :case_status,
             :court_id,
             {
-              case_documents_attributes: %i[id document_status document hash_value],
+              case_documents_attributes: %i[id document user_id],
               defendants_attributes: [:id, :first_name, :last_name, :email, :cid_no, :phone_number,
                                       {
                                         addresses_attributes: %i[

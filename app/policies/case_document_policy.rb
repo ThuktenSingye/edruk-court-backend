@@ -85,6 +85,18 @@ class CaseDocumentPolicy < ApplicationPolicy
     index?
   end
 
+  def plaintiff?
+    user.registrar? || user.judge? || user.clerk?
+  end
+
+  def defendant?
+    plaintiff?
+  end
+
+  def opponent?
+    user.user?
+  end
+
   private
 
   def registrar_creates_documents?
